@@ -70,9 +70,29 @@ export class AboutMe implements OnInit {
 
   protected readonly techStack = signal<TechStack[]>([
     {
+      name: 'TypeScript',
+      icon: 'https://img.icons8.com/?size=48&id=uJM6fQYqDaZK&format=png',
+      title: 'TypeScript - Typed JavaScript superset',
+    },
+    {
       name: 'Angular',
       icon: 'https://img.icons8.com/?size=48&id=6SWtW8hxZWSo&format=png',
       title: 'Angular - TypeScript-based web framework',
+    },
+    {
+      name: 'React',
+      icon: 'https://img.icons8.com/?size=100&id=asWSSTBrDlTW&format=png&color=000000',
+      title: 'React - JavaScript library for building UIs',
+    },
+    {
+      name: 'Tailwind CSS',
+      icon: 'https://img.icons8.com/?size=48&id=CIAZz2CYc6Kc&format=png',
+      title: 'Tailwind CSS - Utility-first CSS framework',
+    },
+    {
+      name: 'Java',
+      icon: 'https://img.icons8.com/?size=100&id=GPfHz0SM85FX&format=png&color=000000',
+      title: 'Java - Programming language',
     },
     {
       name: 'Spring Boot',
@@ -80,9 +100,14 @@ export class AboutMe implements OnInit {
       title: 'Spring Boot - Java enterprise framework',
     },
     {
-      name: 'Java',
-      icon: 'https://img.icons8.com/?size=100&id=GPfHz0SM85FX&format=png&color=000000',
-      title: 'Java - Programming language',
+      name: 'Node.js',
+      icon: 'https://img.icons8.com/?size=48&id=hsPbhkOH4FMe&format=png',
+      title: 'Node.js - JavaScript runtime environment',
+    },
+    {
+      name: 'Python',
+      icon: 'https://img.icons8.com/?size=100&id=13441&format=png&color=000000',
+      title: 'Python - Programming language',
     },
     {
       name: 'PostgreSQL',
@@ -100,14 +125,14 @@ export class AboutMe implements OnInit {
       title: 'Docker - Containerization platform',
     },
     {
-      name: 'Tailwind CSS',
-      icon: 'https://img.icons8.com/?size=48&id=CIAZz2CYc6Kc&format=png',
-      title: 'Tailwind CSS - Utility-first CSS framework',
+      name: 'Git',
+      icon: 'https://img.icons8.com/?size=48&id=20906&format=png',
+      title: 'Git - Version control system',
     },
     {
-      name: 'Keycloak',
-      icon: 'https://img.icons8.com/fluency/48/key-cloak.png',
-      title: 'Keycloak - Identity and access management',
+      name: 'AWS',
+      icon: 'https://img.icons8.com/?size=100&id=G0CnLqqcRBXl&format=png&color=000000',
+      title: 'AWS - Amazon Web Services cloud platform',
     },
     {
       name: 'Apache Kafka',
@@ -130,24 +155,19 @@ export class AboutMe implements OnInit {
       title: 'Grafana - Analytics and monitoring platform',
     },
     {
-      name: 'Node.js',
-      icon: 'https://img.icons8.com/?size=48&id=hsPbhkOH4FMe&format=png',
-      title: 'Node.js - JavaScript runtime environment',
+      name: 'Keycloak',
+      icon: 'https://img.icons8.com/fluency/48/key-cloak.png',
+      title: 'Keycloak - Identity and access management',
     },
     {
-      name: 'TypeScript',
-      icon: 'https://img.icons8.com/?size=48&id=uJM6fQYqDaZK&format=png',
-      title: 'TypeScript - Typed JavaScript superset',
+      name: 'IntelliJ IDEA',
+      icon: 'https://img.icons8.com/?size=100&id=61466&format=png&color=000000',
+      title: 'IntelliJ IDEA - Integrated development environment',
     },
     {
-      name: 'Git',
-      icon: 'https://img.icons8.com/?size=48&id=20906&format=png',
-      title: 'Git - Version control system',
-    },
-    {
-      name: 'AWS',
-      icon: 'https://img.icons8.com/?size=100&id=G0CnLqqcRBXl&format=png&color=000000',
-      title: 'AWS - Amazon Web Services cloud platform',
+      name: 'VS Code',
+      icon: 'https://img.icons8.com/?size=100&id=9OGIyU8hrxW5&format=png&color=000000',
+      title: 'VS Code - Source-code editor',
     },
   ]);
 

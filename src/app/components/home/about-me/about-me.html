@@ -1,123 +1,128 @@
-<section
-  class="relative max-w-7xl mx-auto px-4 py-20 sm:px-6 lg:px-8 overflow-hidden"
->
+<section class="relative py-24 sm:py-32 overflow-hidden">
   <div
-    class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-blue-500/10 dark:bg-blue-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
+    class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
+  ></div>
+  <div
+    class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
   ></div>
 
-  <div class="flex flex-col gap-16">
-    <div class="text-center max-w-2xl mx-auto space-y-4">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8">
+    <div class="max-w-2xl mx-auto text-center mb-24">
       <h2
-        class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl"
+        class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl mb-4"
       >
         Beyond the Code
       </h2>
-      <p class="text-zinc-500 dark:text-zinc-400 text-lg">
-        A look at my impact on GitHub and what keeps me moving offline.
+      <p class="text-lg text-zinc-600 dark:text-zinc-400">
+        Exploring the metrics that define my journey and the tools that power my
+        work.
       </p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 mb-32">
       <div
-        class="group relative overflow-hidden rounded-3xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 p-6 flex flex-col justify-between md:col-span-1 hover:border-blue-500/50 transition-colors duration-500"
+        class="lg:col-span-6 group relative overflow-hidden rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5"
       >
         <div
-          class="absolute right-0 top-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity"
+          class="absolute right-0 top-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500"
         >
           <ng-icon
             name="lucideTrendingUp"
-            size="5rem"
+            size="8rem"
             class="text-zinc-900 dark:text-white"
           />
         </div>
-        <div>
-          <p
-            class="text-sm font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wider"
-          >
-            Experience
-          </p>
-          <h3 class="text-4xl font-bold text-zinc-900 dark:text-zinc-100 mt-2">
-            2+ <span class="text-lg text-zinc-400 font-normal">Years</span>
-          </h3>
+        <div class="relative z-10 h-full flex flex-col justify-between gap-8">
+          <div>
+            <div
+              class="inline-flex items-center rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 ring-1 ring-inset ring-blue-500/20"
+            >
+              Career
+            </div>
+          </div>
+          <div>
+            <span
+              class="text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+            >
+              2+ <span class="text-2xl font-medium text-zinc-500">Years</span>
+            </span>
+            <p class="mt-2 text-zinc-600 dark:text-zinc-400">
+              Building scalable backend systems and robust frontend
+              architectures.
+            </p>
+          </div>
         </div>
-        <p class="text-zinc-600 dark:text-zinc-400 text-sm mt-4">
-          Building scalable backend systems.
-        </p>
       </div>
 
-      <div class="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+      <div
+        class="lg:col-span-3 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5"
+      >
         <div
-          class="rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 p-6 flex items-center gap-4 group hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-purple-500/10 group-hover:text-purple-600 transition-colors duration-300"
         >
-          <div
-            class="p-3 rounded-2xl bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform"
-          >
-            <ng-icon name="lucideUsers" size="1.5rem" />
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              {{ followers() }}
-            </div>
-            <div
-              class="text-xs text-zinc-500 dark:text-zinc-400 font-medium uppercase"
-            >
-              Followers
-            </div>
-          </div>
+          <ng-icon name="lucideUsers" size="1.75rem" />
         </div>
+        <div class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+          {{ followers() }}
+        </div>
+        <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+          GitHub Followers
+        </div>
+      </div>
 
+      <div
+        class="lg:col-span-3 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5"
+      >
         <div
-          class="rounded-3xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800 p-6 flex items-center gap-4 group hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-emerald-500/10 group-hover:text-emerald-600 transition-colors duration-300"
         >
-          <div
-            class="p-3 rounded-2xl bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 group-hover:scale-110 transition-transform"
-          >
-            <ng-icon name="lucideFolders" size="1.5rem" />
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              {{ publicRepos() }}
-            </div>
-            <div
-              class="text-xs text-zinc-500 dark:text-zinc-400 font-medium uppercase"
-            >
-              Repositories
-            </div>
-          </div>
+          <ng-icon name="lucideFolders" size="1.75rem" />
+        </div>
+        <div class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
+          {{ publicRepos() }}
+        </div>
+        <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+          Repositories
         </div>
       </div>
     </div>
 
-    <div class="space-y-8">
-      <div class="text-center">
-        <h3 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">
-          My Arsenal
+    <div class="space-y-12">
+      <div
+        class="flex items-center gap-4 before:h-px before:flex-1 before:bg-linear-to-r before:from-transparent before:to-zinc-200 dark:before:to-zinc-800 after:h-px after:flex-1 after:bg-linear-to-l after:from-transparent after:to-zinc-200 dark:after:to-zinc-800"
+      >
+        <h3
+          class="text-sm font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest"
+        >
+          Technical Arsenal
         </h3>
       </div>
+
       <div
-        class="relative w-full max-w-5xl mx-auto min-h-[300px] flex flex-wrap justify-center items-center gap-x-8 gap-y-12 py-10"
+        class="flex flex-wrap justify-center items-center gap-x-12 gap-y-16 max-w-5xl mx-auto px-4 mt-12"
       >
         @for (tech of techStack(); track tech.name; let i = $index) {
         <div
-          class="group relative flex flex-col items-center justify-center w-20 h-20 md:w-24 md:h-24 transition-all duration-300 hover:z-50"
-          [class.translate-y-4]="i % 2 === 0"
-          [class.-translate-y-4]="i % 2 !== 0"
-          [class.md:translate-y-8]="i % 3 === 0"
-          [class.md:-translate-y-6]="i % 4 === 0"
-          [style.animation-delay]="i * 100 + 'ms'"
+          class="relative group animate-float nth-[2n]:translate-y-4 nth-[3n]:-translate-y-6 nth-[5n]:rotate-3 nth-[7n]:-rotate-6"
+          [style.animation-delay]="i * 0.2 + 's'"
         >
           <div
-            class="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs py-1 px-3 rounded-full whitespace-nowrap pointer-events-none mb-2 font-bold shadow-xl"
+            class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
           >
-            {{ tech.name }}
+            <span
+              class="text-xs font-medium text-zinc-500 bg-white/90 dark:bg-zinc-800/90 px-2 py-1 rounded shadow-sm border border-zinc-200 dark:border-zinc-700 whitespace-nowrap"
+            >
+              {{ tech.name }}
+            </span>
           </div>
+
           <div
-            class="animate-float w-16 h-16 md:w-20 md:h-20 bg-white dark:bg-zinc-800/50 backdrop-blur-md rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-sm group-hover:shadow-xl group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 flex items-center justify-center"
+            class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center bg-white/40 dark:bg-zinc-900/40 backdrop-blur-md rounded-2xl border border-zinc-200/50 dark:border-zinc-700/50 shadow-sm transition-all duration-500 ease-out group-hover:scale-110 group-hover:bg-white/80 dark:group-hover:bg-zinc-800/80 group-hover:shadow-xl group-hover:shadow-blue-500/10 group-hover:border-blue-500/20"
           >
             <img
               [src]="tech.icon"
               [alt]="tech.name"
-              class="w-10 h-10 md:w-12 md:h-12 object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300 opacity-70 group-hover:opacity-100"
+              class="w-8 h-8 sm:w-10 sm:h-10 object-contain filter grayscale opacity-70 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
             />
           </div>
         </div>
