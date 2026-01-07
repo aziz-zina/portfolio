@@ -3,7 +3,7 @@ import { MetaTag } from '@analogjs/router';
 import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
 import { ContentMetadata } from '../content-metadata/content-metadata';
 
-const BASE_URL = 'https://oussemasahbeni.tn';
+const BASE_URL = 'https://azizzina.tn';
 const DEFAULT_IMAGE = '/default-social.webp';
 
 function injectActiveContentMetadata(
@@ -32,7 +32,7 @@ export const postMetaResolver: ResolveFn<MetaTag[]> = (route) => {
 
   return [
     { name: 'description', content: meta.description },
-    { name: 'author', content: 'Oussema Sahbeni' },
+    { name: 'author', content: 'Aziz Zina' },
 
     // --- Open Graph (Facebook / LinkedIn) ---
     { property: 'og:title', content: meta.title },

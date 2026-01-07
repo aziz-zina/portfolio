@@ -10,7 +10,7 @@ Welcome to my portfolio! This project showcases my skills and projects developed
 
 ## Deployment
 
-This portfolio is deployed using Vercel, ensuring seamless and reliable hosting. Check it out live at [https://www.oussemasahbeni.tn](https://www.oussemasahbeni.tn).
+This portfolio is deployed using Vercel, ensuring seamless and reliable hosting. Check it out live at [https://www.azizzina.tn](https://www.azizzina.tn).
 
 ## Features
 
@@ -25,7 +25,7 @@ To get a local copy up and running, follow these simple steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Oussemasahbeni/portfolio-Oussema-Sahbeni
+   git clone https://github.com/aziz-zina/portfolio
 
    ```
 

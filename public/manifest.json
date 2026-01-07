@@ -1,7 +1,7 @@
 {
-    "name": "Oussema Sahbeni - Full Stack Developer",
-    "short_name": "Oussema Sahbeni",
-    "description": "Portfolio of Oussema Sahbeni, Expert Full Stack Developer specializing in Angular, Spring Boot, and modern web technologies",
+    "name": "Aziz Zina - Full Stack Developer",
+    "short_name": "Aziz Zina",
+    "description": "Portfolio of Aziz Zina, Expert Full Stack Developer specializing in Angular, Spring Boot, and modern web technologies",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
@@ -34,7 +34,7 @@
             "src": "logo.svg",
             "sizes": "1280x720",
             "type": "image/png",
-            "label": "Oussema Sahbeni Portfolio Homepage"
+            "label": "Aziz Zina Portfolio Homepage"
         }
     ]
 }
