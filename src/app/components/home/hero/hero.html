@@ -1,113 +1,48 @@
-<section
-  class="relative py-24 px-4 sm:px-6 lg:px-8 flex items-center justify-center min-h-screen bg-white dark:bg-transparent"
->
-  <!-- Subtle Background -->
-  <div class="absolute inset-0 z-0 pointer-events-none opacity-30">
-    <div
-      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-gradient-to-br from-zinc-100 to-zinc-200 dark:from-zinc-900 dark:to-zinc-800 blur-[120px]"
-    ></div>
+<section class="sticky top-0 z-0 w-full h-screen overflow-hidden text-black">
+
+
+  <!-- Social Sidebar -->
+  <div class="absolute left-8 bottom-8 flex flex-col gap-6 z-50 hidden md:flex">
+    <div class="w-[1px] h-24 bg-black/20 mx-auto"></div>
+    <a href="#" class="text-gray-600 hover:text-black transition-colors">
+      <ng-icon name="lucideLinkedin" size="1.25rem" />
+    </a>
+    <a href="#" class="text-gray-600 hover:text-black transition-colors">
+      <ng-icon name="lucideMessageCircle" size="1.25rem" />
+    </a>
+    <a href="#" class="text-gray-600 hover:text-black transition-colors">
+      <ng-icon name="lucideGithub" size="1.25rem" />
+    </a>
   </div>
 
   <!-- Main Content -->
-  <div
-    class="flex flex-col z-10 w-full max-w-4xl mx-auto text-center space-y-16"
-  >
-    <!-- Name & Title -->
-    <div class="space-y-4">
-      <div
-        class="inline-flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400 mb-2"
-      >
-        <div class="relative flex h-2 w-2">
-          <span
-            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 dark:bg-green-500 opacity-75"
-          ></span>
-          <span
-            class="relative inline-flex rounded-full h-2 w-2 bg-green-500 dark:bg-green-400"
-          ></span>
-        </div>
-        <span>Open to opportunities</span>
-      </div>
-
-      <h1
-        class="text-5xl md:text-7xl font-bold tracking-tight text-zinc-900 dark:text-white"
-      >
-        Aziz Zina
+  <div class="absolute inset-0 flex flex-col items-center justify-center z-40 pointer-events-none">
+    <div class="text-center space-y-2">
+      <p class="text-lg md:text-xl text-gray-600 mb-4 hero-text-reveal">Hi! I'm Aziz</p>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight leading-tight hero-text-reveal">
+        Full-stack Developer
       </h1>
-
-      <p
-        class="text-xl md:text-2xl text-zinc-600 dark:text-zinc-400 font-light mt-2"
-      >
-        Software Engineer
-      </p>
-    </div>
-
-    <!-- Brief Description -->
-    <p
-      class="text-lg mt-3 text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed"
-    >
-      Building scalable systems and elegant interfaces with modern technologies
-    </p>
-
-    <!-- CTA Buttons -->
-    <div class="flex flex-wrap justify-center gap-3 pt-4">
-      <button
-        hlmBtn
-        variant="default"
-        class="rounded-lg bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:bg-zinc-800 dark:hover:bg-zinc-100 px-6 py-2.5 text-sm font-medium transition-colors"
-      >
-        View Projects
-        <ng-icon name="lucideArrowRight" class="ml-2" size="1rem" />
-      </button>
-      <button
-        hlmBtn
-        variant="outline"
-        class="rounded-lg border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 px-6 py-2.5 text-sm font-medium transition-colors"
-      >
-        Contact
-        <ng-icon name="lucideMail" class="ml-2" size="1rem" />
-      </button>
-    </div>
-
-    <!-- Minimal Social Links -->
-    <div class="flex justify-center gap-4 pt-8">
-      <a
-        href="#"
-        class="text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        aria-label="GitHub"
-      >
-        <ng-icon name="lucideGithub" size="1.25rem" />
-      </a>
-      <a
-        href="#"
-        class="text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        aria-label="LinkedIn"
-      >
-        <ng-icon name="lucideLinkedin" size="1.25rem" />
-      </a>
-      <a
-        href="#"
-        class="text-zinc-500 dark:text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
-        aria-label="Email"
-      >
-        <ng-icon name="lucideMail" size="1.25rem" />
-      </a>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-medium tracking-tight leading-tight hero-text-reveal">
+        UI & UX Designer.
+      </h1>
     </div>
   </div>
 
+  <!-- 3D Canvas Container -->
+  <div #canvasContainer class="absolute inset-0 z-30"></div>
+
   <!-- Scroll Indicator -->
-  <div
-    class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce transition-opacity duration-500"
-    [class.opacity-0]="!isAtTop()"
-    [class.opacity-100]="isAtTop()"
-    [class.pointer-events-none]="!isAtTop()"
-  >
-    <span class="text-xs text-zinc-500 dark:text-zinc-400 font-medium"
-      >Scroll</span
-    >
-    <ng-icon
-      name="lucideChevronDown"
-      size="1.5rem"
-      class="text-zinc-400 dark:text-zinc-500"
-    />
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-50">
+    <span class="text-sm text-gray-500">scroll down</span>
+    <div class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center animate-bounce">
+       <ng-icon name="lucideChevronDown" size="1.25rem" class="text-gray-600" />
+    </div>
+  </div>
+  
+  <!-- Bottom Right Action -->
+  <div class="absolute bottom-8 right-8 z-50">
+      <button class="w-12 h-12 rounded-full bg-black/10 flex items-center justify-center hover:bg-black/20 transition-colors">
+          <div class="w-6 h-[2px] bg-black"></div>
+      </button>
   </div>
 </section>

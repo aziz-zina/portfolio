@@ -1,27 +1,57 @@
-<section class="relative py-24 sm:py-32 overflow-hidden">
+<section
+  class="py-24 sm:py-32 overflow-visible bg-white dark:bg-transparent"
+>
+
+  <!-- Background blobs -->
   <div
-    class="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
+    class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
   ></div>
   <div
-    class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
+    class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
   ></div>
 
-  <div class="max-w-7xl mx-auto px-6 lg:px-8">
-    <div class="max-w-2xl mx-auto text-center mb-24">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8">
+    <!-- About Me -->
+    <div class="w-full mx-auto text-center mb-24 space-y-12">
       <h2
-        class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-4xl mb-4"
+        class="text-3xl md:text-5xl font-thin tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight flex flex-wrap gap-x-3 justify-center "
+        appScrollAnimation="word-reveal"
+        [stagger]="0.05"
       >
-        Beyond the Code
+        @for (word of splitBioTitle; track $index) {
+          <span class="inline-block">{{ word }}</span>
+        }
       </h2>
-      <p class="text-lg text-zinc-600 dark:text-zinc-400">
-        Exploring the metrics that define my journey and the tools that power my
-        work.
+      <p 
+        class="text-thin md:text-xl mt-10 text-zinc-600 dark:text-zinc-400 w-full mx-auto leading-relaxed flex flex-wrap justify-center gap-x-1.5"
+        appScrollAnimation="word-reveal"
+        [stagger]="0.02"
+        [delay]="0.5"
+      >
+        @for (word of splitBioDescription; track $index) {
+          <span class="inline-block">{{ word }}</span>
+        }
       </p>
+      
+      <div class="flex justify-center pt-4" appScrollAnimation="fade-up" [delay]="1">
+        <button
+          hlmBtn
+          class="rounded-full bg-[#d4ff00] text-black hover:bg-[#b8e600] font-medium px-8 py-6 text-lg gap-2 transition-transform hover:scale-105"
+        >
+          About Me
+          <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center -mr-4 ml-2">
+             <ng-icon name="lucideArrowUpRight" size="1.2rem" />
+          </div>
+        </button>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 mb-32">
+      <!-- Experience -->
       <div
-        class="lg:col-span-6 group relative overflow-hidden rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5"
+        class="lg:col-span-4 group relative overflow-hidden rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5"
+        appScrollAnimation="fade-up"
+        [delay]="0.1"
       >
         <div
           class="absolute right-0 top-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500"
@@ -54,8 +84,11 @@
         </div>
       </div>
 
+      <!-- Followers -->
       <div
-        class="lg:col-span-3 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5"
+        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5"
+        appScrollAnimation="fade-up"
+        [delay]="0.2"
       >
         <div
           class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-purple-500/10 group-hover:text-purple-600 transition-colors duration-300"
@@ -70,8 +103,11 @@
         </div>
       </div>
 
+      <!-- Repositories -->
       <div
-        class="lg:col-span-3 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5"
+        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5"
+        appScrollAnimation="fade-up"
+        [delay]="0.3"
       >
         <div
           class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-emerald-500/10 group-hover:text-emerald-600 transition-colors duration-300"
@@ -105,6 +141,8 @@
         <div
           class="relative group animate-float nth-[2n]:translate-y-4 nth-[3n]:-translate-y-6 nth-[5n]:rotate-3 nth-[7n]:-rotate-6"
           [style.animation-delay]="i * 0.2 + 's'"
+          appScrollAnimation="scale-up"
+          [delay]="0.05 * i"
         >
           <div
             class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"

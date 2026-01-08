@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 
 @Component({
   selector: 'app-experience',
   standalone: true,
-  imports: [CommonModule, HlmBadgeImports],
+  imports: [CommonModule, HlmBadgeImports, ScrollAnimationDirective],
   templateUrl: './experience.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

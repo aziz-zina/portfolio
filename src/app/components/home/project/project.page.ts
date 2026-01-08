@@ -12,11 +12,12 @@ import {
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
+import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
 
 @Component({
   selector: 'app-projects',
   standalone: true,
-  imports: [CommonModule, HlmButtonImports, HlmBadgeImports, HlmIconImports],
+  imports: [CommonModule, HlmButtonImports, HlmBadgeImports, HlmIconImports, ScrollAnimationDirective],
   providers: [
     provideIcons({
       lucideArrowRight,

@@ -1,23 +1,35 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   OnInit,
   PLATFORM_ID,
+  ViewChild,
   inject,
   signal,
 } from '@angular/core';
 import { provideIcons } from '@ng-icons/core';
 import {
+  lucideArrowUpRight,
   lucideDumbbell,
   lucideFolders,
+  lucideStar,
   lucideTrendingUp,
   lucideUsers,
 } from '@ng-icons/lucide';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GithubApiService } from '../../../lib/github/github-api.service';
 import { SpotlightDirective } from '../../directives/spotlight.directive';
+import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
+import { ViewEncapsulation } from '@angular/compiler';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface TechStack {
   name: string;
@@ -25,19 +37,41 @@ interface TechStack {
   title: string;
 }
 
+export interface GithubProfile {
+  login: string;
+  id: number;
+  avatar_url: string;
+  url: string;
+  html_url: string;
+  name: string; // "Aziz Zina"
+  company: string | null;
+  blog: string | null;
+  location: string | null;
+  email: string | null;
+  hireable: boolean | null; // e.g., true
+  bio: string | null;
+  public_repos: number;
+  public_gists: number;
+  followers: number;
+  following: number;
+  created_at: string;
+  updated_at: string;
+}
+
 @Component({
   selector: 'app-about-me',
-  imports: [HlmCardImports, HlmIconImports, SpotlightDirective],
+  imports: [HlmCardImports, HlmIconImports, HlmButtonImports, ScrollAnimationDirective],
   providers: [
     provideIcons({
       lucideUsers,
       lucideFolders,
       lucideTrendingUp,
       lucideDumbbell,
+      lucideArrowUpRight,
     }),
   ],
   templateUrl: './about-me.html',
-  styleUrls: ['./about-me.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
       @keyframes float {
@@ -55,18 +89,30 @@ interface TechStack {
     `,
   ],
 
-  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AboutMe implements OnInit {
+export class AboutMe implements OnInit, AfterViewInit {
   private readonly gitApi = inject(GithubApiService);
   private readonly platform = inject(PLATFORM_ID);
 
+  @ViewChild('separator') separator!: ElementRef<HTMLElement>;
+
   readonly publicRepos = signal(0);
   readonly followers = signal(0);
+  
+  readonly bioTitle = "I'm Aziz – a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
+  readonly bioDescription = "I specialize in developing SaaS platforms, AI-driven products, and interactive 3D web experiences using technologies like Next.js, Node.js, and Three.js.";
+
+  get splitBioTitle() {
+    return this.bioTitle.split(' ');
+  }
+
+  get splitBioDescription() {
+    return this.bioDescription.split(' ');
+  }
+
   readonly yearsExperience = signal(2);
   readonly usersServed = signal(1000);
   readonly projectsCompleted = signal(4);
-  readonly languagesSpoken = signal(3);
 
   protected readonly techStack = signal<TechStack[]>([
     {
@@ -174,9 +220,33 @@ export class AboutMe implements OnInit {
   ngOnInit(): void {
     if (isPlatformBrowser(this.platform)) {
       this.gitApi.getInfo().subscribe((data: any) => {
+        console.log('GitHub profile data:', data);
         this.followers.set(data.followers);
         this.publicRepos.set(data.public_repos);
       });
+    }
+  }
+
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platform)) {
+      // Parallax animation for the separator
+      // Start "below" (less negative translateY) and move "above" (more negative translateY)
+      gsap.fromTo(
+        this.separator.nativeElement,
+        {
+          yPercent: -30, // Starts lower (covering less of hero)
+        },
+        {
+          yPercent: -100, // Moves up to standard position
+          ease: 'none',
+          scrollTrigger: {
+            trigger: this.separator.nativeElement,
+            start: 'top bottom', // When top of separator hits bottom of viewport
+            end: 'top top', // When top of separator hits top of viewport
+            scrub: true,
+          },
+        }
+      );
     }
   }
 }

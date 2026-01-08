@@ -1,4 +1,9 @@
 import { isPlatformBrowser } from '@angular/common';
+import Lenis from 'lenis';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,17 +15,16 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { BackToTop } from './components/layout/back-to-top/back-to-top';
 import { Footer } from './components/layout/footer/footer';
 import { Navbar } from './components/layout/navbar/navbar';
+import { CursorComponent } from './components/layout/cursor/cursor.component';
 
-declare const gtag: Function;
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Footer, Navbar, BackToTop],
-  host: {
-    class: 'flex h-full w-full flex-auto  flex-col',
-  },
+  standalone: true,
+  imports: [RouterOutlet, Navbar, Footer, BackToTop, CursorComponent],
   template: `
+    <app-cursor />
     <app-navbar />
-    <main class="flex-1">
+    <main class="min-h-screen">
       <router-outlet />
     </main>
     <app-footer />
@@ -47,5 +51,24 @@ export class App {
         }
       }
     });
+
+    if (isPlatformBrowser(this.platform)) {
+      this.initLenis();
+    }
+  }
+
+  private initLenis() {
+    const lenis = new Lenis({
+      autoRaf: true,
+    });
+
+    // Synchronize Lenis with GSAP ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
+
+    gsap.ticker.add((time) => {
+      lenis.raf(time * 1000);
+    });
+
+    gsap.ticker.lagSmoothing(0);
   }
 }

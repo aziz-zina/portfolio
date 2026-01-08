@@ -7,7 +7,7 @@
   ></div>
 
   <div class="max-w-4xl mx-auto px-6 relative z-10">
-    <div class="text-center mb-20 space-y-4">
+    <div class="text-center mb-20 space-y-4" appScrollAnimation="fade-up">
       <div
         class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-medium text-zinc-600 dark:text-zinc-400"
       >
@@ -27,7 +27,7 @@
 
     <div class="space-y-24 md:space-y-32">
       @for (project of projects(); track $index) {
-      <div class="group relative">
+      <div class="group relative" appScrollAnimation="fade-up" [delay]="0.1">
         <div
           class="absolute -left-4 md:-left-12 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-zinc-200 dark:via-zinc-800 to-transparent hidden md:block"
         ></div>
