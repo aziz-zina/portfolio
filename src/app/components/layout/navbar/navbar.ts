@@ -38,7 +38,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
     if (isPlatformBrowser(this.platform)) {
       this.scrollHandler = () => this.handleScroll();
       window.addEventListener('scroll', this.scrollHandler, { passive: true });
-      this.handleScroll(); // Check initial scroll position
+      this.handleScroll();
     }
   }
 
@@ -70,13 +70,11 @@ export class Navbar implements AfterViewInit, OnDestroy {
     
     if (this.menuTimeline) this.menuTimeline.kill();
     
-    // Get button position for the reveal origin
     const btn = this.hamburgerBtn.nativeElement;
     const rect = btn.getBoundingClientRect();
     const originX = rect.left + rect.width / 2;
     const originY = rect.top + rect.height / 2;
     
-    // Calculate the maximum distance to any corner to ensure full coverage
     const maxDistance = Math.max(
       Math.hypot(originX, originY),
       Math.hypot(window.innerWidth - originX, originY),
@@ -86,34 +84,29 @@ export class Navbar implements AfterViewInit, OnDestroy {
     
     this.menuTimeline = gsap.timeline();
     
-    // Set initial state
     gsap.set(this.menuOverlay.nativeElement, {
       visibility: 'visible',
       clipPath: `circle(0px at ${originX}px ${originY}px)`
     });
     
-    // Animate overlay expanding from button
     this.menuTimeline.to(this.menuOverlay.nativeElement, {
       clipPath: `circle(${maxDistance}px at ${originX}px ${originY}px)`,
       duration: 0.7,
       ease: 'power3.inOut'
     });
     
-    // Animate menu items with stagger
     this.menuTimeline.fromTo('.menu-item',
       { opacity: 0, y: 60, rotateX: -15 },
       { opacity: 1, y: 0, rotateX: 0, duration: 0.6, stagger: 0.08, ease: 'power3.out' },
       '-=0.3'
     );
     
-    // Animate right side content
     this.menuTimeline.fromTo('.menu-right-content',
       { opacity: 0, x: 50 },
       { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out' },
       '-=0.5'
     );
     
-    // Animate close button
     this.menuTimeline.fromTo('.menu-close-btn',
       { opacity: 0, scale: 0 },
       { opacity: 1, scale: 1, duration: 0.4, ease: 'back.out(1.7)' },
@@ -124,7 +117,6 @@ export class Navbar implements AfterViewInit, OnDestroy {
   closeMenu() {
     if (this.menuTimeline) this.menuTimeline.kill();
     
-    // Get button position for the reveal origin
     const btn = this.hamburgerBtn.nativeElement;
     const rect = btn.getBoundingClientRect();
     const originX = rect.left + rect.width / 2;
@@ -145,7 +137,6 @@ export class Navbar implements AfterViewInit, OnDestroy {
       }
     });
     
-    // Fade out content first
     this.menuTimeline.to('.menu-item', {
       opacity: 0,
       y: -20,
@@ -167,7 +158,6 @@ export class Navbar implements AfterViewInit, OnDestroy {
       ease: 'power2.in'
     }, '-=0.15');
     
-    // Animate overlay collapsing back to button
     this.menuTimeline.to(this.menuOverlay.nativeElement, {
       clipPath: `circle(0px at ${originX}px ${originY}px)`,
       duration: 0.5,

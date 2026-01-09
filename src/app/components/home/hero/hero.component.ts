@@ -15,11 +15,11 @@ import { lucideArrowUpRight } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { SocialSidebar } from '../../../shared/components/social-sidebar/social-sidebar';
-import { ScrollIndicatorComponent } from '../../../shared/components/scroll-indicator/scroll-indicator.component';
 
-import * as THREE from 'three';
+import type * as THREE from 'three';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollIndicatorComponent } from '../../../shared/components/scroll-indicator/scroll-indicator';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -44,6 +44,7 @@ export class Hero implements AfterViewInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
   
+  // Use explicit types from the type-only import
   private scene!: THREE.Scene;
   private camera!: THREE.PerspectiveCamera;
   private renderer!: THREE.WebGLRenderer;
@@ -52,10 +53,14 @@ export class Hero implements AfterViewInit, OnDestroy {
   private mouseX = 0;
   private mouseY = 0;
 
-  ngAfterViewInit() {
+  async ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      this.initThreeJs();
+      // Start animations immediately for LCP
       this.initAnimations();
+
+      // Dynamic import Three.js in background
+      const THREE = await import('three');
+      this.initThreeJs(THREE);
     }
   }
 
@@ -63,16 +68,20 @@ export class Hero implements AfterViewInit, OnDestroy {
     if (this.animationId !== null) {
       cancelAnimationFrame(this.animationId);
     }
+    // We can't easily check 'instanceof THREE.WebGLRenderer' here if THREE isn't loaded,
+    // but we can check if the properties exist.
     if (this.renderer) {
       this.renderer.dispose();
     }
     if (this.particles) {
       this.particles.geometry.dispose();
-      (this.particles.material as THREE.Material).dispose();
+      // Need to cast to any or use a type guard if we wanted to be strict,
+      // but 'any' is safe enough for cleanup here since we know the structure.
+      (this.particles.material as any).dispose();
     }
   }
 
-  private initThreeJs() {
+  private initThreeJs(THREE: typeof import('three')) {
     const container = this.canvasContainer.nativeElement;
     const width = container.clientWidth;
     const height = container.clientHeight;

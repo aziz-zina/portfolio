@@ -233,6 +233,7 @@ export class AboutMe implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platform)) {
+    if (this.separator) {
       gsap.fromTo(
         this.separator.nativeElement,
         {
@@ -249,6 +250,7 @@ export class AboutMe implements OnInit, AfterViewInit {
           },
         }
       );
+    }
     }
   }
   

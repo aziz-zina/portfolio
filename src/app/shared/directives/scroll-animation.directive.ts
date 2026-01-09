@@ -1,7 +1,6 @@
-import { Directive, ElementRef, Input, AfterViewInit, OnDestroy, inject, PLATFORM_ID } from '@angular/core';
+import { Directive, ElementRef, Input, AfterViewInit, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 @Directive({
   selector: '[appScrollAnimation]',
@@ -15,19 +14,12 @@ export class ScrollAnimationDirective implements AfterViewInit {
 
   private element = inject(ElementRef);
   private platformId = inject(PLATFORM_ID);
-  private scrollTrigger: ScrollTrigger | undefined;
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.initAnimation();
     }
   }
-
-  // ngOnDestroy() {
-  //   if (this.scrollTrigger) {
-  //     this.scrollTrigger.kill();
-  //   }
-  // }
 
   private initAnimation() {
     const el = this.element.nativeElement;

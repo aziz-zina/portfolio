@@ -42,14 +42,12 @@ export class ScrollIndicatorComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Initial entrance animation
       gsap.fromTo(
         this.indicator.nativeElement,
         { opacity: 0, y: 20 },
         { opacity: 1, y: 0, duration: 1, delay: 1.5, ease: 'power4.out' }
       );
 
-      // Scroll-based visibility
       this.scrollHandler = () => this.handleScroll();
       window.addEventListener('scroll', this.scrollHandler, { passive: true });
     }
@@ -69,7 +67,6 @@ export class ScrollIndicatorComponent implements AfterViewInit, OnDestroy {
     const threshold = 50;
 
     if (scrollY > threshold && this.isVisible) {
-      // Hide the indicator
       this.isVisible = false;
       if (this.tween) this.tween.kill();
       this.tween = gsap.to(this.indicator.nativeElement, {
@@ -79,7 +76,6 @@ export class ScrollIndicatorComponent implements AfterViewInit, OnDestroy {
         ease: 'power2.out',
       });
     } else if (scrollY <= threshold && !this.isVisible) {
-      // Show the indicator
       this.isVisible = true;
       if (this.tween) this.tween.kill();
       this.tween = gsap.to(this.indicator.nativeElement, {

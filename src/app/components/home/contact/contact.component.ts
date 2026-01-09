@@ -25,7 +25,7 @@ import { ScrollAnimationDirective } from '../../../shared/directives/scroll-anim
 })
 export class Contact {
   copied = false;
-  email = 'aziz.khaldi@example.com'; // Replace with actual email
+  email = 'aziz.zina2001@gmail.com';
 
   copyEmail() {
     navigator.clipboard.writeText(this.email);
