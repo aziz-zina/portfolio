@@ -93,7 +93,7 @@ export class Hero implements AfterViewInit, OnDestroy {
 
     // Particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const count = 1000;
+    const count = 700;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
@@ -122,17 +122,15 @@ export class Hero implements AfterViewInit, OnDestroy {
         const clampedMix = Math.max(0, Math.min(1, mix));
 
         // Base colors
-        const r1 = 1, g1 = 0.4, b1 = 1; // Lighter Pinkish
-        const r2 = 0.4, g2 = 1, b2 = 1; // Lighter Cyanish
+        const color1 = new THREE.Color('#3185FF'); // Pink
+        const color2 = new THREE.Color('#FC413E'); // Blue
 
         // Lerp
-        const red = r1 + (r2 - r1) * clampedMix;
-        const green = g1 + (g2 - g1) * clampedMix;
-        const blue = b1 + (b2 - b1) * clampedMix;
+        const color = color1.clone().lerp(color2, clampedMix);
 
-        colors[i] = red;
-        colors[i+1] = green;
-        colors[i+2] = blue;
+        colors[i] = color.r;
+        colors[i+1] = color.g;
+        colors[i+2] = color.b;
 
     }
 

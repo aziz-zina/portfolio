@@ -59,10 +59,12 @@ export class App {
 
   private initLenis() {
     const lenis = new Lenis({
-      autoRaf: true,
+      autoRaf: false,
+      lerp: 0.1,
+      smoothWheel: true,
+      wheelMultiplier: 1,
     });
 
-    // Synchronize Lenis with GSAP ScrollTrigger
     lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add((time) => {

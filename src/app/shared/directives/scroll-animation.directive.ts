@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
   selector: '[appScrollAnimation]',
   standalone: true
 })
-export class ScrollAnimationDirective implements AfterViewInit, OnDestroy {
+export class ScrollAnimationDirective implements AfterViewInit {
   @Input('appScrollAnimation') animationType: 'fade-up' | 'fade-in' | 'scale-up' | 'slide-in-right' | 'slide-in-left' | 'word-reveal' = 'fade-up';
   @Input() delay = 0;
   @Input() duration = 1;
@@ -23,11 +23,11 @@ export class ScrollAnimationDirective implements AfterViewInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    if (this.scrollTrigger) {
-      this.scrollTrigger.kill();
-    }
-  }
+  // ngOnDestroy() {
+  //   if (this.scrollTrigger) {
+  //     this.scrollTrigger.kill();
+  //   }
+  // }
 
   private initAnimation() {
     const el = this.element.nativeElement;
