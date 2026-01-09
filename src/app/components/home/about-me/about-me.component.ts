@@ -15,7 +15,6 @@ import {
   lucideArrowUpRight,
   lucideDumbbell,
   lucideFolders,
-  lucideStar,
   lucideTrendingUp,
   lucideUsers,
 } from '@ng-icons/lucide';
@@ -25,10 +24,8 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GithubApiService } from '../../../lib/github/github-api.service';
-import { SpotlightDirective } from '../../directives/spotlight.directive';
 import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
 import { LinkButton } from '../../../shared/components/link-button/link-button';
-import { ViewEncapsulation } from '@angular/compiler';
 
 gsap.registerPlugin(ScrollTrigger);
 
