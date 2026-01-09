@@ -7,6 +7,18 @@
     class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
   ></div>
 
+  <div class="mb-16 text-center" appScrollAnimation="fade-up">
+    <div class="text-center space-y-4">
+      <div
+        class="inline-flex items-center gap-2 text-lg font-mono text-zinc-600 dark:text-zinc-400"
+      >
+        <span class="w-8 h-px bg-zinc-300 dark:bg-zinc-700"></span>
+        <span> About Me </span>
+        <span class="w-8 h-px bg-zinc-300 dark:bg-zinc-700"></span>
+      </div>
+    </div>
+  </div>
+
   <div class="max-w-5xl mx-auto px-6 lg:px-8">
     <!-- About Me -->
     <div class="w-full mx-auto text-center mb-24 space-y-12">
@@ -35,17 +47,7 @@
         appScrollAnimation="fade-up"
         [delay]="1"
       >
-        <button
-          hlmBtn
-          class="rounded-full bg-[#d4ff00] text-black hover:bg-[#b8e600] font-medium px-8 py-6 text-lg gap-2 transition-transform hover:scale-105"
-        >
-          About Me
-          <div
-            class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center -mr-4 ml-2"
-          >
-            <ng-icon name="lucideArrowUpRight" size="1.2rem" />
-          </div>
-        </button>
+        <app-link-button link="#contact" title="Contact" />
       </div>
     </div>
 
@@ -55,9 +57,12 @@
         class="lg:col-span-4 group relative overflow-hidden rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5"
         appScrollAnimation="fade-up"
         [delay]="0.1"
+        (mouseenter)="onExperienceHover()"
+        (mouseleave)="onExperienceLeave()"
       >
         <div
-          class="absolute right-0 top-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity duration-500"
+          #experienceArrow
+          class="absolute right-0 top-0 p-8 opacity-5"
         >
           <ng-icon
             name="lucideTrendingUp"
@@ -108,12 +113,12 @@
 
       <!-- Repositories -->
       <div
-        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-[#d4ff00]/50 hover:shadow-lg hover:shadow-[#d4ff00]/10"
+        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-[#fc413e]/50 hover:shadow-lg hover:shadow-[#fc413e]/10"
         appScrollAnimation="fade-up"
         [delay]="0.3"
       >
         <div
-          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-[#d4ff00]/20 group-hover:text-[#b8e600] transition-colors duration-300"
+          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-[#fc413e]/20 group-hover:text-[#fc413e] transition-colors duration-300"
         >
           <ng-icon name="lucideFolders" size="1.75rem" />
         </div>

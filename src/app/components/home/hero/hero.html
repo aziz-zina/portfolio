@@ -2,42 +2,28 @@
 
 
   <!-- Social Sidebar -->
-  <div class="absolute left-8 bottom-8 flex flex-col gap-6 z-50 hidden md:flex">
-    <div class="w-[1px] h-24 bg-black/20 mx-auto"></div>
-    <a href="#" class="group p-2 -m-2 rounded-full text-gray-600 hover:text-black hover:scale-110 transition-all duration-300 ease-out">
-      <ng-icon name="lucideMessageCircle" size="1.25rem" class="transition-transform duration-300 group-hover:-translate-y-0.5" />
-    </a>
-    <a href="https://www.linkedin.com/in/aziz-zina/" class="group p-2 -m-2 rounded-full text-gray-600 hover:text-black hover:scale-110 transition-all duration-300 ease-out">
-      <ng-icon name="lucideLinkedin" size="1.25rem" class="transition-transform duration-300 group-hover:-translate-y-0.5" />
-    </a>
-    <a href="https://github.com/aziz-zina" class="group p-2 -m-2 rounded-full text-gray-600 hover:text-black hover:scale-110 transition-all duration-300 ease-out">
-      <ng-icon name="lucideGithub" size="1.25rem" class="transition-transform duration-300 group-hover:-translate-y-0.5" />
-    </a>
+  <div class="absolute left-8 bottom-8 z-50 hidden md:flex opacity-0 hero-text-reveal">
+    <app-social-sidebar />
   </div>
 
   <!-- Main Content -->
   <div class="absolute inset-0 flex flex-col items-center justify-center z-40 pointer-events-none">
     <div class="text-center space-y-2">
-      <p class="text-lg md:text-xl text-gray-600 mb-4 hero-text-reveal">Hi! I'm Aziz</p>
-      <h1 class="text-5xl md:text-5xl lg:text-7xl font-medium tracking-tight leading-tight hero-text-reveal">
+      <p class="text-lg md:text-xl text-gray-600 mb-4 hero-text-reveal opacity-0">Hi! I'm Aziz</p>
+      <h1 class="text-5xl md:text-5xl lg:text-7xl font-medium tracking-tight leading-tight hero-text-reveal opacity-0">
         Full-stack Developer
       </h1>
-      <h1 class="text-5xl md:text-4xl lg:text-5xl font-medium text-[#45474D] tracking-tight leading-tight hero-text-reveal">
+      <h1 class="text-5xl md:text-4xl lg:text-5xl font-medium text-[#45474D] tracking-tight leading-tight hero-text-reveal opacity-0">
         AI & Web Enthusiast.
       </h1>
     </div>
   </div>
 
   <!-- 3D Canvas Container -->
-  <div #canvasContainer class="absolute inset-0 z-30"></div>
+  <div #canvasContainer class="absolute inset-0 z-30 opacity-0"></div>
 
   <!-- Scroll Indicator -->
-  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-50">
-    <span class="text-sm text-gray-500">scroll down</span>
-    <div class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center animate-bounce">
-       <ng-icon name="lucideChevronDown" size="1.25rem" class="text-gray-600" />
-    </div>
-  </div>
+  <app-scroll-indicator />
   
   <!-- Bottom Right Action -->
   <div class="absolute bottom-8 right-8 z-50">

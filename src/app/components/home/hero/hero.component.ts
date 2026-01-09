@@ -11,30 +11,26 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { provideIcons } from '@ng-icons/core';
-import {
-  lucideArrowUpRight,
-  lucideGithub,
-  lucideLinkedin,
-  lucideMessageCircle,
-  lucideChevronDown,
-} from '@ng-icons/lucide';
+import { lucideArrowUpRight } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
+import { SocialSidebar } from '../../../shared/components/social-sidebar/social-sidebar';
+import { ScrollIndicatorComponent } from '../../../shared/components/scroll-indicator/scroll-indicator.component';
+
 import * as THREE from 'three';
 import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-hero',
   standalone: true,
-  imports: [HlmButtonImports, HlmIconImports],
+  imports: [HlmButtonImports, HlmIconImports, SocialSidebar, ScrollIndicatorComponent],
   templateUrl: './hero.html',
   providers: [
     provideIcons({
       lucideArrowUpRight,
-      lucideGithub,
-      lucideLinkedin,
-      lucideMessageCircle,
-      lucideChevronDown,
     }),
   ],
   host: {
@@ -93,15 +89,17 @@ export class Hero implements AfterViewInit, OnDestroy {
 
     // Particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const count = 700;
+    const count = 400;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
     for (let i = 0; i < count * 3; i+=3) {
         // Random position in a sphere
-        // Use cubic root of random for uniform distribution in sphere
-        // Reduced radius from 2.5 to 1.8 to make the model smaller
-        const r = 2.5 * Math.cbrt(Math.random());
+        // Use higher power to bias particles toward outer shell (fewer in center)
+        // minRadius creates a hollow center, power of 0.2 further biases toward outer edge
+        const minRadius = 0.6; // Minimum radius - creates hollow center
+        const maxRadius = 2.0;
+        const r = minRadius + (maxRadius - minRadius) * Math.pow(Math.random(), 0.2);
         const theta = Math.random() * 2 * Math.PI;
         const phi = Math.acos(2 * Math.random() - 1);
         
@@ -118,7 +116,7 @@ export class Hero implements AfterViewInit, OnDestroy {
         // Cyan: 0, 1, 1
         
         // Normalize x from roughly -1.8 to 1.8 to 0-1 range for blending
-        const mix = (x / 2.5 + 1) / 2;
+        const mix = (x / 2.0 + 1) / 2;
         const clampedMix = Math.max(0, Math.min(1, mix));
 
         // Base colors
@@ -216,18 +214,17 @@ export class Hero implements AfterViewInit, OnDestroy {
   }
 
   private initAnimations() {
-    gsap.from('.hero-text-reveal', {
-      y: 100,
-      opacity: 0,
+    gsap.to('.hero-text-reveal', {
+      y: 0,
+      opacity: 1,
       duration: 1.5,
       stagger: 0.2,
       ease: 'power4.out',
-      delay: 0.5
     });
     
-    gsap.from(this.canvasContainer.nativeElement, {
-        scale: 0.8,
-        opacity: 0,
+    gsap.to(this.canvasContainer.nativeElement, {
+        scale: 1,
+        opacity: 1,
         duration: 2,
         ease: 'power2.out'
     });

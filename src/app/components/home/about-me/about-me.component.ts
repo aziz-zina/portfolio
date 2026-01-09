@@ -27,6 +27,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GithubApiService } from '../../../lib/github/github-api.service';
 import { SpotlightDirective } from '../../directives/spotlight.directive';
 import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
+import { LinkButton } from '../../../shared/components/link-button/link-button';
 import { ViewEncapsulation } from '@angular/compiler';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -60,7 +61,7 @@ export interface GithubProfile {
 
 @Component({
   selector: 'app-about-me',
-  imports: [HlmCardImports, HlmIconImports, HlmButtonImports, ScrollAnimationDirective],
+  imports: [HlmCardImports, HlmIconImports, HlmButtonImports, ScrollAnimationDirective, LinkButton],
   providers: [
     provideIcons({
       lucideUsers,
@@ -95,6 +96,9 @@ export class AboutMe implements OnInit, AfterViewInit {
   private readonly platform = inject(PLATFORM_ID);
 
   @ViewChild('separator') separator!: ElementRef<HTMLElement>;
+  @ViewChild('experienceArrow') experienceArrow!: ElementRef<HTMLElement>;
+  
+  private arrowTween: gsap.core.Tween | null = null;
 
   readonly publicRepos = signal(0);
   readonly followers = signal(0);
@@ -245,6 +249,32 @@ export class AboutMe implements OnInit, AfterViewInit {
           },
         }
       );
+    }
+  }
+  
+  onExperienceHover() {
+    if (this.experienceArrow && isPlatformBrowser(this.platform)) {
+      if (this.arrowTween) this.arrowTween.kill();
+      this.arrowTween = gsap.to(this.experienceArrow.nativeElement, {
+        scale: 1.1,
+        y: -15,
+        opacity: 0.15,
+        duration: 0.4,
+        ease: 'power2.out',
+      });
+    }
+  }
+  
+  onExperienceLeave() {
+    if (this.experienceArrow && isPlatformBrowser(this.platform)) {
+      if (this.arrowTween) this.arrowTween.kill();
+      this.arrowTween = gsap.to(this.experienceArrow.nativeElement, {
+        scale: 1,
+        y: 0,
+        opacity: 0.05,
+        duration: 0.4,
+        ease: 'power2.out',
+      });
     }
   }
 }

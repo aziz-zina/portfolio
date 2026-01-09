@@ -16,7 +16,6 @@ import { BackToTop } from './components/layout/back-to-top/back-to-top';
 import { Footer } from './components/layout/footer/footer';
 import { Navbar } from './components/layout/navbar/navbar';
 import { CursorComponent } from './components/layout/cursor/cursor.component';
-
 @Component({
   selector: 'app-root',
   standalone: true,
