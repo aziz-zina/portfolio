@@ -1,24 +1,38 @@
 <nav class="absolute top-0 left-0 w-full p-8 flex justify-between items-center z-50">
   <!-- Logo -->
-  <!-- Logo -->
-  <a routerLink="/" class="block">
+  <a routerLink="/" class="block hover:scale-110 transition-transform duration-300 ease-out">
     <img src="/favicon.ico" alt="Logo" class="w-8 h-8 object-contain" />
   </a>
 
   <!-- Menu -->
   <div class="flex items-center gap-8">
     <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
-      <li><a routerLink="/" class="hover:text-black transition-colors">Home</a></li>
-      <li><a routerLink="/about" class="hover:text-black transition-colors">About</a></li>
-      <li><a routerLink="/works" class="hover:text-black transition-colors">Works</a></li>
+      <li>
+        <a routerLink="/" class="relative py-1 hover:text-black transition-all duration-300 group">
+          Home
+          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/about" class="relative py-1 hover:text-black transition-all duration-300 group">
+          About
+          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/works" class="relative py-1 hover:text-black transition-all duration-300 group">
+          Works
+          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+        </a>
+      </li>
     </ul>
     
     <div class="flex items-center gap-2">
-      <button class="bg-black text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-gray-900 transition-colors">
+      <button #contactBtn class="cursor-pointer group flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ease-out">
         Contact
-      </button>
-      <button class="w-9 h-9 rounded-full bg-black text-white flex items-center justify-center hover:bg-gray-900 transition-colors">
-        <ng-icon name="lucideArrowUpRight" size="1.2rem" />
+        <span class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-black/30 transition-colors duration-300">
+          <ng-icon name="lucideArrowUpRight" size="0.9rem" class="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+        </span>
       </button>
     </div>
   </div>

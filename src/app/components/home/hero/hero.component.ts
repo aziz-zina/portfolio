@@ -68,7 +68,6 @@ export class Hero implements AfterViewInit, OnDestroy {
     if (this.renderer) {
       this.renderer.dispose();
     }
-    // Clean up Three.js resources
     if (this.blob) {
       this.blob.geometry.dispose();
       if (Array.isArray(this.blob.material)) {
@@ -84,33 +83,24 @@ export class Hero implements AfterViewInit, OnDestroy {
     const width = container.clientWidth;
     const height = container.clientHeight;
 
-    // Scene
     this.scene = new THREE.Scene();
 
-    // Camera
     this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     this.camera.position.z = 4.5;
-
-    // Renderer
     this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
     container.appendChild(this.renderer.domElement);
-
-    // Object (Liquid Glass Blob)
-    const geometry = new THREE.IcosahedronGeometry(2, 30); // Higher detail for liquid effect
-    
-    // Store original positions for displacement calculation
+    const geometry = new THREE.IcosahedronGeometry(2, 30);
     const originalPositions = geometry.attributes['position'].array.slice();
-    
     const material = new THREE.MeshPhysicalMaterial({
       roughness: 0.15,
       metalness: 0.1,
       transmission: 1,
-      thickness: 2, // Thicker glass
-      ior: 1.45, // Glass IOR
+      thickness: 2,
+      ior: 1.45,
       reflectivity: 0.9,
       iridescence: 1,
       iridescenceIOR: 1.3,
@@ -123,7 +113,6 @@ export class Hero implements AfterViewInit, OnDestroy {
     this.blob = new THREE.Mesh(geometry, material);
     this.scene.add(this.blob);
 
-    // Lighting
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     this.scene.add(ambientLight);
 
@@ -131,7 +120,6 @@ export class Hero implements AfterViewInit, OnDestroy {
     mainLight.position.set(10, 10, 10);
     this.scene.add(mainLight);
     
-    // Colored lights for iridescence
     const pinkLight = new THREE.PointLight(0xff00ff, 3, 20);
     pinkLight.position.set(-5, 5, 5);
     this.scene.add(pinkLight);
@@ -140,18 +128,13 @@ export class Hero implements AfterViewInit, OnDestroy {
     blueLight.position.set(5, -5, 5);
     this.scene.add(blueLight);
 
-    // Animation Loop
     this.ngZone.runOutsideAngular(() => {
       const animate = (time: number) => {
         this.animationId = requestAnimationFrame(animate);
         
-        const t = time * 0.001; // Convert to seconds
-
-        // Rotate blob
+        const t = time * 0.001;
         this.blob.rotation.x = t * 0.1;
         this.blob.rotation.y = t * 0.15;
-
-        // Liquid Displacement
         const positionAttribute = geometry.attributes['position'];
         const positions = positionAttribute.array as Float32Array;
         
@@ -164,7 +147,6 @@ export class Hero implements AfterViewInit, OnDestroy {
           const length = vector.length();
           const dir = vector.normalize();
           
-          // Simple noise-like displacement using sine waves
           const displacement = 
             Math.sin(x * 1.5 + t * 1.2) * 0.3 + 
             Math.cos(y * 1.5 + t * 1.5) * 0.3 + 
@@ -178,14 +160,13 @@ export class Hero implements AfterViewInit, OnDestroy {
         }
         
         positionAttribute.needsUpdate = true;
-        geometry.computeVertexNormals(); // Essential for lighting updates
+        geometry.computeVertexNormals();
 
         this.renderer.render(this.scene, this.camera);
       };
       animate(0);
     });
 
-    // Resize Handler
     window.addEventListener('resize', () => {
       const newWidth = container.clientWidth;
       const newHeight = container.clientHeight;
@@ -194,7 +175,6 @@ export class Hero implements AfterViewInit, OnDestroy {
       this.renderer.setSize(newWidth, newHeight);
     });
     
-    // Mouse Interaction
     window.addEventListener('mousemove', (event) => {
         const x = (event.clientX / window.innerWidth) * 2 - 1;
         const y = -(event.clientY / window.innerHeight) * 2 + 1;

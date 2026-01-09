@@ -19,7 +19,7 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
   template: `@if (isVisible()) {
     <button
       hlmBtn
-      class="fixed z-50 bottom-6 right-6"
+      class="fixed z-50 bottom-6 right-6 hover:scale-110 transition-all duration-300 ease-out cursor-pointer"
       (click)="scrollToTop()"
       title="Back to top"
       size="icon"

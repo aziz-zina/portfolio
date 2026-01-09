@@ -1,7 +1,4 @@
-<section
-  class="py-24 sm:py-32 overflow-visible bg-white dark:bg-transparent"
->
-
+<section class="relative py-24 sm:py-32 overflow-visible bg-background z-10">
   <!-- Background blobs -->
   <div
     class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
@@ -14,33 +11,39 @@
     <!-- About Me -->
     <div class="w-full mx-auto text-center mb-24 space-y-12">
       <h2
-        class="text-3xl md:text-5xl font-thin tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight flex flex-wrap gap-x-3 justify-center "
+        class="text-3xl md:text-5xl font-thin tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight flex flex-wrap gap-x-3 justify-center"
         appScrollAnimation="word-reveal"
         [stagger]="0.05"
       >
         @for (word of splitBioTitle; track $index) {
-          <span class="inline-block">{{ word }}</span>
+        <span class="inline-block">{{ word }}</span>
         }
       </h2>
-      <p 
+      <p
         class="text-thin md:text-xl mt-10 text-zinc-600 dark:text-zinc-400 w-full mx-auto leading-relaxed flex flex-wrap justify-center gap-x-1.5"
         appScrollAnimation="word-reveal"
         [stagger]="0.02"
         [delay]="0.5"
       >
         @for (word of splitBioDescription; track $index) {
-          <span class="inline-block">{{ word }}</span>
+        <span class="inline-block">{{ word }}</span>
         }
       </p>
-      
-      <div class="flex justify-center pt-4" appScrollAnimation="fade-up" [delay]="1">
+
+      <div
+        class="flex justify-center pt-4"
+        appScrollAnimation="fade-up"
+        [delay]="1"
+      >
         <button
           hlmBtn
           class="rounded-full bg-[#d4ff00] text-black hover:bg-[#b8e600] font-medium px-8 py-6 text-lg gap-2 transition-transform hover:scale-105"
         >
           About Me
-          <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center -mr-4 ml-2">
-             <ng-icon name="lucideArrowUpRight" size="1.2rem" />
+          <div
+            class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center -mr-4 ml-2"
+          >
+            <ng-icon name="lucideArrowUpRight" size="1.2rem" />
           </div>
         </button>
       </div>
@@ -105,12 +108,12 @@
 
       <!-- Repositories -->
       <div
-        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-emerald-500/30 hover:shadow-lg hover:shadow-emerald-500/5"
+        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-[#d4ff00]/50 hover:shadow-lg hover:shadow-[#d4ff00]/10"
         appScrollAnimation="fade-up"
         [delay]="0.3"
       >
         <div
-          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-emerald-500/10 group-hover:text-emerald-600 transition-colors duration-300"
+          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-[#d4ff00]/20 group-hover:text-[#b8e600] transition-colors duration-300"
         >
           <ng-icon name="lucideFolders" size="1.75rem" />
         </div>
