@@ -43,12 +43,12 @@ export interface GithubProfile {
   avatar_url: string;
   url: string;
   html_url: string;
-  name: string; // "Aziz Zina"
+  name: string;
   company: string | null;
   blog: string | null;
   location: string | null;
   email: string | null;
-  hireable: boolean | null; // e.g., true
+  hireable: boolean | null;
   bio: string | null;
   public_repos: number;
   public_gists: number;
@@ -229,20 +229,18 @@ export class AboutMe implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platform)) {
-      // Parallax animation for the separator
-      // Start "below" (less negative translateY) and move "above" (more negative translateY)
       gsap.fromTo(
         this.separator.nativeElement,
         {
-          yPercent: -30, // Starts lower (covering less of hero)
+          yPercent: -30,
         },
         {
-          yPercent: -100, // Moves up to standard position
+          yPercent: -100,
           ease: 'none',
           scrollTrigger: {
             trigger: this.separator.nativeElement,
-            start: 'top bottom', // When top of separator hits bottom of viewport
-            end: 'top top', // When top of separator hits top of viewport
+            start: 'top bottom',
+            end: 'top top',
             scrub: true,
           },
         }

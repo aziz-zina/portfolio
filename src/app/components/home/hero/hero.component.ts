@@ -93,7 +93,7 @@ export class Hero implements AfterViewInit, OnDestroy {
 
     // Particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const count = 700;
+    const count = 1000;
     const positions = new Float32Array(count * 3);
     const colors = new Float32Array(count * 3);
 
@@ -101,7 +101,7 @@ export class Hero implements AfterViewInit, OnDestroy {
         // Random position in a sphere
         // Use cubic root of random for uniform distribution in sphere
         // Reduced radius from 2.5 to 1.8 to make the model smaller
-        const r = 1.8 * Math.cbrt(Math.random());
+        const r = 2.5 * Math.cbrt(Math.random());
         const theta = Math.random() * 2 * Math.PI;
         const phi = Math.acos(2 * Math.random() - 1);
         
@@ -118,12 +118,12 @@ export class Hero implements AfterViewInit, OnDestroy {
         // Cyan: 0, 1, 1
         
         // Normalize x from roughly -1.8 to 1.8 to 0-1 range for blending
-        const mix = (x / 1.8 + 1) / 2;
+        const mix = (x / 2.5 + 1) / 2;
         const clampedMix = Math.max(0, Math.min(1, mix));
 
         // Base colors
-        const r1 = 1, g1 = 0.2, b1 = 1; // Pinkish
-        const r2 = 0.2, g2 = 1, b2 = 1; // Cyanish
+        const r1 = 1, g1 = 0.4, b1 = 1; // Lighter Pinkish
+        const r2 = 0.4, g2 = 1, b2 = 1; // Lighter Cyanish
 
         // Lerp
         const red = r1 + (r2 - r1) * clampedMix;
@@ -145,15 +145,32 @@ export class Hero implements AfterViewInit, OnDestroy {
     canvas.height = 32;
     const ctx = canvas.getContext('2d');
     if (ctx) {
+        // Draw Diamond Star
         ctx.beginPath();
-        ctx.arc(16, 16, 16, 0, 2 * Math.PI);
+        const cx = 16;
+        const cy = 16;
+        const outerRadius = 15; // Slightly less than 16 to avoid clipping
+        const innerRadius = 4;  // Sharpness of the star
+
+        for(let i = 0; i < 4; i++) {
+            // Outer point
+            const angle = (i * Math.PI) / 2;
+            if (i === 0) ctx.moveTo(cx + Math.cos(angle) * outerRadius, cy + Math.sin(angle) * outerRadius);
+            else ctx.lineTo(cx + Math.cos(angle) * outerRadius, cy + Math.sin(angle) * outerRadius);
+            
+            // Inner point
+            const nextAngle = angle + (Math.PI / 4); 
+            ctx.lineTo(cx + Math.cos(nextAngle) * innerRadius, cy + Math.sin(nextAngle) * innerRadius);
+        }
+        ctx.closePath();
+        
         ctx.fillStyle = '#ffffff';
         ctx.fill();
     }
     const circleTexture = new THREE.CanvasTexture(canvas);
 
     const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.05, // Slightly larger to compensate for circular alpha cut
+      size: 0.1, // Increased size
       map: circleTexture,
       vertexColors: true,
       transparent: true,
