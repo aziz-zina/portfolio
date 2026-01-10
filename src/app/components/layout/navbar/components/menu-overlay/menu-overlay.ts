@@ -9,7 +9,8 @@ import {
   NgZone, 
   OnDestroy, 
   output, 
-  PLATFORM_ID, 
+  PLATFORM_ID,
+  signal,
   ViewChild 
 } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
@@ -38,6 +39,8 @@ export class MenuOverlay implements OnDestroy {
   menuItems = input.required<MenuItem[]>();
   close = output<void>();
 
+  isLoading = signal(true);
+
   @ViewChild('overlayContainer') overlayContainer!: ElementRef<HTMLElement>;
   @ViewChild('robotContainer') robotContainer!: ElementRef<HTMLDivElement>;
 
@@ -50,8 +53,9 @@ export class MenuOverlay implements OnDestroy {
       const open = this.isOpen();
       if (isPlatformBrowser(this.platform)) {
         if (open) {
-          // Small delay to ensure DOM is ready
-          setTimeout(() => this.initRobotScene(), 100);
+          this.isLoading.set(true);
+          // Delay to ensure menu open animation completes (0.7s) before loading heavy 3D assets
+          setTimeout(() => this.initRobotScene(), 1000);
         } else {
           this.disposeRobotScene();
         }
@@ -74,11 +78,16 @@ export class MenuOverlay implements OnDestroy {
         this.robotContainer.nativeElement,
         this.ngZone,
         THREE,
-        GLTFLoader
+        GLTFLoader,
+        () => this.onRobotLoaded()
       );
     } catch (error) {
       console.error('Failed to initialize robot scene:', error);
     }
+  }
+
+  private onRobotLoaded() {
+    this.isLoading.set(false);
   }
 
   private disposeRobotScene() {

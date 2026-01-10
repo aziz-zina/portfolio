@@ -20,7 +20,8 @@ export class RobotScene {
     private container: HTMLDivElement,
     private ngZone: NgZone,
     private THREE: typeof import('three'),
-    private GLTFLoaderClass: typeof GLTFLoader
+    private GLTFLoaderClass: typeof GLTFLoader,
+    private onLoaded?: () => void
   ) {
     this.resizeListener = this.onResize.bind(this);
     this.mouseMoveListener = this.onMouseMove.bind(this);
@@ -106,6 +107,11 @@ export class RobotScene {
         console.log('Applied scale:', scale);
         
         this.robot.add(model);
+        
+        // Signal loading complete
+        if (this.onLoaded) {
+          this.onLoaded();
+        }
       },
       (progress) => {
         // Loading progress

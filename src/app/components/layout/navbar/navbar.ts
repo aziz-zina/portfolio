@@ -15,6 +15,7 @@ import { LinkButton } from '../../../shared/components/link-button/link-button';
 import { HamburgerButton } from './components/hamburger-button/hamburger-button';
 import { MenuOverlay } from './components/menu-overlay/menu-overlay';
 import { gsap } from 'gsap';
+import { CursorService } from '../../../shared/services/cursor.service';
 
 @Component({
   selector: 'app-navbar',
@@ -25,6 +26,7 @@ import { gsap } from 'gsap';
 })
 export class Navbar implements AfterViewInit, OnDestroy {
   private readonly platform = inject(PLATFORM_ID);
+  private readonly cursorService = inject(CursorService);
   
   @ViewChild('menuOverlay') menuOverlay!: MenuOverlay;
   @ViewChild('hamburgerBtn') hamburgerBtn!: HamburgerButton;
@@ -67,6 +69,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
 
   openMenu() {
     this.isMenuOpen.set(true);
+    this.cursorService.setMenuOpen(true);
     document.body.style.overflow = 'hidden';
     
     if (this.menuTimeline) this.menuTimeline.kill();
@@ -133,6 +136,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
     this.menuTimeline = gsap.timeline({
       onComplete: () => {
         this.isMenuOpen.set(false);
+        this.cursorService.setMenuOpen(false);
         document.body.style.overflow = '';
         gsap.set(this.menuOverlay.overlayContainer.nativeElement, { visibility: 'hidden' });
       }

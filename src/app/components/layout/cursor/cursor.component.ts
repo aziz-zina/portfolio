@@ -8,9 +8,11 @@ import {
   PLATFORM_ID,
   NgZone,
   Renderer2,
+  effect,
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
+import { CursorService } from '../../../shared/services/cursor.service';
 
 @Component({
   selector: 'app-cursor',
@@ -42,6 +44,7 @@ export class CursorComponent implements AfterViewInit, OnDestroy {
   private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
   private renderer = inject(Renderer2);
+  private cursorService = inject(CursorService);
 
   private cursorX: any;
   private cursorY: any;
@@ -50,6 +53,27 @@ export class CursorComponent implements AfterViewInit, OnDestroy {
 
   private mouseMoveListener: (() => void) | null = null;
   private hoverListeners: (() => void)[] = [];
+
+  constructor() {
+    effect(() => {
+      const isMenuOpen = this.cursorService.isMenuOpen();
+      if (isPlatformBrowser(this.platformId) && this.cursor?.nativeElement && this.follower?.nativeElement) {
+        if (isMenuOpen) {
+           this.cursor.nativeElement.classList.add('!bg-white');
+           this.cursor.nativeElement.classList.remove('bg-black', 'dark:bg-white');
+           
+           this.follower.nativeElement.classList.add('!border-white');
+           this.follower.nativeElement.classList.remove('border-black', 'dark:border-white');
+        } else {
+           this.cursor.nativeElement.classList.remove('!bg-white');
+           this.cursor.nativeElement.classList.add('bg-black', 'dark:bg-white');
+           
+           this.follower.nativeElement.classList.remove('!border-white');
+           this.follower.nativeElement.classList.add('border-black', 'dark:border-white');
+        }
+      }
+    });
+  }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
