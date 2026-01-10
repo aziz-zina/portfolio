@@ -14,8 +14,7 @@ import {
   ViewChild 
 } from '@angular/core';
 import { NgIconComponent, provideIcons } from '@ng-icons/core';
-import { lucideArrowUpRight } from '@ng-icons/lucide';
-import { gsap } from 'gsap';
+import { lucideX } from '@ng-icons/lucide';
 import { RobotScene } from './robot-scene';
 
 interface MenuItem {
@@ -27,7 +26,7 @@ interface MenuItem {
   selector: 'app-menu-overlay',
   standalone: true,
   imports: [NgIconComponent],
-  providers: [provideIcons({ lucideArrowUpRight })],
+  providers: [provideIcons({ lucideX })],
   templateUrl: './menu-overlay.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -99,31 +98,5 @@ export class MenuOverlay implements OnDestroy {
 
   ngOnDestroy() {
     this.disposeRobotScene();
-  }
-
-  onMenuItemEnter(event: MouseEvent) {
-    const target = event.currentTarget as HTMLElement;
-    const underline = target.querySelector('.menu-underline');
-    if (underline) {
-      gsap.to(underline, {
-        scaleX: 1,
-        duration: 0.4,
-        ease: 'power3.out',
-        transformOrigin: 'left center'
-      });
-    }
-  }
-
-  onMenuItemLeave(event: MouseEvent) {
-    const target = event.currentTarget as HTMLElement;
-    const underline = target.querySelector('.menu-underline');
-    if (underline) {
-      gsap.to(underline, {
-        scaleX: 0,
-        duration: 0.3,
-        ease: 'power3.in',
-        transformOrigin: 'right center'
-      });
-    }
   }
 }

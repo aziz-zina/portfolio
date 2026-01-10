@@ -94,11 +94,22 @@ export class AboutMe implements OnInit, AfterViewInit {
 
   @ViewChild('separator') separator!: ElementRef<HTMLElement>;
   @ViewChild('experienceArrow') experienceArrow!: ElementRef<HTMLElement>;
+  @ViewChild('yearsCount') yearsCount!: ElementRef<HTMLElement>;
+  @ViewChild('followersCount') followersCount!: ElementRef<HTMLElement>;
+  @ViewChild('reposCount') reposCount!: ElementRef<HTMLElement>;
   
   private arrowTween: gsap.core.Tween | null = null;
+  private remoteStatsAnimated = false;
+  private isDataLoaded = false;
 
+  // Final values (source of truth from API)
   readonly publicRepos = signal(0);
   readonly followers = signal(0);
+  
+  // Display values (animated)
+  readonly yearsDisplay = signal(0);
+  readonly followersDisplay = signal(0);
+  readonly reposDisplay = signal(0);
   
   readonly bioTitle = "I'm Aziz – a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
   readonly bioDescription = "I specialize in developing SaaS platforms, AI-driven products, and interactive 3D web experiences using technologies like Next.js, Node.js, and Three.js.";
@@ -220,35 +231,104 @@ export class AboutMe implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platform)) {
-      this.gitApi.getInfo().subscribe((data: any) => {
-        console.log('GitHub profile data:', data);
-        this.followers.set(data.followers);
-        this.publicRepos.set(data.public_repos);
+      this.gitApi.getInfo().subscribe({
+        next: (data: any) => {
+          // Store final values
+          this.followers.set(data.followers);
+          this.publicRepos.set(data.public_repos);
+          this.isDataLoaded = true;
+          this.initRemoteStatsAnimations();
+        },
+        error: (err) => {
+          console.error('Error fetching Github info', err);
+        }
       });
     }
   }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platform)) {
-    if (this.separator) {
-      gsap.fromTo(
-        this.separator.nativeElement,
-        {
-          yPercent: -30,
-        },
-        {
-          yPercent: -100,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: this.separator.nativeElement,
-            start: 'top bottom',
-            end: 'top top',
-            scrub: true,
+      this.initRemoteStatsAnimations();
+
+      if (this.separator) {
+        gsap.fromTo(
+          this.separator.nativeElement,
+          {
+            yPercent: -30,
           },
-        }
-      );
+          {
+            yPercent: -100,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: this.separator.nativeElement,
+              start: 'top bottom',
+              end: 'top top',
+              scrub: true,
+            },
+          }
+        );
+      }
+
+      // Animate Years
+      if (this.yearsCount) {
+         const yearsObj = { val: 0 };
+         // The target year is constant 2
+         gsap.to(yearsObj, {
+           val: 2,
+           duration: 2,
+           delay: 1.2,
+           ease: 'power2.out',
+           scrollTrigger: {
+             trigger: this.yearsCount.nativeElement,
+             start: 'top 85%',
+             once: true
+           },
+           onUpdate: () => {
+             this.yearsDisplay.set(Math.round(yearsObj.val));
+           }
+         });
+      }
     }
-    }
+  }
+
+  private initRemoteStatsAnimations() {
+    if (this.remoteStatsAnimated || !this.isDataLoaded || !this.followersCount || !this.reposCount) return;
+    
+    this.remoteStatsAnimated = true;
+
+    // Animate Followers
+    const followersObj = { val: 0 };
+    gsap.to(followersObj, {
+      val: this.followers(),
+      duration: 2,
+      delay: 1.3,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: this.followersCount.nativeElement,
+        start: 'top 85%',
+        once: true 
+      },
+      onUpdate: () => {
+        this.followersDisplay.set(Math.round(followersObj.val));
+      }
+    });
+
+    // Animate Repos
+    const reposObj = { val: 0 };
+    gsap.to(reposObj, {
+      val: this.publicRepos(),
+      duration: 2,
+      delay: 1.4,
+      ease: 'power2.out',
+      scrollTrigger: {
+          trigger: this.reposCount.nativeElement,
+          start: 'top 85%',
+          once: true
+      },
+      onUpdate: () => {
+        this.reposDisplay.set(Math.round(reposObj.val));
+      }
+    });
   }
   
   onExperienceHover() {
