@@ -12,21 +12,22 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { LinkButton } from '../../../shared/components/link-button/link-button';
+import { HamburgerButton } from './components/hamburger-button/hamburger-button';
+import { MenuOverlay } from './components/menu-overlay/menu-overlay';
 import { gsap } from 'gsap';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, LinkButton],
+  imports: [RouterLink, LinkButton, HamburgerButton, MenuOverlay],
   templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Navbar implements AfterViewInit, OnDestroy {
   private readonly platform = inject(PLATFORM_ID);
   
-  @ViewChild('menuOverlay') menuOverlay!: ElementRef<HTMLElement>;
-  @ViewChild('menuContent') menuContent!: ElementRef<HTMLElement>;
-  @ViewChild('hamburgerBtn') hamburgerBtn!: ElementRef<HTMLElement>;
+  @ViewChild('menuOverlay') menuOverlay!: MenuOverlay;
+  @ViewChild('hamburgerBtn') hamburgerBtn!: HamburgerButton;
   
   isScrolled = signal(false);
   isMenuOpen = signal(false);
@@ -70,7 +71,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
     
     if (this.menuTimeline) this.menuTimeline.kill();
     
-    const btn = this.hamburgerBtn.nativeElement;
+    const btn = this.hamburgerBtn.buttonElement.nativeElement;
     const rect = btn.getBoundingClientRect();
     const originX = rect.left + rect.width / 2;
     const originY = rect.top + rect.height / 2;
@@ -84,12 +85,12 @@ export class Navbar implements AfterViewInit, OnDestroy {
     
     this.menuTimeline = gsap.timeline();
     
-    gsap.set(this.menuOverlay.nativeElement, {
+    gsap.set(this.menuOverlay.overlayContainer.nativeElement, {
       visibility: 'visible',
       clipPath: `circle(0px at ${originX}px ${originY}px)`
     });
     
-    this.menuTimeline.to(this.menuOverlay.nativeElement, {
+    this.menuTimeline.to(this.menuOverlay.overlayContainer.nativeElement, {
       clipPath: `circle(${maxDistance}px at ${originX}px ${originY}px)`,
       duration: 0.7,
       ease: 'power3.inOut'
@@ -117,7 +118,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
   closeMenu() {
     if (this.menuTimeline) this.menuTimeline.kill();
     
-    const btn = this.hamburgerBtn.nativeElement;
+    const btn = this.hamburgerBtn.buttonElement.nativeElement;
     const rect = btn.getBoundingClientRect();
     const originX = rect.left + rect.width / 2;
     const originY = rect.top + rect.height / 2;
@@ -133,7 +134,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
       onComplete: () => {
         this.isMenuOpen.set(false);
         document.body.style.overflow = '';
-        gsap.set(this.menuOverlay.nativeElement, { visibility: 'hidden' });
+        gsap.set(this.menuOverlay.overlayContainer.nativeElement, { visibility: 'hidden' });
       }
     });
     
@@ -158,7 +159,7 @@ export class Navbar implements AfterViewInit, OnDestroy {
       ease: 'power2.in'
     }, '-=0.15');
     
-    this.menuTimeline.to(this.menuOverlay.nativeElement, {
+    this.menuTimeline.to(this.menuOverlay.overlayContainer.nativeElement, {
       clipPath: `circle(0px at ${originX}px ${originY}px)`,
       duration: 0.5,
       ease: 'power3.inOut'
@@ -169,6 +170,6 @@ export class Navbar implements AfterViewInit, OnDestroy {
     { label: 'Home', link: '/' },
     { label: 'About', link: '#about' },
     { label: 'Works', link: '#projects' },
-    { label: 'Contact', link: '#contact' },
+    { label: 'Contact Me', link: '#contact' },
   ];
 }
