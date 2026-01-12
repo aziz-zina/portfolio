@@ -12,6 +12,7 @@ import {
 } from '@angular/core';
 import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
+import { SectionTitle } from '../../../shared/components/section-title/section-title';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -20,7 +21,7 @@ gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-experience',
   standalone: true,
-  imports: [CommonModule, HlmBadgeImports, ScrollAnimationDirective],
+  imports: [CommonModule, HlmBadgeImports, ScrollAnimationDirective, SectionTitle],
   templateUrl: './experience.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -31,6 +32,8 @@ export class Experience implements AfterViewInit, OnDestroy {
   @ViewChild('horizontalContainer') horizontalContainer!: ElementRef<HTMLElement>;
   @ViewChild('horizontalTrack') horizontalTrack!: ElementRef<HTMLElement>;
   @ViewChild('progressBar') progressBar!: ElementRef<HTMLElement>;
+  
+  @ViewChild('endSpacer') endSpacer!: ElementRef<HTMLElement>;
   
   private scrollTrigger: ScrollTrigger | null = null;
 
@@ -117,6 +120,7 @@ export class Experience implements AfterViewInit, OnDestroy {
     const track = this.horizontalTrack.nativeElement;
     const container = this.horizontalContainer.nativeElement;
     const progressBar = this.progressBar.nativeElement;
+    const endSpacer = this.endSpacer?.nativeElement;
     
     // Calculate how far we need to scroll horizontally
     const scrollWidth = track.scrollWidth - container.offsetWidth;
@@ -139,6 +143,18 @@ export class Experience implements AfterViewInit, OnDestroy {
         gsap.set(progressBar, {
           width: `${self.progress * 100}%`,
         });
+
+        // Animate End Spacer (reveal near the end)
+        if (endSpacer) {
+          const buffer = 0.9; // Start animating when 90% through
+          const remappedProgress = Math.max(0, (self.progress - buffer) * (1 / (1 - buffer)));
+          
+          gsap.set(endSpacer, {
+            opacity: remappedProgress,
+            scale: 0.5 + (0.5 * remappedProgress),
+            rotate: 10 * (1 - remappedProgress)
+          });
+        }
       },
     });
   }

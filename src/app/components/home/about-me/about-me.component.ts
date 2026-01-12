@@ -26,6 +26,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { GithubApiService } from '../../../lib/github/github-api.service';
 import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
 import { LinkButton } from '../../../shared/components/link-button/link-button';
+import { SectionTitle } from '../../../shared/components/section-title/section-title';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -58,7 +59,7 @@ export interface GithubProfile {
 
 @Component({
   selector: 'app-about-me',
-  imports: [HlmCardImports, HlmIconImports, HlmButtonImports, ScrollAnimationDirective, LinkButton],
+  imports: [HlmCardImports, HlmIconImports, HlmButtonImports, ScrollAnimationDirective, LinkButton, SectionTitle],
   providers: [
     provideIcons({
       lucideUsers,

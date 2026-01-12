@@ -79,6 +79,9 @@ h6 {
 */
 app-root {
   isolation: isolate;
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 :root {
