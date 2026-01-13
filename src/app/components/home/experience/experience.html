@@ -16,7 +16,7 @@
 
       <!-- Cards -->
       <div #horizontalTrack class="flex gap-8 px-8 pl-2 items-center h-full will-change-transform">
-        @for (item of experience(); track $index) {
+        @for (item of experience(); track $index; let last = $last) {
           <div class="group relative h-[50vh] w-[80vw] md:w-[480px] flex-shrink-0 perspective-1000">
             
             <!-- Card Content -->
@@ -70,22 +70,11 @@
                 }
               </div>
             </div>
+            @if (last) {
+              <img src="standing.png" alt="" class="absolute -right-[455px] bottom-0 h-[115%] w-auto max-w-none pointer-events-none z-20 object-contain translate-y-8" />
+            }
           </div>
         }
-        
-        <!-- End Spacer -->
-        <div class="flex-shrink-0 w-[30vmax] flex items-center justify-center p-8">
-          <div #endSpacer class="relative group cursor-pointer">
-            <!-- Circle -->
-            <div class="w-32 h-32 md:w-48 md:h-48 rounded-full border border-zinc-300 dark:border-zinc-700 flex items-center justify-center relative overflow-hidden transition-colors duration-500 group-hover:border-black dark:group-hover:border-white">
-              <div class="absolute inset-0 bg-black dark:bg-white scale-0 transition-transform duration-500 ease-out group-hover:scale-100 rounded-full origin-center"></div>
-              
-              <a href="#contact" class="text-sm md:text-base font-mono relative z-10 text-zinc-600 dark:text-zinc-400 transition-colors duration-300 group-hover:text-white dark:group-hover:text-black">
-                Get in Touch
-              </a>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
