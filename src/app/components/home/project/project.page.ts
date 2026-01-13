@@ -23,6 +23,7 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { SectionTitle } from '../../../shared/components/section-title/section-title';
+import { ProjectCard, Project } from './components/project-card/project-card';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -37,6 +38,7 @@ gsap.registerPlugin(ScrollTrigger);
     HlmBadgeImports,
     HlmIconImports,
     SectionTitle,
+    ProjectCard,
   ],
   providers: [
     provideIcons({
@@ -141,7 +143,7 @@ export default class Projects implements AfterViewInit, OnDestroy {
         'A modern, responsive React-based theme for Keycloak Identity Server. Replaces the legacy FreeMarker templates with a clean Tailwind CSS interface.',
       techs: ['React', 'TypeScript', 'Keycloakify', 'Tailwind'],
       website:
-        'https://github.com/Oussemasahbeni/keycloak-react-custom-theme-keycloakify',
+        'https://oussemasahbeni.github.io/keycloakify-shadcn-starter',
       highlights: [
         'React-based component architecture',
         'Full Dark Mode support',

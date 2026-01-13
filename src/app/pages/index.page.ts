@@ -21,8 +21,8 @@ import Projects from '../components/home/project/project.page';
     <app-hero />
     <app-about-me />
     <app-experience />
-    <app-featured-blogs />
     <app-projects />
+    <app-featured-blogs />
     <app-contact />
   `,
 })

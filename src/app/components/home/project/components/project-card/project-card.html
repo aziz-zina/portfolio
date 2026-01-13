@@ -1,0 +1,56 @@
+<div class="project-card group">
+  <!-- Project Image -->
+  <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-6 bg-[#1e1e1e] border border-zinc-800 shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
+    <!-- Mac-style Window Controls -->
+    <div class="absolute top-0 w-full h-8 bg-[#2a2a2a] border-b border-zinc-800 flex items-center px-3 gap-1.5 z-10">
+      <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
+      <div class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
+      <div class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
+      <div class="absolute inset-0 flex items-center justify-center text-[10px] font-mono text-white">
+        {{ project().name }}
+      </div>
+    </div>
+    <img 
+      [src]="project().image" 
+      [alt]="project().name"
+      class="object-cover w-full h-full pt-8 group-hover:scale-105 transition-transform duration-500"
+      loading="lazy"
+    />
+  </div>
+
+  <!-- Project Info -->
+  <div class="space-y-4">
+    <span class="text-sm font-mono text-zinc-400 font-medium tracking-widest uppercase">
+      {{ project().type }}
+    </span>
+
+    <h3 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
+      {{ project().name }}
+    </h3>
+
+    <p class="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
+      {{ project().description }}
+    </p>
+
+    <!-- Tech Stack -->
+    <div class="flex flex-wrap gap-2 pt-2">
+      @for (tech of project().techs; track $index) {
+        <span class="text-xs font-medium text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded">
+          {{ tech }}
+        </span>
+      }
+    </div>
+
+    <!-- Links -->
+    <div class="pt-2 flex items-center gap-4">
+      @if(project().website) {
+        <a [href]="project().website" target="_blank" hlmBtn variant="ghost" class="rounded-full px-0 hover:bg-transparent hover:text-blue-500 pl-0 gap-2">
+          Visit Site <ng-icon name="lucideExternalLink" size="sm" />
+        </a>
+      }
+      <button hlmBtn variant="ghost" size="icon" class="rounded-full hover:bg-transparent hover:text-black dark:hover:text-white">
+        <ng-icon name="lucideGithub" size="sm" />
+      </button>
+    </div>
+  </div>
+</div>
