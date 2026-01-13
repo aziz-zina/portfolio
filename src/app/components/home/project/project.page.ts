@@ -3,13 +3,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  signal,
-  ViewChildren,
-  QueryList,
   AfterViewInit,
   OnDestroy,
-  ViewChild,
+  signal,
+  inject,
+  PLATFORM_ID,
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { provideIcons } from '@ng-icons/core';
 import {
   lucideArrowRight,
@@ -25,6 +25,8 @@ import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { SectionTitle } from '../../../shared/components/section-title/section-title';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 @Component({
   selector: 'app-projects',
@@ -50,18 +52,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class Projects implements AfterViewInit, OnDestroy {
-  @ViewChildren('projectContent') projectContents!: QueryList<ElementRef>;
-  @ViewChildren('projectImage') projectImages!: QueryList<ElementRef>;
-  
-  @ViewChild('section') section!: ElementRef;
-  @ViewChild('container') container!: ElementRef;
-  @ViewChild('previewWrapper') previewWrapper!: ElementRef;
-  @ViewChild('preview') preview!: ElementRef;
-  @ViewChild('leftColumn') leftColumn!: ElementRef;
-
-  private ctx: gsap.Context | undefined;
-  
-  activeProjectName = signal('');
+  private readonly platform = inject(PLATFORM_ID);
+  private readonly el = inject(ElementRef);
+  private ctx: gsap.Context | null = null;
 
   projects = signal([
     {
@@ -157,119 +150,43 @@ export default class Projects implements AfterViewInit, OnDestroy {
     },
   ]);
 
-  constructor(private el: ElementRef) {
-    gsap.registerPlugin(ScrollTrigger);
-  }
-
   ngAfterViewInit() {
-    requestAnimationFrame(() => {
-      this.initScrollAnimations();
-    });
-  }
-
-  private initScrollAnimations() {
-    this.ctx = gsap.context(() => {
-      const container = this.container?.nativeElement;
-      const previewWrapper = this.previewWrapper?.nativeElement;
-      const preview = this.preview?.nativeElement;
-      const leftColumn = this.leftColumn?.nativeElement;
-
-      if (!container || !leftColumn) return;
-
-      const contents = this.el.nativeElement.querySelectorAll('.project-content');
-      const images = this.el.nativeElement.querySelectorAll('.project-image');
-
-      if (!contents.length || !images.length) return;
-
-      // Set initial state for images
-      gsap.set(images, { opacity: 0, scale: 1.05 });
-      gsap.set(images[0], { opacity: 1, scale: 1 });
-      this.activeProjectName.set(this.projects()[0].name);
-
-      const mm = gsap.matchMedia();
-
-      // Desktop: Split-screen with delayed pinning
-      mm.add("(min-width: 1024px)", () => {
-        if (!preview || !previewWrapper) return;
-
-        // The preview wrapper is absolutely positioned at top:0
-        // We pin the inner preview container which creates the "delayed" effect
-        // Pin starts when the container top hits the viewport top
-        ScrollTrigger.create({
-          trigger: container,
-          start: "top top",
-          endTrigger: leftColumn,
-          end: "bottom bottom",
-          pin: preview,
-          pinSpacing: false,
-          // markers: true, // Uncomment for debugging
-        });
-
-        // Text & Image transitions based on scroll position
-        contents.forEach((content: HTMLElement, i: number) => {
-          ScrollTrigger.create({
-            trigger: content,
-            start: 'top center',
-            end: 'bottom center',
-            onEnter: () => this.updateActive(i, contents, images),
-            onEnterBack: () => this.updateActive(i, contents, images),
-          });
-        });
-
-        // Initialize first item as active
-        this.updateActive(0, contents, images);
-
-        return () => {};
-      });
-
-      // Mobile: No pinning
-      mm.add("(max-width: 1023px)", () => {
-        contents.forEach((content: HTMLElement) => {
-          gsap.set(content, { opacity: 1 });
-        });
-
-        return () => {};
-      });
-
-    }, this.el);
-  }
-
-  updateActive(index: number, contents: NodeListOf<HTMLElement>, images: NodeListOf<HTMLElement>) {
-    this.activeProjectName.set(this.projects()[index].name);
-
-    // Animate Texts
-    contents.forEach((content, i) => {
-      gsap.to(content, {
-        opacity: i === index ? 1 : 0.3,
-        duration: 0.5,
-        ease: 'power2.out',
-        overwrite: 'auto'
-      });
-    });
-
-    // Animate Images
-    images.forEach((img, i) => {
-      if (i === index) {
-        gsap.to(img, {
-          opacity: 1,
-          scale: 1,
-          duration: 0.7,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      } else {
-        gsap.to(img, {
-          opacity: 0,
-          scale: 1.05,
-          duration: 0.7,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      }
-    });
+    if (isPlatformBrowser(this.platform)) {
+      setTimeout(() => this.initCardAnimations(), 100);
+    }
   }
 
   ngOnDestroy() {
-    this.ctx?.revert();
+    if (this.ctx) {
+      this.ctx.revert();
+    }
+  }
+
+  private initCardAnimations() {
+    this.ctx = gsap.context(() => {
+      const cards = this.el.nativeElement.querySelectorAll('.project-card');
+      
+      // Set initial state
+      gsap.set(cards, {
+        opacity: 0,
+        y: 60,
+      });
+
+      // Animate each card when it comes into view
+      cards.forEach((card: HTMLElement, index: number) => {
+        gsap.to(card, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none none',
+          },
+          delay: (index % 2) * 0.15, // Stagger between left and right columns
+        });
+      });
+    }, this.el.nativeElement);
   }
 }

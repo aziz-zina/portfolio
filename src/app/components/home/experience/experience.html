@@ -15,9 +15,9 @@
       </div>
 
       <!-- Cards -->
-      <div #horizontalTrack class="flex gap-8 px-8 pl-2 items-center h-full will-change-transform">
+      <div #horizontalTrack class="flex gap-8 px-8 pl-20 items-center h-full will-change-transform">
         @for (item of experience(); track $index; let last = $last) {
-          <div class="group relative h-[50vh] w-[80vw] md:w-[480px] flex-shrink-0 perspective-1000">
+          <div #experienceCard class="group relative h-[50vh] w-[80vw] md:w-[480px] flex-shrink-0 perspective-1000">
             
             <!-- Card Content -->
             <div 

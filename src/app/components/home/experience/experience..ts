@@ -6,7 +6,9 @@ import {
   ElementRef, 
   OnDestroy, 
   PLATFORM_ID, 
+  QueryList,
   ViewChild, 
+  ViewChildren,
   inject, 
   signal 
 } from '@angular/core';
@@ -34,8 +36,10 @@ export class Experience implements AfterViewInit, OnDestroy {
   @ViewChild('progressBar') progressBar!: ElementRef<HTMLElement>;
   
   @ViewChild('endSpacer') endSpacer!: ElementRef<HTMLElement>;
+  @ViewChildren('experienceCard') experienceCards!: QueryList<ElementRef<HTMLElement>>;
   
   private scrollTrigger: ScrollTrigger | null = null;
+  private gsapContext: gsap.Context | null = null;
 
   experience = signal([
     {
@@ -106,6 +110,9 @@ export class Experience implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.gsapContext) {
+      this.gsapContext.revert();
+    }
     if (this.scrollTrigger) {
       this.scrollTrigger.kill();
     }
@@ -121,41 +128,82 @@ export class Experience implements AfterViewInit, OnDestroy {
     const container = this.horizontalContainer.nativeElement;
     const progressBar = this.progressBar.nativeElement;
     const endSpacer = this.endSpacer?.nativeElement;
+    const cards = this.experienceCards.toArray().map(card => card.nativeElement);
     
     // Calculate how far we need to scroll horizontally
     const scrollWidth = track.scrollWidth - container.offsetWidth;
     
-    // Create the horizontal scroll animation
-    this.scrollTrigger = ScrollTrigger.create({
-      trigger: container,
-      start: 'top top',
-      end: () => `+=${scrollWidth}`,
-      pin: true,
-      anticipatePin: 1,
-      scrub: 1,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => {
-        // Move the track horizontally based on scroll progress
-        gsap.set(track, {
-          x: -scrollWidth * self.progress,
-        });
-        // Update progress bar
-        gsap.set(progressBar, {
-          width: `${self.progress * 100}%`,
-        });
-
-        // Animate End Spacer (reveal near the end)
-        if (endSpacer) {
-          const buffer = 0.9; // Start animating when 90% through
-          const remappedProgress = Math.max(0, (self.progress - buffer) * (1 / (1 - buffer)));
-          
-          gsap.set(endSpacer, {
-            opacity: remappedProgress,
-            scale: 0.5 + (0.5 * remappedProgress),
-            rotate: 10 * (1 - remappedProgress)
+    // Create GSAP context for proper cleanup
+    this.gsapContext = gsap.context(() => {
+      // Set initial state for cards (skip the first one - it's visible by default)
+      const animatedCards = cards.slice(1);
+      gsap.set(animatedCards, {
+        opacity: 0,
+        y: 80,
+        scale: 0.9,
+        rotateX: 15,
+      });
+      
+      // Create the horizontal scroll animation
+      this.scrollTrigger = ScrollTrigger.create({
+        trigger: container,
+        start: 'top top',
+        end: () => `+=${scrollWidth}`,
+        pin: true,
+        anticipatePin: 1,
+        scrub: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          // Move the track horizontally based on scroll progress
+          gsap.set(track, {
+            x: -scrollWidth * self.progress,
           });
-        }
-      },
+          // Update progress bar
+          gsap.set(progressBar, {
+            width: `${self.progress * 100}%`,
+          });
+
+          // Animate cards based on their position in the scroll (skip first card)
+          const totalAnimatedCards = animatedCards.length;
+          animatedCards.forEach((card, index) => {
+            // Calculate when each card should animate (staggered based on position)
+            const cardStart = (index + 1) / (totalAnimatedCards + 2);
+            const cardEnd = cardStart + (1 / (totalAnimatedCards + 2));
+            
+            // Calculate card's individual progress
+            const cardProgress = Math.min(
+              1,
+              Math.max(0, (self.progress - cardStart) / (cardEnd - cardStart))
+            );
+            
+            // Apply eased animation
+            const easedProgress = this.easeOutCubic(cardProgress);
+            
+            gsap.set(card, {
+              opacity: easedProgress,
+              y: 80 * (1 - easedProgress),
+              scale: 0.9 + (0.1 * easedProgress),
+              rotateX: 15 * (1 - easedProgress),
+            });
+          });
+
+          // Animate End Spacer (reveal near the end)
+          if (endSpacer) {
+            const buffer = 0.9; // Start animating when 90% through
+            const remappedProgress = Math.max(0, (self.progress - buffer) * (1 / (1 - buffer)));
+            
+            gsap.set(endSpacer, {
+              opacity: remappedProgress,
+              scale: 0.5 + (0.5 * remappedProgress),
+              rotate: 10 * (1 - remappedProgress)
+            });
+          }
+        },
+      });
     });
+  }
+  
+  private easeOutCubic(t: number): number {
+    return 1 - Math.pow(1 - t, 3);
   }
 }
