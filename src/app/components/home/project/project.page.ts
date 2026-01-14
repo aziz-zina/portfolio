@@ -25,7 +25,8 @@ import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
 import { SectionTitle } from '../../../shared/components/section-title/section-title';
-import { ProjectCard, Project } from './components/project-card/project-card';
+import { ProjectCard } from './components/project-card/project-card';
+import { PROJECTS_DATA } from '../../../shared/data/projects.data';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -61,99 +62,7 @@ export default class Projects implements AfterViewInit, OnDestroy {
   private readonly el = inject(ElementRef);
   private ctx: gsap.Context | null = null;
 
-  projects = signal([
-    {
-      name: 'Sabeel Platform',
-      type: 'Social Impact',
-      image:
-        'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=1600&auto=format&fit=crop',
-      description:
-        'A comprehensive reintegration ecosystem for ex-prisoners. The platform bridges the gap between rehabilitation and society through tailored resource matching.',
-      techs: ['Angular', 'Spring Boot', 'PostgreSQL', 'Keycloak', 'AWS'],
-      website: null,
-      highlights: [
-        'Assisted 500+ individuals with reintegration',
-        'Increased job placement rates by 40%',
-        'Secure RBAC with Keycloak Identity',
-      ],
-    },
-    {
-      name: 'One Saha',
-      type: 'Health Tech',
-      image:
-        'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?q=80&w=1600&auto=format&fit=crop',
-      description:
-        'Community-driven public health data aggregation platform. Uses ML to classify and serve relevant health news and statistics to the public.',
-      techs: ['Spring Cloud', 'Python', 'ML', 'Docker', 'Prometheus'],
-      website: 'https://onesaha.org/home',
-      highlights: [
-        'Microservices architecture (10+ services)',
-        'ML-powered news classification engine',
-        'Real-time data processing pipeline',
-      ],
-    },
-    {
-      name: 'Inspark Forge',
-      type: 'AI Recruitment',
-      image:
-        'https://images.unsplash.com/photo-1655720828018-edd2daec9349?q=80&w=1600&auto=format&fit=crop',
-      description:
-        'Next-gen talent matching for the Tunisian market. Leverages GPT-4o to analyze CVs and match candidates with opportunities based on semantic compatibility.',
-      techs: ['OpenAI API', 'Spring Boot', 'DDD', 'RabbitMQ', 'Angular'],
-      website: 'https://talent.inspark.tn/',
-      highlights: [
-        'Integrated GPT-4o for semantic matching',
-        'Domain-Driven Design implementation',
-        'Asynchronous event-driven architecture',
-      ],
-    },
-    {
-      name: 'Ministry of Agriculture',
-      type: 'Government',
-      image:
-        'https://images.unsplash.com/photo-1625246333195-58f214014a2b?q=80&w=1600&auto=format&fit=crop',
-      description:
-        'The official digital gateway for the Ministry. A high-traffic portal providing secure access to agricultural services, news, and regulatory data.',
-      techs: ['Elasticsearch', 'Keycloak', 'Resilience4j', 'Tailwind'],
-      website: 'https://staging-agri.agrinet.tn/home',
-      highlights: [
-        'Advanced search with Elasticsearch',
-        'High-availability & Rate limiting',
-        'WCAG Accessibility compliance',
-      ],
-    },
-    {
-      name: 'Konnect Boot Starter',
-      type: 'Open Source',
-      image:
-        'https://images.unsplash.com/photo-1555099962-4199c345e5dd?q=80&w=1600&auto=format&fit=crop',
-      description:
-        'A developer-first Spring Boot starter for the Konnect Payment Gateway. Simplifies payment integration with auto-configuration and resilience patterns.',
-      techs: ['Java', 'Maven Central', 'Spring Boot', 'Resilience4j'],
-      website: 'https://github.com/Oussemasahbeni/konnect-spring-boot-starter',
-      highlights: [
-        'Published artifact on Maven Central',
-        'Built-in webhook security validation',
-        'Zero-config Spring auto-configuration',
-      ],
-    },
-    {
-      name: 'Keycloakify Custom Theme',
-      type: 'Dev Tools',
-      image:
-        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1600&auto=format&fit=crop',
-      description:
-        'A modern, responsive React-based theme for Keycloak Identity Server. Replaces the legacy FreeMarker templates with a clean Tailwind CSS interface.',
-      techs: ['React', 'TypeScript', 'Keycloakify', 'Tailwind'],
-      website:
-        'https://oussemasahbeni.github.io/keycloakify-shadcn-starter',
-      highlights: [
-        'React-based component architecture',
-        'Full Dark Mode support',
-        'Custom email template generation',
-      ],
-    },
-  ]);
+  projects = signal(PROJECTS_DATA);
 
   // Display only first 4 projects on home page
   displayedProjects = computed(() => this.projects().slice(0, 4));

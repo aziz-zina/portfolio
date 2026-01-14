@@ -44,14 +44,10 @@
     <!-- Links -->
     <div class="pt-2 flex items-center gap-4">
       @if(project().website) {
-        <a [href]="project().website" target="_blank" hlmBtn class="rounded-full px-0 hover:bg-transparent hover:text-blue-500 pl-0 gap-2">
-          Visit Site <ng-icon name="lucideExternalLink" size="md" />
+        <a [href]="project().website" target="_blank" hlmBtn class=" border border-zinc-200 dark:border-zinc-800 rounded-full px-0 hover:bg-transparent hover:text-blue-500 pl-0 gap-2">
+          Explore <ng-icon hlm name="lucideExternalLink" size="sm" />
         </a>
       }
-      <a hlmBtn variant="outline" class="gap-2">
-        <ng-icon name="lucideGithub" size="sm" />
-        View Source
-      </a>
     </div>
   </div>
 </div>
