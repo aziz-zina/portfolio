@@ -39,14 +39,24 @@ import { CursorComponent } from './components/layout/cursor/cursor.component';
 export class App {
   private readonly router = inject(Router);
   private readonly platform = inject(PLATFORM_ID);
+  private lenis: Lenis | null = null;
 
   constructor() {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        if (isPlatformBrowser(this.platform) && typeof gtag !== 'undefined') {
-          gtag('config', 'G-42206BJGCL', {
-            page_path: event.urlAfterRedirects,
-          });
+        if (isPlatformBrowser(this.platform)) {
+          // Scroll to top on route change
+          if (this.lenis) {
+            this.lenis.scrollTo(0, { immediate: true });
+          } else {
+            window.scrollTo(0, 0);
+          }
+          
+          if (typeof gtag !== 'undefined') {
+            gtag('config', 'G-42206BJGCL', {
+              page_path: event.urlAfterRedirects,
+            });
+          }
         }
       }
     });
@@ -57,17 +67,17 @@ export class App {
   }
 
   private initLenis() {
-    const lenis = new Lenis({
+    this.lenis = new Lenis({
       autoRaf: false,
       lerp: 0.1,
       smoothWheel: true,
       wheelMultiplier: 1,
     });
 
-    lenis.on('scroll', ScrollTrigger.update);
+    this.lenis.on('scroll', ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
+      this.lenis?.raf(time * 1000);
     });
 
     gsap.ticker.lagSmoothing(0);

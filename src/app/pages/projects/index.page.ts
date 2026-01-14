@@ -24,7 +24,6 @@ import {
 import { HlmBadgeImports } from '@spartan-ng/helm/badge';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { SectionTitle } from '../../shared/components/section-title/section-title';
 import { ProjectCard, Project } from '../../components/home/project/components/project-card/project-card';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -40,7 +39,6 @@ gsap.registerPlugin(ScrollTrigger);
     HlmButtonImports,
     HlmBadgeImports,
     HlmIconImports,
-    SectionTitle,
     ProjectCard,
   ],
   providers: [

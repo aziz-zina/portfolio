@@ -23,7 +23,7 @@ gsap.registerPlugin(ScrollTrigger);
 @Component({
   selector: 'app-experience',
   standalone: true,
-  imports: [CommonModule, HlmBadgeImports, ScrollAnimationDirective, SectionTitle],
+  imports: [CommonModule, HlmBadgeImports, SectionTitle],
   templateUrl: './experience.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
