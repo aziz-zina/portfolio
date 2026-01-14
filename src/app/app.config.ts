@@ -10,7 +10,7 @@ import {
   provideClientHydration,
   withEventReplay,
 } from '@angular/platform-browser';
-import { withViewTransitions } from '@angular/router';
+import { withInMemoryScrolling, withViewTransitions } from '@angular/router';
 import {
   provideNgIconsConfig,
   withContentSecurityPolicy,
@@ -22,7 +22,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withFetch()),
     provideBrowserGlobalErrorListeners(),
     provideContent(withMarkdownRenderer(), withShikiHighlighter()),
-    provideFileRouter(withViewTransitions()),
+    provideFileRouter(
+      withViewTransitions(),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top' })
+    ),
     provideClientHydration(withEventReplay()),
     provideNgIconsConfig(
       {},
