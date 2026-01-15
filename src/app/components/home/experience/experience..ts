@@ -46,6 +46,7 @@ export class Experience implements AfterViewInit, OnDestroy {
       title: 'Software Developer',
       date: 'Jan 2024 — Present',
       company: 'Inspark',
+      logo: 'companies/inspark.png',
       current: true,
       gotBulletPoints: true,
       description: [
@@ -65,41 +66,32 @@ export class Experience implements AfterViewInit, OnDestroy {
       ],
     },
     {
-      title: 'Internship Trainee',
-      date: 'Jan 2023 — Feb 2023',
-      company: "Centre National de l'Informatique",
+      title: 'Advanced Internship Trainee',
+      date: 'Jan 2022 — Feb 2022',
+      company: 'BNA - Banque Nationale Agricole',
+      logo: 'companies/bna.png',
       current: false,
       gotBulletPoints: true,
       description: [
-        'Developed internal task management platform adopted by 3 departments; improved tracking efficiency by 50%.',
-        'Configured role-based access via Spring Security; optimized PostgreSQL queries to reduce API latency by 35%.',
+        'Designed and developed a full-stack expense management module for the bank’s litigation management system.',
+        'Implemented backend services and user interfaces to streamline expense tracking and validation workflows.',
       ],
-      skills: ['Spring Boot', 'Spring Security', 'PostgreSQL', 'Angular'],
+      skills: ['Spring Boot', 'Angular', 'Oracle Database', 'Full Stack Development'],
     },
     {
-      title: 'Internship Trainee',
-      date: 'Jan 2023 — Feb 2023',
-      company: "Centre National de l'Informatique",
+      title: 'Introductory Internship Trainee',
+      date: 'Jul 2021 — Aug 2021',
+      company: 'QNB - Qatar National Bank',
+      logo: 'companies/qnb.png',
       current: false,
       gotBulletPoints: true,
       description: [
-        'Developed internal task management platform adopted by 3 departments; improved tracking efficiency by 50%.',
-        'Configured role-based access via Spring Security; optimized PostgreSQL queries to reduce API latency by 35%.',
+        'Performed hardware and software maintenance within the computer systems department.',
+        'Provided technical support for workstations, operating systems, and internal IT infrastructure.',
       ],
-      skills: ['Spring Boot', 'Spring Security', 'PostgreSQL', 'Angular'],
+      skills: ['IT Support', 'Hardware Maintenance', 'Software Maintenance', 'Computer Systems'],
     },
-    {
-      title: 'Internship Trainee',
-      date: 'Jan 2023 — Feb 2023',
-      company: "Centre National de l'Informatique",
-      current: false,
-      gotBulletPoints: true,
-      description: [
-        'Developed internal task management platform adopted by 3 departments; improved tracking efficiency by 50%.',
-        'Configured role-based access via Spring Security; optimized PostgreSQL queries to reduce API latency by 35%.',
-      ],
-      skills: ['Spring Boot', 'Spring Security', 'PostgreSQL', 'Angular'],
-    },
+
   ]);
 
   ngAfterViewInit() {

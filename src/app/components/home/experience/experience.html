@@ -23,22 +23,32 @@
             <div 
               class="relative h-full w-full bg-white/40 dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200 dark:border-zinc-800 p-8 flex flex-col justify-between transition-all duration-500 ease-out group-hover:scale-[1.02] group-hover:-translate-y-2 group-hover:border-zinc-900 dark:group-hover:border-zinc-100 group-hover:shadow-2xl group-hover:shadow-zinc-200/50 dark:group-hover:shadow-zinc-900/50 rounded-2xl"
             >
-              <!-- Top: Date & Status -->
+              <!-- Top: Date & Status + Logo -->
               <div class="flex justify-between items-start">
-                <span class="font-mono text-xs md:text-sm text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-300 transition-colors">
-                  {{ item.date }}
-                </span>
-                @if (item.current) {
-                  <span class="flex items-center gap-2 px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-[10px] font-mono tracking-widest text-zinc-900 dark:text-zinc-100">
-                    <span class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
-                    PRESENT
+                <div class="flex flex-col gap-1">
+                  <span class="font-mono text-xs md:text-sm text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-300 transition-colors">
+                    {{ item.date }}
                   </span>
-                }
+                  @if (item.current) {
+                    <span class="flex text-green-500 items-center gap-2 px-2 py-0.5 w-fit border border-green-500 text-[10px] font-mono tracking-widest rounded-full bg-green-500/20">
+                      <span class="w-1 h-1 rounded-full bg-green-500 animate-pulse"></span>
+                      PRESENT
+                    </span>
+                  }
+                </div>
+                <!-- Company Logo -->
+                <div class="w-12 h-12 md:w-14 md:h-14 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:shadow-lg group-hover:border-zinc-400 dark:group-hover:border-zinc-500">
+                  <img 
+                    [src]="item.logo" 
+                    [alt]="item.company + ' logo'" 
+                    class="w-full h-full object-contain"
+                  />
+                </div>
               </div>
 
               <!-- Middle: Role & Company -->
               <div class="space-y-2 my-4">
-                <h3 class="text-3xl md:text-4xl font-light tracking-tight text-zinc-900 dark:text-white group-hover:translate-x-1 transition-transform duration-300">
+                <h3 class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 dark:text-white group-hover:translate-x-1 transition-transform duration-300">
                   {{ item.title }}
                 </h3>
                 <div class="text-lg text-zinc-500 dark:text-zinc-400 font-normal">
@@ -50,7 +60,7 @@
               <div class="space-y-6">
                 <ul class="space-y-2">
                   @for (desc of item.description; track $index) {
-                    <li class="flex items-start gap-3 text-zinc-600 dark:text-zinc-400 text-xs md:text-sm leading-relaxed font-light">
+                    <li class="flex items-start gap-3 text-zinc-600 dark:text-zinc-400 text-sm md:text-md leading-relaxed font-normal">
                       <span class="mt-1.5 w-1 h-1 rounded-full bg-zinc-300 dark:bg-zinc-600 group-hover:bg-zinc-900 dark:group-hover:bg-zinc-100 transition-colors"></span>
                       <span>{{ desc }}</span>
                     </li>
