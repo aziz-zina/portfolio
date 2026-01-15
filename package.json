@@ -44,6 +44,7 @@
     "@tailwindcss/vite": "^4.1.4",
     "@types/gsap": "^1.20.2",
     "@types/three": "^0.182.0",
+    "@vercel/analytics": "^1.6.1",
     "angular-three": "^4.0.8",
     "angular-three-rapier": "^4.0.8",
     "angular-three-soba": "^4.0.8",

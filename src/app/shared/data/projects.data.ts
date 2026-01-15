@@ -90,7 +90,7 @@ export const PROJECTS_DATA: Project[] = [
     name: 'Tech Professionals Survey Analytics',
     type: 'Big Data - Analytics',
     image:
-      'https://private-user-images.githubusercontent.com/100224001/402820164-429c4626-c3f4-4b9f-9a1f-e858dff7ea69.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3Njg0MzUwMzcsIm5iZiI6MTc2ODQzNDczNywicGF0aCI6Ii8xMDAyMjQwMDEvNDAyODIwMTY0LTQyOWM0NjI2LWMzZjQtNGI5Zi05YTFmLWU4NThkZmY3ZWE2OS5wbmc_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjYwMTE0JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI2MDExNFQyMzUyMTdaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT1hZjk2OWMyZjFlMzVmOWQ2OWM1YTFjZDkzODllNzIyYWQyMTUzNmQwZDE4MWYxOTIyMDcyZTk5MTIzNTJjMThhJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCJ9.HuAKnNatnLRmn9BfHafBGgTsrl3T2YHcBc9d4IPeGOU',
+      './projects/data_survery.png',
     description:
       'A Big Data project that analyzes a survey of computer science and data science professionals. It focuses on data cleaning, analysis, and visualization to extract meaningful insights using Power BI and Python.',
     techs: ['Python', 'Power BI', 'Pandas', 'Matplotlib', 'Seaborn', 'Excel'],
