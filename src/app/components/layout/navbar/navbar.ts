@@ -173,7 +173,16 @@ export class Navbar implements AfterViewInit, OnDestroy {
   readonly menuItems = [
     { label: 'Home', link: '/' },
     { label: 'About', link: '#about' },
-    { label: 'Works', link: '#projects' },
+    { label: 'Experience', link: '#experience' },
+    { label: 'Projects', link: '#projects' },
     { label: 'Contact Me', link: '#contact' },
   ];
+
+  scrollToSection(event: MouseEvent, sectionId: string) {
+    event.preventDefault();
+    const targetElement = document.getElementById(sectionId);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
 }

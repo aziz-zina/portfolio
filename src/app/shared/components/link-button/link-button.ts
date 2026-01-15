@@ -23,6 +23,7 @@ import { gsap } from 'gsap';
       #linkBtn
       [href]="link()"
       class="cursor-pointer group inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ease-out hover:scale-105"
+      (click)="onClick($event)"
       (mouseenter)="onMouseEnter()"
       (mouseleave)="onMouseLeave()"
     >
@@ -53,6 +54,21 @@ export class LinkButton implements AfterViewInit {
   title = input.required<string>();
 
   ngAfterViewInit() {
+  }
+
+  onClick(event: MouseEvent) {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    const href = this.link();
+    // Handle anchor links with smooth scroll
+    if (href.startsWith('#')) {
+      event.preventDefault();
+      const targetId = href.substring(1);
+      const targetElement = document.getElementById(targetId);
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
   }
 
   onMouseEnter() {

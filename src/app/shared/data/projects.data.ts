@@ -2,17 +2,17 @@ import { Project } from '../../components/home/project/components/project-card/p
 
 export const PROJECTS_DATA: Project[] = [
   {
-    name: 'Sabeel Platform',
-    type: 'Social Impact',
-    image: './projects/sabeel.png',
+    name: 'Keycloakify Custom Theme',
+    type: 'Dev Tools',
+    image: './projects/keycloakify.png',
     description:
-      'A comprehensive reintegration ecosystem for ex-prisoners. The platform bridges the gap between rehabilitation and society through tailored resource matching.',
-    techs: ['Angular', 'Spring Boot', 'PostgreSQL', 'Keycloak', 'AWS'],
-    website: null,
+      'A modern, responsive React-based theme for Keycloak Identity Server. Replaces the legacy FreeMarker templates with a clean Tailwind CSS interface.',
+    techs: ['React', 'TypeScript', 'Keycloakify', 'Tailwind'],
+    website: 'https://oussemasahbeni.github.io/keycloakify-shadcn-starter',
     highlights: [
-      'Assisted 500+ individuals with reintegration',
-      'Increased job placement rates by 40%',
-      'Secure RBAC with Keycloak Identity',
+      'React-based component architecture',
+      'Full Dark Mode support',
+      'Custom email template generation',
     ],
   },
   {
@@ -30,20 +30,6 @@ export const PROJECTS_DATA: Project[] = [
     ],
   },
   {
-    name: 'Inspark Forge',
-    type: 'AI Recruitment',
-    image: './projects/inspark_forge.png',
-    description:
-      'Next-gen talent matching for the Tunisian market. Leverages GPT-4o to analyze CVs and match candidates with opportunities based on semantic compatibility.',
-    techs: ['OpenAI API', 'Spring Boot', 'DDD', 'RabbitMQ', 'Angular'],
-    website: 'https://talent.inspark.tn/',
-    highlights: [
-      'Integrated GPT-4o for semantic matching',
-      'Domain-Driven Design implementation',
-      'Asynchronous event-driven architecture',
-    ],
-  },
-  {
     name: 'Ministry of Agriculture',
     type: 'Government',
     image: './projects/agriculture.png',
@@ -55,20 +41,6 @@ export const PROJECTS_DATA: Project[] = [
       'Advanced search with Elasticsearch',
       'High-availability & Rate limiting',
       'WCAG Accessibility compliance',
-    ],
-  },
-  {
-    name: 'Keycloakify Custom Theme',
-    type: 'Dev Tools',
-    image: './projects/keycloakify.png',
-    description:
-      'A modern, responsive React-based theme for Keycloak Identity Server. Replaces the legacy FreeMarker templates with a clean Tailwind CSS interface.',
-    techs: ['React', 'TypeScript', 'Keycloakify', 'Tailwind'],
-    website: 'https://oussemasahbeni.github.io/keycloakify-shadcn-starter',
-    highlights: [
-      'React-based component architecture',
-      'Full Dark Mode support',
-      'Custom email template generation',
     ],
   },
   {
@@ -84,6 +56,34 @@ export const PROJECTS_DATA: Project[] = [
       'Interactive scenarios focused on real-life risk situations',
       'Educational content designed for children and adolescents',
       'Promotes safe decision-making and awareness through storytelling',
+    ],
+  },
+  {
+    name: 'Sabeel Platform',
+    type: 'Social Impact',
+    image: './projects/sabeel.png',
+    description:
+      'A comprehensive reintegration ecosystem for ex-prisoners. The platform bridges the gap between rehabilitation and society through tailored resource matching.',
+    techs: ['Angular', 'Spring Boot', 'PostgreSQL', 'Keycloak', 'AWS'],
+    website: null,
+    highlights: [
+      'Assisted 500+ individuals with reintegration',
+      'Increased job placement rates by 40%',
+      'Secure RBAC with Keycloak Identity',
+    ],
+  },
+  {
+    name: 'Inspark Forge',
+    type: 'AI Recruitment',
+    image: './projects/inspark_forge.png',
+    description:
+      'Next-gen talent matching for the Tunisian market. Leverages GPT-4o to analyze CVs and match candidates with opportunities based on semantic compatibility.',
+    techs: ['OpenAI API', 'Spring Boot', 'DDD', 'RabbitMQ', 'Angular'],
+    website: 'https://talent.inspark.tn/',
+    highlights: [
+      'Integrated GPT-4o for semantic matching',
+      'Domain-Driven Design implementation',
+      'Asynchronous event-driven architecture',
     ],
   },
   {

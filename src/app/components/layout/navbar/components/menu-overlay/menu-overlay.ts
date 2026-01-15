@@ -99,4 +99,23 @@ export class MenuOverlay implements OnDestroy {
   ngOnDestroy() {
     this.disposeRobotScene();
   }
+
+  onLinkClick(event: MouseEvent, link: string) {
+    if (link.startsWith('#')) {
+      event.preventDefault();
+      const targetId = link.substring(1);
+      
+      // Close menu first, then scroll after a short delay for animation
+      this.close.emit();
+      
+      setTimeout(() => {
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 600); // Wait for menu close animation
+    } else {
+      this.close.emit();
+    }
+  }
 }
