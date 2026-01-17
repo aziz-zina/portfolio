@@ -7,6 +7,8 @@ import { ChangeDetectionStrategy, Component, ElementRef, input, output, ViewChil
     <button
       #buttonElement
       (click)="toggle.emit()"
+      [attr.aria-label]="isOpen() ? 'Close menu' : 'Open menu'"
+      [attr.aria-expanded]="isOpen()"
       class="fixed cursor-pointer top-6 right-6 md:top-8 md:right-8 z-[60] w-12 h-12 rounded-full bg-zinc-900 text-white flex flex-col items-center justify-center gap-1.5 shadow-lg transition-all duration-500 hover:scale-110 hover:bg-black"
       [class.opacity-100]="isVisible()"
       [class.pointer-events-auto]="isVisible()"
