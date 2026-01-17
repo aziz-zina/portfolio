@@ -5,5 +5,17 @@ import { inject } from "@vercel/analytics"
 import { injectSpeedInsights } from '@vercel/speed-insights';
 
 bootstrapApplication(App, appConfig).catch((err) => console.error(err));
-inject();
-injectSpeedInsights();
+
+// Wrap analytics in try-catch to handle ad blockers gracefully
+try {
+  inject();
+} catch (e) {
+  // Analytics blocked by ad blocker - fail silently
+}
+
+try {
+  injectSpeedInsights();
+} catch (e) {
+  // Speed insights blocked by ad blocker - fail silently
+}
+
