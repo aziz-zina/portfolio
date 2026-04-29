@@ -78,5 +78,29 @@ export class Hero implements AfterViewInit, OnDestroy {
         duration: 2,
         ease: 'power2.out'
     });
+
+    const typewriterElement = document.querySelector('.typewriter-text');
+    if (typewriterElement) {
+      const originalText = "AI & Web Enthusiast";
+      const textObj = { length: 0 };
+      
+      gsap.to(textObj, {
+        length: originalText.length,
+        duration: 1.5,
+        ease: "none",
+        delay: 0.8,
+        onUpdate: () => {
+          typewriterElement.textContent = originalText.substring(0, Math.floor(textObj.length));
+        }
+      });
+      
+      gsap.to('.hero-cursor', {
+        opacity: 0,
+        ease: "steps(1)",
+        repeat: -1,
+        yoyo: true,
+        duration: 0.4
+      });
+    }
   }
 }
