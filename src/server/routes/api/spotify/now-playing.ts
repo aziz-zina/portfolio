@@ -71,8 +71,15 @@ async function getNowPlaying() {
 }
 
 export default defineEventHandler(async () => {
+    console.log('🎵 Now playing endpoint hit');
+    console.log('ENV CHECK:', {
+      hasClientId: !!process.env['SPOTIFY_CLIENT_ID'],
+      hasClientSecret: !!process.env['SPOTIFY_CLIENT_SECRET'],
+      hasRefreshToken: !!process.env['SPOTIFY_REFRESH_TOKEN'],
+    });
   try {
     const nowPlaying = await getNowPlaying();
+    console.log('✅ Result:', nowPlaying);
     return nowPlaying;
   } catch (error) {
     console.error('Error fetching now playing:', error);
