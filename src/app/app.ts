@@ -85,10 +85,8 @@ export class App {
     if (typeof window !== 'undefined' && typeof ResizeObserver !== 'undefined') {
       const resizeObserver = new ResizeObserver(() => {
         this.lenis?.resize();
-        // Also refresh ScrollTrigger so animations remain synced with the new height
         ScrollTrigger.refresh();
       });
-      // Observe the main container for any height changes (e.g., stats loading)
       resizeObserver.observe(document.body);
     }
   }
