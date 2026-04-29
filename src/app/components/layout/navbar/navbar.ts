@@ -16,11 +16,12 @@ import { HamburgerButton } from './components/hamburger-button/hamburger-button'
 import { MenuOverlay } from './components/menu-overlay/menu-overlay';
 import { gsap } from 'gsap';
 import { CursorService } from '../../../shared/services/cursor.service';
+import { NowPlaying } from "../now-playing/now-playing";
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, LinkButton, HamburgerButton, MenuOverlay],
+  imports: [RouterLink, LinkButton, HamburgerButton, MenuOverlay, NowPlaying],
   templateUrl: './navbar.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

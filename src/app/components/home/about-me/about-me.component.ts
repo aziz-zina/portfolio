@@ -113,8 +113,8 @@ export class AboutMe implements OnInit, AfterViewInit {
   readonly reposDisplay = signal(0);
   
   readonly bioTitle = "I'm Aziz – a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
-readonly bioDescription =
-  "I’m Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
+  readonly bioDescription =
+    "I’m Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
 
   get splitBioTitle() {
     return this.bioTitle.split(' ');
