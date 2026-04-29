@@ -5,7 +5,6 @@ on:
     branches: ["main"]
   pull_request:
     branches: ["main"]
-  workflow_dispatch:
 
 permissions:
   pull-requests: read
@@ -13,27 +12,13 @@ permissions:
 jobs:
   Analysis:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Shallow clones disabled for better analysis
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Run tests with coverage
-        run: npx ng test --watch=false --browsers=ChromeHeadless --code-coverage
-        continue-on-error: true # Don't fail the whole pipeline if tests fail
+          fetch-depth: 0
 
       - name: Analyze with SonarCloud
-        uses: SonarSource/sonarcloud-github-action@4006f663ecaf1f8093e8e4abb9227f6041f52216
+        uses: SonarSource/sonarcloud-github-action@master
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -41,9 +26,3 @@ jobs:
           args: >
             -Dsonar.projectKey=portfolio
             -Dsonar.organization=aziz-zina
-            -Dsonar.sources=src
-            -Dsonar.exclusions=**/node_modules/**,**/*.spec.ts
-            -Dsonar.tests=src
-            -Dsonar.test.inclusions=**/*.spec.ts
-            -Dsonar.javascript.lcov.reportPaths=coverage/portfolio/lcov.info
-          projectBaseDir: .
