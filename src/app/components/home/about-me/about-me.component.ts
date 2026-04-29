@@ -23,6 +23,10 @@ import {
   lucideCloud,
   lucideShield,
   lucideCode,
+  lucideStar,
+  lucideGitCommit,
+  lucideGitPullRequest,
+  lucideBug,
 } from '@ng-icons/lucide';
 import { HlmButtonImports } from '@spartan-ng/helm/button';
 import { HlmCardImports } from '@spartan-ng/helm/card';
@@ -36,17 +40,7 @@ import { SectionTitle } from '../../../shared/components/section-title/section-t
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface TechStack {
-  name: string;
-  icon: string;
-  title: string;
-}
-
-interface TechCategory {
-  title: string;
-  categoryIcon: string;
-  skills: TechStack[];
-}
+import { TechCategory, techCategoriesData } from './data';
 
 export interface GithubProfile {
   login: string;
@@ -85,6 +79,10 @@ export interface GithubProfile {
       lucideCloud,
       lucideShield,
       lucideCode,
+      lucideStar,
+      lucideGitCommit,
+      lucideGitPullRequest,
+      lucideBug,
     }),
   ],
   templateUrl: './about-me.html',
@@ -125,14 +123,24 @@ export class AboutMe implements OnInit, AfterViewInit {
   readonly publicRepos = signal(0);
   readonly followers = signal(0);
   
+  // Custom Stats
+  readonly githubStars = signal(0);
+  readonly githubCommits = signal(0);
+  readonly githubPRs = signal(0);
+  readonly githubIssues = signal(0);
+  
   // Display values (animated)
   readonly yearsDisplay = signal(0);
   readonly followersDisplay = signal(0);
   readonly reposDisplay = signal(0);
+  readonly githubStarsDisplay = signal(0);
+  readonly githubCommitsDisplay = signal(0);
+  readonly githubPRsDisplay = signal(0);
+  readonly githubIssuesDisplay = signal(0);
   
-  readonly bioTitle = "I'm Aziz – a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
+  readonly bioTitle = "I'm Aziz - a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
   readonly bioDescription =
-    "I’m Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
+    "I'm Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
 
   get splitBioTitle() {
     return this.bioTitle.split(' ');
@@ -146,169 +154,7 @@ export class AboutMe implements OnInit, AfterViewInit {
   readonly usersServed = signal(1000);
   readonly projectsCompleted = signal(4);
 
-  protected readonly techCategories = signal<TechCategory[]>([
-    {
-      title: 'Frontend Development',
-      categoryIcon: 'lucideLayout',
-      skills: [
-        {
-          name: 'Angular',
-          icon: 'https://img.icons8.com/?size=48&id=6SWtW8hxZWSo&format=png',
-          title: 'Angular - TypeScript-based web framework',
-        },
-        {
-          name: 'Next.js',
-          icon: 'https://img.icons8.com/?size=48&id=MWiBjkuHeMVq&format=png',
-          title: 'Next.js - React framework for production',
-        },
-        {
-          name: 'React',
-          icon: 'https://img.icons8.com/?size=100&id=asWSSTBrDlTW&format=png&color=000000',
-          title: 'React - JavaScript library for building UIs',
-        },
-        {
-          name: 'TypeScript',
-          icon: 'https://img.icons8.com/?size=48&id=uJM6fQYqDaZK&format=png',
-          title: 'TypeScript - Typed JavaScript superset',
-        },
-        {
-          name: 'Tailwind CSS',
-          icon: 'https://img.icons8.com/?size=48&id=CIAZz2CYc6Kc&format=png',
-          title: 'Tailwind CSS - Utility-first CSS framework',
-        },
-      ]
-    },
-    {
-      title: 'Backend Development',
-      categoryIcon: 'lucideServer',
-      skills: [
-        {
-          name: 'Spring Boot',
-          icon: 'https://img.icons8.com/?size=48&id=90519&format=png',
-          title: 'Spring Boot - Java enterprise framework',
-        },
-        {
-          name: 'Node.js',
-          icon: 'https://img.icons8.com/?size=48&id=hsPbhkOH4FMe&format=png',
-          title: 'Node.js - JavaScript runtime environment',
-        },
-        {
-          name: 'Java',
-          icon: 'https://img.icons8.com/?size=100&id=GPfHz0SM85FX&format=png&color=000000',
-          title: 'Java - Programming language',
-        },
-        {
-          name: 'Python',
-          icon: 'https://img.icons8.com/?size=100&id=13441&format=png&color=000000',
-          title: 'Python - Programming language',
-        },
-      ]
-    },
-    {
-      title: 'Databases & Message Brokers',
-      categoryIcon: 'lucideDatabase',
-      skills: [
-        {
-          name: 'PostgreSQL',
-          icon: 'https://img.icons8.com/?size=48&id=38561&format=png',
-          title: 'PostgreSQL - Advanced relational database',
-        },
-        {
-          name: 'MySQL',
-          icon: 'https://img.icons8.com/?size=100&id=QeIg9siFKGgp&format=png&color=000000',
-          title: 'MySQL - Relation database system',
-        },
-        {
-          name: 'MongoDB',
-          icon: 'https://img.icons8.com/?size=48&id=8rKdRqZFLurS&format=png',
-          title: 'MongoDB - NoSQL document database',
-        },
-        {
-          name: 'RabbitMQ',
-          icon: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rabbitmq/rabbitmq-original.svg',
-          title: 'RabbitMQ - Message broker',
-        },
-      ]
-    },
-    {
-      title: 'DevOps & Cloud',
-      categoryIcon: 'lucideCloud',
-      skills: [
-        {
-          name: 'Linux',
-          icon: 'https://img.icons8.com/?size=48&id=17842&format=png',
-          title: 'Linux - Operating System',
-        },
-        {
-          name: 'Docker',
-          icon: 'https://img.icons8.com/?size=48&id=cdYUlRaag9G9&format=png',
-          title: 'Docker - Containerization platform',
-        },
-        {
-          name: 'Kubernetes',
-          icon: 'https://img.icons8.com/?size=100&id=cvzmaEA4kC0o&format=png&color=000000',
-          title: 'Kubernetes - Container orchestration platform',
-        },
-        {
-          name: 'AWS',
-          icon: 'https://img.icons8.com/?size=100&id=G0CnLqqcRBXl&format=png&color=000000',
-          title: 'AWS - Amazon Web Services cloud platform',
-        },
-        {
-          name: 'Azure',
-          icon: 'https://img.icons8.com/?size=48&id=VLKafOkk3sBX&format=png',
-          title: 'Azure - Microsoft Azure cloud platform',
-        }
-      ]
-    },
-    {
-      title: 'Tools & Security',
-      categoryIcon: 'lucideShield',
-      skills: [
-        {
-          name: 'Keycloak',
-          icon: 'https://img.icons8.com/fluency/48/key-cloak.png',
-          title: 'Keycloak - Identity and access management',
-        },
-        {
-          name: 'Prometheus',
-          icon: 'https://img.icons8.com/?size=48&id=lOqoeP2Zy02f&format=png',
-          title: 'Prometheus - Monitoring and alerting toolkit',
-        },
-        {
-          name: 'Grafana',
-          icon: 'https://img.icons8.com/?size=48&id=9uVrNMu3Zx1K&format=png',
-          title: 'Grafana - Analytics and monitoring platform',
-        },
-        {
-          name: 'Git',
-          icon: 'https://img.icons8.com/?size=48&id=20906&format=png',
-          title: 'Git - Version control system',
-        },
-      ]
-    },
-    {
-      title: 'Development Environments',
-      categoryIcon: 'lucideCode',
-      skills: [
-        {
-          name: 'IntelliJ IDEA',
-          icon: 'https://img.icons8.com/?size=100&id=61466&format=png&color=000000',
-          title: 'IntelliJ IDEA - Integrated development environment',
-        },
-        {
-          name: 'VS Code',
-          icon: 'https://img.icons8.com/?size=100&id=9OGIyU8hrxW5&format=png&color=000000',
-          title: 'VS Code - Source-code editor',
-        },
-        {
-          name: 'Jupyter Notebook',
-          icon: 'https://img.icons8.com/?size=100&id=J0SgMWzAxqFj&format=png&color=000000',
-          title: 'Jupyter Notebook - Notebook environment',
-        },
-      ]
-    }
-  ]);
+  protected readonly techCategories = signal<TechCategory[]>(techCategoriesData);
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platform)) {
@@ -322,6 +168,24 @@ export class AboutMe implements OnInit, AfterViewInit {
         },
         error: (err) => {
           console.error('Error fetching Github info', err);
+        }
+      });
+      
+      this.gitApi.getCustomStats().subscribe({
+        next: (data) => {
+          if (!data.error) {
+            this.githubStars.set(data.stars);
+            this.githubCommits.set(data.commits);
+            this.githubPRs.set(data.prs);
+            this.githubIssues.set(data.issues);
+            // Re-trigger animation logic if needed, or animate separately
+            this.animateCustomStats();
+          } else {
+            console.error('Error in custom stats:', data.error);
+          }
+        },
+        error: (err) => {
+          console.error('Error fetching Custom Github stats', err);
         }
       });
     }
@@ -410,6 +274,53 @@ export class AboutMe implements OnInit, AfterViewInit {
         this.reposDisplay.set(Math.round(reposObj.val));
       }
     });
+  }
+
+  private animateCustomStats() {
+    // Only animate if values are loaded
+    const duration = 2.5;
+    const ease = 'power2.out';
+    const delay = 0.5;
+
+    // Stars
+    if (this.githubStars() > 0) {
+      const starsObj = { val: 0 };
+      gsap.to(starsObj, {
+        val: this.githubStars(), duration, delay, ease,
+        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
+        onUpdate: () => this.githubStarsDisplay.set(Math.round(starsObj.val))
+      });
+    }
+
+    // Commits
+    if (this.githubCommits() > 0) {
+      const commitsObj = { val: 0 };
+      gsap.to(commitsObj, {
+        val: this.githubCommits(), duration, delay: delay + 0.1, ease,
+        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
+        onUpdate: () => this.githubCommitsDisplay.set(Math.round(commitsObj.val))
+      });
+    }
+
+    // PRs
+    if (this.githubPRs() > 0) {
+      const prsObj = { val: 0 };
+      gsap.to(prsObj, {
+        val: this.githubPRs(), duration, delay: delay + 0.2, ease,
+        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
+        onUpdate: () => this.githubPRsDisplay.set(Math.round(prsObj.val))
+      });
+    }
+
+    // Issues
+    if (this.githubIssues() > 0) {
+      const issuesObj = { val: 0 };
+      gsap.to(issuesObj, {
+        val: this.githubIssues(), duration, delay: delay + 0.3, ease,
+        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
+        onUpdate: () => this.githubIssuesDisplay.set(Math.round(issuesObj.val))
+      });
+    }
   }
   
   onExperienceHover() {

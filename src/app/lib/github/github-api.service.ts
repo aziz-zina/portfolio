@@ -13,4 +13,10 @@ export class GithubApiService {
       .get('https://api.github.com/users/aziz-zina')
       .pipe(shareReplay(1));
   }
+
+  getCustomStats() {
+    return this.http
+      .get<{stars: number, commits: number, prs: number, issues: number, error?: string}>('/api/github/stats')
+      .pipe(shareReplay(1));
+  }
 }
