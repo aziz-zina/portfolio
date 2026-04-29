@@ -91,13 +91,7 @@ import { SpotifyService } from '../../../lib/spotify/spotify.service';
     </div>
   `,
 })
-export class NowPlaying implements OnInit{
+export class NowPlaying{
   private readonly spotifyService = inject(SpotifyService);
-
   readonly nowPlaying = this.spotifyService.nowPlaying;
-
-  ngOnInit(): void {
-    console.log("Ena houni tawa")
-    console.log("nowPlaying: ", this.nowPlaying());
-  }
 }
