@@ -98,6 +98,6 @@ export class NowPlaying implements OnInit{
 
   ngOnInit(): void {
     console.log("Ena houni tawa")
-      console.log("nowPlaying: ", this.nowPlaying());
+    console.log("nowPlaying: ", this.nowPlaying());
   }
 }
