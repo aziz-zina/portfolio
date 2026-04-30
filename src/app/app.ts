@@ -51,7 +51,7 @@ export class App {
           } else {
             window.scrollTo(0, 0);
           }
-          
+
           if (typeof gtag !== 'undefined') {
             gtag('config', 'G-42206BJGCL', {
               page_path: event.urlAfterRedirects,
@@ -82,12 +82,38 @@ export class App {
 
     gsap.ticker.lagSmoothing(0);
 
-    if (typeof window !== 'undefined' && typeof ResizeObserver !== 'undefined') {
+    if (
+      typeof window !== 'undefined' &&
+      typeof ResizeObserver !== 'undefined'
+    ) {
       const resizeObserver = new ResizeObserver(() => {
         this.lenis?.resize();
         ScrollTrigger.refresh();
       });
       resizeObserver.observe(document.body);
+    }
+
+    // Ensure the mouse wheel can reach the document end when Lenis is smoothing.
+    if (typeof window !== 'undefined') {
+      window.addEventListener(
+        'wheel',
+        (e: WheelEvent) => {
+          try {
+            const el = document.documentElement;
+            const scrollTop = window.scrollY || el.scrollTop;
+            const max = el.scrollHeight - window.innerHeight;
+
+            // If user scrolls down and we're within a few pixels of the bottom,
+            // instruct Lenis to jump to the exact bottom to avoid stopping early.
+            if (e.deltaY > 0 && scrollTop >= max - 8) {
+              this.lenis?.scrollTo(max, { immediate: true });
+            }
+          } catch (err) {
+            console.error('Error in wheel event handler:', err);
+          }
+        },
+        { passive: true },
+      );
     }
   }
 }

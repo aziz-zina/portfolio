@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,7 +10,6 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
 import { provideIcons } from '@ng-icons/core';
 import {
   lucideArrowRight,
@@ -57,10 +56,10 @@ gsap.registerPlugin(ScrollTrigger);
     <section class="relative w-full min-h-screen bg-background dark:bg-black z-10 pt-32 pb-24">
       <!-- Ambient Background -->
       <div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
+        class="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
       ></div>
       <div
-        class="absolute bottom-0 right-0 w-[800px] h-[800px] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"
+        class="absolute bottom-0 right-0 w-200 h-200 bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"
       ></div>
 
       <!-- Back Navigation -->

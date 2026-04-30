@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -11,7 +11,6 @@ import {
   PLATFORM_ID,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { isPlatformBrowser } from '@angular/common';
 import { provideIcons } from '@ng-icons/core';
 import {
   lucideArrowRight,
@@ -82,7 +81,7 @@ export default class Projects implements AfterViewInit, OnDestroy {
   private initCardAnimations() {
     this.ctx = gsap.context(() => {
       const cards = this.el.nativeElement.querySelectorAll('.project-card');
-      
+
       // Set initial state
       gsap.set(cards, {
         opacity: 0,

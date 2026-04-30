@@ -50,6 +50,9 @@
       ],
       "@spartan-ng/helm/separator": [
         "./src/app/components/ui/separator/src/index.ts"
+      ],
+      "@spartan-ng/helm/carousel": [
+        "./src/app/components/ui/carousel/src/index.ts"
       ]
     }
   },
