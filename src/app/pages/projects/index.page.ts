@@ -1,37 +1,37 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from "@angular/common";
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  AfterViewInit,
-  OnDestroy,
-  signal,
   inject,
+  OnDestroy,
   PLATFORM_ID,
-} from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { provideIcons } from '@ng-icons/core';
+  signal,
+} from "@angular/core";
+import { RouterLink } from "@angular/router";
+import { provideIcons } from "@ng-icons/core";
 import {
-  lucideArrowRight,
   lucideArrowLeft,
+  lucideArrowRight,
+  lucideCode2,
   lucideExternalLink,
   lucideGithub,
   lucideLayers,
   lucideLayoutTemplate,
-  lucideCode2,
-} from '@ng-icons/lucide';
-import { HlmBadgeImports } from '@spartan-ng/helm/badge';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { ProjectCard } from '../../components/home/project/components/project-card/project-card';
-import { PROJECTS_DATA } from '../../shared/data/projects.data';
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+} from "@ng-icons/lucide";
+import { HlmBadgeImports } from "@spartan-ng/helm/badge";
+import { HlmButtonImports } from "@spartan-ng/helm/button";
+import { HlmIconImports } from "@spartan-ng/helm/icon";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ProjectCard } from "../../components/home/project/components/project-card/project-card";
+import { PROJECTS_DATA } from "../../shared/data/projects.data";
 
 gsap.registerPlugin(ScrollTrigger);
 
 @Component({
-  selector: 'app-all-projects',
+  selector: "app-all-projects",
   standalone: true,
   imports: [
     CommonModule,
@@ -53,7 +53,9 @@ gsap.registerPlugin(ScrollTrigger);
     }),
   ],
   template: `
-    <section class="relative w-full min-h-screen bg-background dark:bg-black z-10 pt-32 pb-24">
+    <section
+      class="relative w-full min-h-screen bg-background dark:bg-black z-10 pt-32 pb-24"
+    >
       <!-- Ambient Background -->
       <div
         class="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
@@ -72,11 +74,14 @@ gsap.registerPlugin(ScrollTrigger);
 
       <!-- Section Header -->
       <div class="max-w-7xl mx-auto px-6 pb-16 relative z-10">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-zinc-900 mb-4">
+        <h1
+          class="text-4xl md:text-5xl lg:text-6xl font-bold text-zinc-900 mb-4"
+        >
           All Projects
         </h1>
         <p class="text-lg text-gray-400 max-w-2xl">
-          A complete showcase of my work, featuring web applications, open-source contributions, and innovative solutions.
+          A complete showcase of my work, featuring web applications,
+          open-source contributions, and innovative solutions.
         </p>
       </div>
 
@@ -84,10 +89,7 @@ gsap.registerPlugin(ScrollTrigger);
       <div class="max-w-7xl mx-auto px-6 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
           @for (project of projects(); track $index) {
-            <app-project-card 
-              [project]="project" 
-              [attr.data-index]="$index"
-            />
+            <app-project-card [project]="project" [attr.data-index]="$index" />
           }
         </div>
       </div>
@@ -116,8 +118,8 @@ export default class AllProjectsPage implements AfterViewInit, OnDestroy {
 
   private initCardAnimations() {
     this.ctx = gsap.context(() => {
-      const cards = this.el.nativeElement.querySelectorAll('.project-card');
-      
+      const cards = this.el.nativeElement.querySelectorAll(".project-card");
+
       // Set initial state
       gsap.set(cards, {
         opacity: 0,
@@ -130,11 +132,11 @@ export default class AllProjectsPage implements AfterViewInit, OnDestroy {
           opacity: 1,
           y: 0,
           duration: 0.8,
-          ease: 'power3.out',
+          ease: "power3.out",
           scrollTrigger: {
             trigger: card,
-            start: 'top 85%',
-            toggleActions: 'play none none none',
+            start: "top 85%",
+            toggleActions: "play none none none",
           },
           delay: (index % 2) * 0.15, // Stagger between left and right columns
         });

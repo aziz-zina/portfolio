@@ -18,7 +18,7 @@ import { HlmIconImports } from "@spartan-ng/helm/icon";
 
 export interface Project {
   name: string;
-  slug: string;
+  slug?: string;
   type: string;
   image: string;
   images?: string[];

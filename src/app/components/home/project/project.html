@@ -1,10 +1,14 @@
-<section class="relative w-full bg-background dark:bg-black z-10 py-24" id="projects" #section>
+<section
+  class="relative w-full bg-background dark:bg-black z-10 py-24"
+  id="projects"
+  #section
+>
   <!-- Ambient Background -->
   <div
-    class="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[600px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
+    class="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
   ></div>
   <div
-    class="absolute bottom-0 right-0 w-[800px] h-[800px] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"
+    class="absolute bottom-0 right-0 w-200 h-200 bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"
   ></div>
 
   <!-- Section Header -->
@@ -16,18 +20,13 @@
   <div class="max-w-7xl mx-auto px-6 relative z-10">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
       @for (project of displayedProjects(); track $index) {
-        <app-project-card 
-          [project]="project" 
-          [attr.data-index]="$index"
-        />
+      <app-project-card [project]="project" [attr.data-index]="$index" />
       }
     </div>
-    
+
     <!-- View All Projects Button -->
     <div class="flex justify-center mt-16">
-      <a hlmBtn variant="outline" routerLink="/projects">
-        View All Projects
-      </a>
+      <a hlmBtn variant="outline" routerLink="/projects"> View All Projects </a>
     </div>
   </div>
 </section>

@@ -91,7 +91,6 @@ export const PROJECTS_DATA: Project[] = [
   },
   {
     name: "Inspark Forge",
-    slug: "inspark-forge",
     type: "AI Recruitment",
     image: "./projects/inspark_forge.png",
     description:
