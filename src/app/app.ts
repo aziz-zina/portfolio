@@ -1,23 +1,23 @@
-import { isPlatformBrowser } from '@angular/common';
-import Lenis from 'lenis';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-gsap.registerPlugin(ScrollTrigger);
+import { isPlatformBrowser } from "@angular/common";
 import {
   ChangeDetectionStrategy,
   Component,
   PLATFORM_ID,
   inject,
-} from '@angular/core';
-import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+} from "@angular/core";
+import { NavigationEnd, Router, RouterOutlet } from "@angular/router";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Lenis from "lenis";
 
-import { BackToTop } from './components/layout/back-to-top/back-to-top';
-import { Footer } from './components/layout/footer/footer';
-import { Navbar } from './components/layout/navbar/navbar';
-import { CursorComponent } from './components/layout/cursor/cursor.component';
+gsap.registerPlugin(ScrollTrigger);
+
+import { BackToTop } from "./components/layout/back-to-top/back-to-top";
+import { CursorComponent } from "./components/layout/cursor/cursor.component";
+import { Footer } from "./components/layout/footer/footer";
+import { Navbar } from "./components/layout/navbar/navbar";
 @Component({
-  selector: 'app-root',
+  selector: "app-root",
   standalone: true,
   imports: [RouterOutlet, Navbar, Footer, BackToTop, CursorComponent],
   template: `
@@ -45,15 +45,19 @@ export class App {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         if (isPlatformBrowser(this.platform)) {
-          // Scroll to top on route change
           if (this.lenis) {
             this.lenis.scrollTo(0, { immediate: true });
+            // Re-sync after navigation so scroll limit is recalculated
+            setTimeout(() => {
+              this.lenis?.resize();
+              ScrollTrigger.refresh();
+            }, 100);
           } else {
             window.scrollTo(0, 0);
           }
 
-          if (typeof gtag !== 'undefined') {
-            gtag('config', 'G-42206BJGCL', {
+          if (typeof gtag !== "undefined") {
+            gtag("config", "G-42206BJGCL", {
               page_path: event.urlAfterRedirects,
             });
           }
@@ -66,6 +70,56 @@ export class App {
     }
   }
 
+  // private initLenis() {
+  //   this.lenis = new Lenis({
+  //     autoRaf: false,
+  //     lerp: 0.1,
+  //     smoothWheel: true,
+  //     wheelMultiplier: 1,
+  //   });
+
+  //   this.lenis.on('scroll', ScrollTrigger.update);
+
+  //   gsap.ticker.add((time) => {
+  //     this.lenis?.raf(time * 1000);
+  //   });
+
+  //   gsap.ticker.lagSmoothing(0);
+
+  //   if (
+  //     typeof window !== 'undefined' &&
+  //     typeof ResizeObserver !== 'undefined'
+  //   ) {
+  //     const resizeObserver = new ResizeObserver(() => {
+  //       this.lenis?.resize();
+  //       ScrollTrigger.refresh();
+  //     });
+  //     resizeObserver.observe(document.body);
+  //   }
+
+  //   // Ensure the mouse wheel can reach the document end when Lenis is smoothing.
+  //   if (typeof window !== 'undefined') {
+  //     window.addEventListener(
+  //       'wheel',
+  //       (e: WheelEvent) => {
+  //         try {
+  //           const el = document.documentElement;
+  //           const scrollTop = window.scrollY || el.scrollTop;
+  //           const max = el.scrollHeight - window.innerHeight;
+
+  //           // If user scrolls down and we're within a few pixels of the bottom,
+  //           // instruct Lenis to jump to the exact bottom to avoid stopping early.
+  //           if (e.deltaY > 0 && scrollTop >= max - 8) {
+  //             this.lenis?.scrollTo(max, { immediate: true });
+  //           }
+  //         } catch (err) {
+  //           console.error('Error in wheel event handler:', err);
+  //         }
+  //       },
+  //       { passive: true },
+  //     );
+  //   }
+  // }
   private initLenis() {
     this.lenis = new Lenis({
       autoRaf: false,
@@ -74,7 +128,7 @@ export class App {
       wheelMultiplier: 1,
     });
 
-    this.lenis.on('scroll', ScrollTrigger.update);
+    this.lenis.on("scroll", ScrollTrigger.update);
 
     gsap.ticker.add((time) => {
       this.lenis?.raf(time * 1000);
@@ -83,37 +137,21 @@ export class App {
     gsap.ticker.lagSmoothing(0);
 
     if (
-      typeof window !== 'undefined' &&
-      typeof ResizeObserver !== 'undefined'
+      typeof window !== "undefined" &&
+      typeof ResizeObserver !== "undefined"
     ) {
+      let resizeTimer: ReturnType<typeof setTimeout>;
       const resizeObserver = new ResizeObserver(() => {
-        this.lenis?.resize();
-        ScrollTrigger.refresh();
+        // Debounce to avoid mid-scroll refreshes
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          this.lenis?.resize();
+          ScrollTrigger.refresh();
+        }, 150);
       });
       resizeObserver.observe(document.body);
     }
 
-    // Ensure the mouse wheel can reach the document end when Lenis is smoothing.
-    if (typeof window !== 'undefined') {
-      window.addEventListener(
-        'wheel',
-        (e: WheelEvent) => {
-          try {
-            const el = document.documentElement;
-            const scrollTop = window.scrollY || el.scrollTop;
-            const max = el.scrollHeight - window.innerHeight;
-
-            // If user scrolls down and we're within a few pixels of the bottom,
-            // instruct Lenis to jump to the exact bottom to avoid stopping early.
-            if (e.deltaY > 0 && scrollTop >= max - 8) {
-              this.lenis?.scrollTo(max, { immediate: true });
-            }
-          } catch (err) {
-            console.error('Error in wheel event handler:', err);
-          }
-        },
-        { passive: true },
-      );
-    }
+    // REMOVED: The wheel event override — it was fighting Lenis and causing the stop
   }
 }
