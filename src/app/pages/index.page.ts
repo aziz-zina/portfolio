@@ -5,16 +5,16 @@
 //   pathMatch: 'full',
 // };
 
-import { Component } from '@angular/core';
-import { FeaturedBlogs } from '../components/blog/featured-blogs/featured-blogs';
-import { AboutMe } from '../components/home/about-me/about-me.component';
-import { Contact } from '../components/home/contact/contact.component';
-import { Experience } from '../components/home/experience/experience.';
-import { Hero } from '../components/home/hero/hero.component';
-import Projects from '../components/home/project/project.page';
+import { Component } from "@angular/core";
+import { FeaturedBlogs } from "../components/blog/featured-blogs/featured-blogs";
+import { AboutMe } from "../components/home/about-me/about-me.component";
+import { Contact } from "../components/home/contact/contact.component";
+import { Experience } from "../components/home/experience/experience.";
+import { Hero } from "../components/home/hero/hero.component";
+import Projects from "../components/home/project/project.page";
 
 @Component({
-  selector: 'home',
+  selector: "home",
   standalone: true,
   imports: [Hero, AboutMe, Experience, FeaturedBlogs, Projects, Contact],
   template: `
@@ -22,7 +22,7 @@ import Projects from '../components/home/project/project.page';
     <app-about-me />
     <app-experience />
     <app-projects />
-    <app-featured-blogs />
+    <!-- <app-featured-blogs /> -->
     <app-contact />
   `,
 })

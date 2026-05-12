@@ -10,10 +10,14 @@
 
   @keyframes aurora {
     from {
-      background-position: 50% 50%, 50% 50%;
+      background-position:
+        50% 50%,
+        50% 50%;
     }
     to {
-      background-position: 350% 50%, 350% 50%;
+      background-position:
+        350% 50%,
+        350% 50%;
     }
   }
 }
@@ -98,11 +102,13 @@ app-root {
 :root {
   color-scheme: light;
 
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji",
-    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 
-  --font-mono: "JetBrains Mono", "Fira Code", "SF Mono", Monaco, "Cascadia Code",
+  --font-mono:
+    "JetBrains Mono", "Fira Code", "SF Mono", Monaco, "Cascadia Code",
     "Roboto Mono", Consolas, "Courier New", monospace;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -172,6 +178,18 @@ app-root {
     @apply bg-background text-foreground;
     cursor: none;
   }
+}
+
+/* Force Shiki code blocks to use our dark background, overriding its inline styles */
+.prose pre,
+.prose pre[style] {
+  background-color: oklch(0.09 0 0) !important;
+  color: inherit;
+}
+
+.prose pre code,
+.prose pre code span {
+  background-color: transparent !important;
 }
 
 .theme-transition::view-transition-old(root),

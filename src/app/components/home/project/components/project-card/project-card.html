@@ -1,30 +1,65 @@
 <div class="project-card group">
   <!-- Project Image -->
-  <div class="relative w-full aspect-[16/10] rounded-2xl overflow-hidden mb-6 bg-[#1e1e1e] border border-zinc-800 shadow-xl group-hover:shadow-2xl transition-shadow duration-300">
+  <div
+    class="relative w-full rounded-2xl overflow-hidden mb-6 bg-[#1e1e1e] border border-zinc-800 shadow-xl group-hover:shadow-2xl transition-shadow duration-300"
+  >
     <!-- Mac-style Window Controls -->
-    <div class="absolute top-0 w-full h-8 bg-[#2a2a2a] border-b border-zinc-800 flex items-center px-3 gap-1.5 z-10">
+    <div
+      class="absolute top-0 w-full h-8 bg-[#2a2a2a] border-b border-zinc-800 flex items-center px-3 gap-1.5 z-10"
+    >
       <div class="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
       <div class="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]"></div>
       <div class="w-2.5 h-2.5 rounded-full bg-[#27c93f]"></div>
-      <div class="absolute inset-0 flex items-center justify-center text-[10px] font-mono text-white">
+      <div
+        class="absolute inset-0 flex items-center justify-center text-[10px] font-mono text-white"
+      >
         {{ project().name }}
       </div>
     </div>
-    <img 
-      [src]="project().image" 
+
+    @if (allImages(); as images) {
+    <!-- Carousel for multiple images -->
+    <div class="pt-8">
+      <hlm-carousel class="w-full">
+        <hlm-carousel-content>
+          @for (img of images; track $index) {
+          <div hlmCarouselItem>
+            <img
+              [src]="img"
+              [alt]="project().name + ' screenshot ' + ($index + 1)"
+              class="w-full"
+              loading="lazy"
+            />
+          </div>
+          }
+        </hlm-carousel-content>
+        <button hlm-carousel-previous class="-left-4"></button>
+        <button hlm-carousel-next class="-right-4"></button>
+        <hlm-carousel-slide-display class="absolute bottom-2 right-3" />
+      </hlm-carousel>
+    </div>
+    } @else {
+    <!-- Single image -->
+    <img
+      [src]="project().image"
       [alt]="project().name"
-      class="object-cover w-full h-full pt-8 group-hover:scale-105 transition-transform duration-500"
+      class="w-full pt-8 group-hover:scale-105 transition-transform duration-500"
       loading="lazy"
     />
+    }
   </div>
 
   <!-- Project Info -->
   <div class="space-y-4">
-    <span class="text-sm font-mono text-zinc-400 font-medium tracking-widest uppercase">
+    <span
+      class="text-sm font-mono text-zinc-400 font-medium tracking-widest uppercase"
+    >
       {{ project().type }}
     </span>
 
-    <h3 class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-50 leading-tight">
+    <h3
+      class="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-zinc-50 leading-tight"
+    >
       {{ project().name }}
     </h3>
 
@@ -35,19 +70,49 @@
     <!-- Tech Stack -->
     <div class="flex flex-wrap gap-2 pt-2">
       @for (tech of project().techs; track $index) {
-        <span class="text-xs font-medium text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded">
-          {{ tech }}
-        </span>
+      <span
+        class="text-xs font-medium text-zinc-400 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800 px-2 py-1 rounded"
+      >
+        {{ tech }}
+      </span>
       }
     </div>
 
     <!-- Links -->
     <div class="pt-2 flex items-center gap-4">
-      @if(project().website) {
-        <a [href]="project().website" target="_blank" hlmBtn class=" border border-zinc-200 dark:border-zinc-800 rounded-full px-0 hover:bg-transparent hover:text-blue-500 pl-0 gap-2">
-          Explore <ng-icon hlm name="lucideExternalLink" size="sm" />
-        </a>
-      }
+      @if (project().hasDetails) {
+      <a
+        [routerLink]="['/projects', project().slug]"
+        hlmBtn
+        variant="default"
+        class="gap-2 rounded-full"
+      >
+        View Details
+        <ng-icon hlm name="lucideArrowRight" size="sm" />
+      </a>
+      } @if (project().website) { @if (isGithub()) {
+      <a
+        [href]="project().website"
+        target="_blank"
+        hlmBtn
+        variant="outline"
+        class="gap-2 rounded-full bg-white text-black border-black hover:bg-zinc-100 hover:text-black dark:bg-white dark:text-black dark:border-black dark:hover:bg-zinc-100"
+      >
+        View Source
+        <ng-icon hlm name="lucideGithub" size="sm" />
+      </a>
+      } @else {
+      <a
+        [href]="project().website"
+        target="_blank"
+        hlmBtn
+        variant="outline"
+        class="gap-2 rounded-full bg-white text-black border-black hover:bg-zinc-100 hover:text-black dark:bg-white dark:text-black dark:border-black dark:hover:bg-zinc-100"
+      >
+        Live
+        <ng-icon hlm name="lucideExternalLink" size="sm" />
+      </a>
+      } }
     </div>
   </div>
 </div>
