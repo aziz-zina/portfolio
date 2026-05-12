@@ -1,11 +1,11 @@
 <section id="about" class="relative py-5 overflow-visible bg-background z-10">
   <!-- Background blobs -->
   <div
-    class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
+    class="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-200 bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
   ></div>
-  <div
-    class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
-  ></div>
+  <!--<div
+    class="absolute bottom-0 right-0 w-150 h-150 bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
+  ></div>-->
 
   <app-section-title title="About Me" />
 
@@ -41,194 +41,314 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6 mb-10">
-      <!-- Experience -->
+    <!-- Bento Stats Grid -->
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 mb-16"
+      appScrollAnimation="fade-up"
+      [delay]="0.1"
+    >
+      <!-- Experience — hero card -->
       <div
-        class="lg:col-span-4 group relative overflow-hidden rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5"
-        appScrollAnimation="fade-up"
-        [delay]="0.1"
+        class="lg:col-span-5 group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 transition-all duration-500 hover:border-blue-500/40 hover:shadow-2xl hover:shadow-blue-500/10 min-h-60"
         (mouseenter)="onExperienceHover()"
         (mouseleave)="onExperienceLeave()"
       >
+        <!-- Dot grid texture -->
+        <div
+          class="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] pointer-events-none"
+          style="
+            background-image: radial-gradient(
+              circle,
+              currentColor 1px,
+              transparent 1px
+            );
+            background-size: 20px 20px;
+          "
+        ></div>
+
+        <!-- Glow blobs -->
+        <div
+          class="absolute -top-16 -right-16 w-56 h-56 bg-blue-500/15 dark:bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/25 transition-all duration-700 pointer-events-none"
+        ></div>
+        <div
+          class="absolute -bottom-8 -left-8 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-700 pointer-events-none"
+        ></div>
+
+        <!-- Big background icon -->
         <div
           #experienceArrow
-          class="absolute right-0 top-0 p-8 opacity-5"
+          class="absolute right-0 bottom-0 p-6 opacity-[0.04] pointer-events-none"
         >
-          <ng-icon
-            name="lucideTrendingUp"
-            size="8rem"
-            class="text-zinc-900 dark:text-white"
-          />
+          <ng-icon name="lucideTrendingUp" size="10rem" class="text-blue-600" />
         </div>
+
         <div class="relative z-10 h-full flex flex-col justify-between gap-8">
-          <div>
+          <!-- Top row -->
+          <div class="flex items-center justify-between">
             <div
-              class="inline-flex items-center rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 ring-1 ring-inset ring-blue-500/20"
+              class="inline-flex items-center gap-1.5 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400 tracking-wide"
             >
+              <ng-icon name="lucideTrendingUp" size="0.7rem" />
               Career
             </div>
-          </div>
-          <div>
             <span
-              #yearsCount
-              class="text-5xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100"
+              class="text-xs text-zinc-400 dark:text-zinc-600 font-mono tracking-widest"
+              >2023 — NOW</span
             >
-              {{ yearsDisplay() }}+ <span class="text-2xl font-medium text-zinc-500">Years</span>
-            </span>
-            <p class="mt-2 text-zinc-600 dark:text-zinc-400">
-              Building scalable backend systems and robust frontend
-              architectures.
+          </div>
+
+          <!-- Number -->
+          <div>
+            <div class="flex items-end gap-2 mb-4">
+              <span
+                #yearsCount
+                class="text-8xl font-black tracking-tighter bg-linear-to-br from-zinc-900 to-zinc-600 dark:from-zinc-100 dark:to-zinc-400 bg-clip-text text-transparent leading-none"
+                >{{ yearsDisplay() }}</span
+              >
+              <div class="mb-3 flex flex-col">
+                <span class="text-3xl font-extralight text-zinc-400">+</span>
+                <span class="text-sm font-medium text-zinc-400 leading-none"
+                  >yrs exp.</span
+                >
+              </div>
+            </div>
+            <!-- Segmented progress -->
+            <div class="flex gap-1 mb-4">
+              <div class="h-1 rounded-full bg-blue-500 flex-1"></div>
+              <div class="h-1 rounded-full bg-blue-400/60 flex-1"></div>
+              <div
+                class="h-1 rounded-full bg-blue-300/30 group-hover:bg-blue-300/60 flex-1 transition-all duration-700"
+              ></div>
+              <div
+                class="h-1 rounded-full bg-zinc-200 dark:bg-zinc-700 flex-1"
+              ></div>
+              <div
+                class="h-1 rounded-full bg-zinc-200 dark:bg-zinc-700 flex-1"
+              ></div>
+            </div>
+            <p
+              class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed max-w-xs"
+            >
+              Crafting scalable web applications and seamless user experiences
             </p>
           </div>
         </div>
       </div>
 
-      <!-- Followers -->
-      <div
-        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-purple-500/30 hover:shadow-lg hover:shadow-purple-500/5"
-        appScrollAnimation="fade-up"
-        [delay]="0.2"
-      >
+      <!-- Followers + Repos stacked -->
+      <div class="lg:col-span-3 flex flex-col gap-4">
+        <!-- Followers -->
         <div
-          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-purple-500/10 group-hover:text-purple-600 transition-colors duration-300"
+          class="group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-6 flex-1 transition-all duration-300 hover:border-purple-500/40 hover:shadow-xl hover:shadow-purple-500/10"
         >
-          <ng-icon name="lucideUsers" size="1.75rem" />
+          <!-- Corner glow -->
+          <div
+            class="absolute -top-8 -right-8 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:bg-purple-500/20 transition-all duration-500 pointer-events-none"
+          ></div>
+          <!-- Decorative circles -->
+          <div
+            class="absolute bottom-3 right-3 w-16 h-16 rounded-full border border-purple-500/10 group-hover:border-purple-500/20 transition-colors duration-500 pointer-events-none"
+          ></div>
+          <div
+            class="absolute bottom-6 right-6 w-8 h-8 rounded-full border border-purple-500/10 group-hover:border-purple-500/25 transition-colors duration-500 pointer-events-none"
+          ></div>
+
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="p-2.5 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 group-hover:bg-purple-500/20 group-hover:scale-110 transition-all duration-300"
+              >
+                <ng-icon name="lucideUsers" size="1.1rem" />
+              </div>
+              <div
+                class="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full"
+              >
+                <span
+                  class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
+                ></span>
+                Live
+              </div>
+            </div>
+            <div
+              #followersCount
+              class="text-5xl font-black tracking-tighter text-zinc-900 dark:text-zinc-100 mb-1 leading-none"
+            >
+              {{ followersDisplay() }}
+            </div>
+            <div
+              class="text-xs font-semibold text-zinc-400 uppercase tracking-widest mt-2"
+            >
+              GitHub Followers
+            </div>
+          </div>
         </div>
-        <div #followersCount class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-          {{ followersDisplay() }}
-        </div>
-        <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-          GitHub Followers
+
+        <!-- Repositories -->
+        <div
+          class="group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-6 flex-1 transition-all duration-300 hover:border-orange-500/40 hover:shadow-xl hover:shadow-orange-500/10"
+        >
+          <!-- Corner glow -->
+          <div
+            class="absolute -top-8 -right-8 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl group-hover:bg-orange-500/20 transition-all duration-500 pointer-events-none"
+          ></div>
+          <!-- Decorative circles -->
+          <div
+            class="absolute bottom-3 right-3 w-16 h-16 rounded-full border border-orange-500/10 group-hover:border-orange-500/20 transition-colors duration-500 pointer-events-none"
+          ></div>
+          <div
+            class="absolute bottom-6 right-6 w-8 h-8 rounded-full border border-orange-500/10 group-hover:border-orange-500/25 transition-colors duration-500 pointer-events-none"
+          ></div>
+
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-5">
+              <div
+                class="p-2.5 rounded-lg bg-orange-500/10 text-orange-600 dark:text-orange-400 group-hover:bg-orange-500/20 group-hover:scale-110 transition-all duration-300"
+              >
+                <ng-icon name="lucideFolders" size="1.1rem" />
+              </div>
+              <span
+                class="text-xs font-medium text-orange-500/80 bg-orange-500/10 px-2 py-0.5 rounded-full"
+                >Public</span
+              >
+            </div>
+            <div
+              #reposCount
+              class="text-5xl font-black tracking-tighter text-zinc-900 dark:text-zinc-100 mb-1 leading-none"
+            >
+              {{ reposDisplay() }}
+            </div>
+            <div
+              class="text-xs font-semibold text-zinc-400 uppercase tracking-widest mt-2"
+            >
+              Repositories
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Repositories -->
-      <div
-        class="lg:col-span-4 group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-8 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-[#fc413e]/50 hover:shadow-lg hover:shadow-[#fc413e]/10"
-        appScrollAnimation="fade-up"
-        [delay]="0.3"
-      >
-        <div
-          class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 group-hover:bg-[#fc413e]/20 group-hover:text-[#fc413e] transition-colors duration-300"
-        >
-          <ng-icon name="lucideFolders" size="1.75rem" />
-        </div>
-        <div #reposCount class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-          {{ reposDisplay() }}
-        </div>
-        <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-          Repositories
-        </div>
-      </div>
-    </div>
-
-    <!-- Custom GitHub Stats -->
-    <div class="max-w-5xl mx-auto px-4 mb-32" id="custom-stats">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+      <!-- GitHub Stats — 2×2 grid -->
+      <div class="lg:col-span-4 grid grid-cols-2 gap-4" id="custom-stats">
         <!-- Stars -->
-        <div class="group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-6 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-yellow-500/30 hover:shadow-lg hover:shadow-yellow-500/5" appScrollAnimation="fade-up" [delay]="0.1">
-          <div class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 transition-colors duration-300 group-hover:bg-yellow-500/10 group-hover:text-yellow-600">
-            <ng-icon name="lucideStar" size="1.75rem" />
+        <div
+          class="group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-5 flex flex-col justify-between transition-all duration-300 hover:border-yellow-500/40 hover:shadow-xl hover:shadow-yellow-500/10"
+        >
+          <div
+            class="absolute inset-0 bg-linear-to-br from-yellow-400/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          ></div>
+          <div
+            class="absolute -bottom-4 -right-4 w-20 h-20 bg-yellow-400/8 rounded-full blur-xl group-hover:bg-yellow-400/18 transition-all duration-500 pointer-events-none"
+          ></div>
+          <div class="relative z-10">
+            <div
+              class="p-2 rounded-lg bg-yellow-400/10 text-yellow-500 w-fit mb-4 group-hover:bg-yellow-400/20 group-hover:scale-110 transition-all duration-300"
+            >
+              <ng-icon name="lucideStar" size="1rem" />
+            </div>
+            <div
+              class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-none mb-1"
+            >
+              {{ githubStarsDisplay() }}
+            </div>
+            <div
+              class="text-xs font-semibold text-zinc-400 uppercase tracking-widest"
+            >
+              Stars
+            </div>
           </div>
-          <div class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-            {{ githubStarsDisplay() }}
-          </div>
-          <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">Total Stars</div>
         </div>
 
         <!-- Commits -->
-        <div class="group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-6 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-green-500/30 hover:shadow-lg hover:shadow-green-500/5" appScrollAnimation="fade-up" [delay]="0.2">
-          <div class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 transition-colors duration-300 group-hover:bg-green-500/10 group-hover:text-green-600">
-            <ng-icon name="lucideGitCommit" size="1.75rem" />
+        <div
+          class="group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-5 flex flex-col justify-between transition-all duration-300 hover:border-emerald-500/40 hover:shadow-xl hover:shadow-emerald-500/10"
+        >
+          <div
+            class="absolute inset-0 bg-linear-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          ></div>
+          <div
+            class="absolute -bottom-4 -right-4 w-20 h-20 bg-emerald-500/8 rounded-full blur-xl group-hover:bg-emerald-500/18 transition-all duration-500 pointer-events-none"
+          ></div>
+          <div class="relative z-10">
+            <div
+              class="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 w-fit mb-4 group-hover:bg-emerald-500/20 group-hover:scale-110 transition-all duration-300"
+            >
+              <ng-icon name="lucideGitCommit" size="1rem" />
+            </div>
+            <div
+              class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-none mb-1"
+            >
+              {{ githubCommitsDisplay() }}
+            </div>
+            <div
+              class="text-xs font-semibold text-zinc-400 uppercase tracking-widest"
+            >
+              Commits
+            </div>
           </div>
-          <div class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-            {{ githubCommitsDisplay() }}
-          </div>
-          <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">Total Commits</div>
         </div>
 
         <!-- PRs -->
-        <div class="group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-6 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/5" appScrollAnimation="fade-up" [delay]="0.3">
-          <div class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 transition-colors duration-300 group-hover:bg-blue-500/10 group-hover:text-blue-600">
-            <ng-icon name="lucideGitPullRequest" size="1.75rem" />
+        <div
+          class="group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-5 flex flex-col justify-between transition-all duration-300 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10"
+        >
+          <div
+            class="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          ></div>
+          <div
+            class="absolute -bottom-4 -right-4 w-20 h-20 bg-blue-500/8 rounded-full blur-xl group-hover:bg-blue-500/18 transition-all duration-500 pointer-events-none"
+          ></div>
+          <div class="relative z-10">
+            <div
+              class="p-2 rounded-lg bg-blue-500/10 text-blue-500 w-fit mb-4 group-hover:bg-blue-500/20 group-hover:scale-110 transition-all duration-300"
+            >
+              <ng-icon name="lucideGitPullRequest" size="1rem" />
+            </div>
+            <div
+              class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-none mb-1"
+            >
+              {{ githubPRsDisplay() }}
+            </div>
+            <div
+              class="text-xs font-semibold text-zinc-400 uppercase tracking-widest"
+            >
+              Pull Requests
+            </div>
           </div>
-          <div class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-            {{ githubPRsDisplay() }}
-          </div>
-          <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">Pull Requests</div>
         </div>
 
         <!-- Issues -->
-        <div class="group relative rounded-3xl bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-6 flex flex-col justify-center items-center text-center transition-all duration-300 hover:border-red-500/30 hover:shadow-lg hover:shadow-red-500/5" appScrollAnimation="fade-up" [delay]="0.4">
-          <div class="mb-4 p-3 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 transition-colors duration-300 group-hover:bg-red-500/10 group-hover:text-red-600">
-            <ng-icon name="lucideBug" size="1.75rem" />
+        <div
+          class="group relative overflow-hidden rounded-3xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-sm border border-zinc-200 dark:border-zinc-800/50 p-5 flex flex-col justify-between transition-all duration-300 hover:border-rose-500/40 hover:shadow-xl hover:shadow-rose-500/10"
+        >
+          <div
+            class="absolute inset-0 bg-linear-to-br from-rose-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          ></div>
+          <div
+            class="absolute -bottom-4 -right-4 w-20 h-20 bg-rose-500/8 rounded-full blur-xl group-hover:bg-rose-500/18 transition-all duration-500 pointer-events-none"
+          ></div>
+          <div class="relative z-10">
+            <div
+              class="p-2 rounded-lg bg-rose-500/10 text-rose-500 w-fit mb-4 group-hover:bg-rose-500/20 group-hover:scale-110 transition-all duration-300"
+            >
+              <ng-icon name="lucideBug" size="1rem" />
+            </div>
+            <div
+              class="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100 leading-none mb-1"
+            >
+              {{ githubIssuesDisplay() }}
+            </div>
+            <div
+              class="text-xs font-semibold text-zinc-400 uppercase tracking-widest"
+            >
+              Issues
+            </div>
           </div>
-          <div class="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-            {{ githubIssuesDisplay() }}
-          </div>
-          <div class="text-xs font-medium text-zinc-500 uppercase tracking-wider">Issues</div>
         </div>
       </div>
     </div>
 
-    <div class="space-y-5">
-      <app-section-title title="Technical Arsenal" />
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-12 max-w-5xl mx-auto px-4">
-        @for (category of techCategories(); track category.title; let catIdx = $index) {
-          <div class="group relative overflow-hidden rounded-3xl bg-white/40 dark:bg-zinc-900/40 backdrop-blur-md border border-zinc-200/50 dark:border-zinc-800/50 p-6 sm:p-8 transition-all duration-500 hover:border-blue-500/30 hover:bg-white/60 dark:hover:bg-zinc-900/60 hover:shadow-2xl hover:shadow-blue-500/5"
-               appScrollAnimation="fade-up" [delay]="0.1 * catIdx">
-            
-            <!-- Subtle background gradient -->
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-
-            <div class="relative z-10 flex flex-col h-full">
-              <h3 class="text-lg sm:text-xl font-medium tracking-tight text-zinc-900 dark:text-zinc-100 mb-8 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                  <div class="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400 group-hover:bg-blue-500/20 transition-colors duration-300">
-                    <ng-icon [name]="category.categoryIcon" size="1.25rem"></ng-icon>
-                  </div>
-                  <span>{{ category.title }}</span>
-                </div>
-                <div class="h-px flex-grow ml-4 sm:ml-6 bg-gradient-to-r from-zinc-200 dark:from-zinc-800 to-transparent"></div>
-              </h3>
-              
-              <div class="flex flex-wrap items-center gap-4 sm:gap-5 mt-auto">
-                @for (tech of category.skills; track tech.name; let i = $index) {
-                  <div
-                    class="relative group/icon"
-                    [style.animation-delay]="i * 0.1 + 's'"
-                    appScrollAnimation="scale-up"
-                    [delay]="0.05 * i"
-                  >
-                    <div class="animate-float" [style.animation-delay]="-(i * 0.5) + 's'">
-                      <div
-                        class="absolute -top-10 left-1/2 -translate-x-1/2 opacity-0 group-hover/icon:opacity-100 transition-opacity duration-300 pointer-events-none z-20"
-                      >
-                        <span
-                          class="text-xs font-medium text-zinc-600 dark:text-zinc-300 bg-white/95 dark:bg-zinc-800/95 px-2.5 py-1 rounded-md shadow-sm border border-zinc-200 dark:border-zinc-700 whitespace-nowrap"
-                        >
-                          {{ tech.name }}
-                        </span>
-                      </div>
-
-                      <div
-                        class="w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200/80 dark:border-zinc-700/80 shadow-sm transition-all duration-300 ease-out cursor-pointer transform-gpu group-hover/icon:-translate-y-1 group-hover/icon:shadow-xl group-hover/icon:shadow-blue-500/10 group-hover/icon:border-blue-500/30 group-hover/icon:scale-110"
-                      >
-                        <img
-                          [src]="tech.icon"
-                          [alt]="tech.name"
-                          class="w-6 h-6 sm:w-7 sm:h-7 object-contain transition-transform duration-300 transform-gpu group-hover/icon:scale-110"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            </div>
-          </div>
-        }
-      </div>
+    <!-- Skills Showcase -->
+    <div class="py-8" appScrollAnimation="fade-up" [delay]="0.1">
+      <app-skills-showcase />
     </div>
   </div>
 </section>

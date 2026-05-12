@@ -1,4 +1,4 @@
-import { isPlatformBrowser } from '@angular/common';
+import { isPlatformBrowser } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -9,38 +9,37 @@ import {
   ViewChild,
   inject,
   signal,
-} from '@angular/core';
-import { provideIcons } from '@ng-icons/core';
+} from "@angular/core";
+import { provideIcons } from "@ng-icons/core";
 import {
   lucideArrowUpRight,
+  lucideBug,
+  lucideCloud,
+  lucideCode,
+  lucideDatabase,
   lucideDumbbell,
   lucideFolders,
-  lucideTrendingUp,
-  lucideUsers,
-  lucideLayout,
-  lucideServer,
-  lucideDatabase,
-  lucideCloud,
-  lucideShield,
-  lucideCode,
-  lucideStar,
   lucideGitCommit,
   lucideGitPullRequest,
-  lucideBug,
-} from '@ng-icons/lucide';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmCardImports } from '@spartan-ng/helm/card';
-import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { GithubApiService } from '../../../lib/github/github-api.service';
-import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
-import { LinkButton } from '../../../shared/components/link-button/link-button';
-import { SectionTitle } from '../../../shared/components/section-title/section-title';
+  lucideLayout,
+  lucideServer,
+  lucideShield,
+  lucideStar,
+  lucideTrendingUp,
+  lucideUsers,
+} from "@ng-icons/lucide";
+import { HlmButtonImports } from "@spartan-ng/helm/button";
+import { HlmCardImports } from "@spartan-ng/helm/card";
+import { HlmIconImports } from "@spartan-ng/helm/icon";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { GithubApiService } from "../../../lib/github/github-api.service";
+import { LinkButton } from "../../../shared/components/link-button/link-button";
+import { SectionTitle } from "../../../shared/components/section-title/section-title";
+import { ScrollAnimationDirective } from "../../../shared/directives/scroll-animation.directive";
+import { SkillsShowcase } from "./skills-showcase/skills-showcase";
 
 gsap.registerPlugin(ScrollTrigger);
-
-import { TechCategory, techCategoriesData } from './data';
 
 export interface GithubProfile {
   login: string;
@@ -64,8 +63,16 @@ export interface GithubProfile {
 }
 
 @Component({
-  selector: 'app-about-me',
-  imports: [HlmCardImports, HlmIconImports, HlmButtonImports, ScrollAnimationDirective, LinkButton, SectionTitle],
+  selector: "app-about-me",
+  imports: [
+    HlmCardImports,
+    HlmIconImports,
+    HlmButtonImports,
+    ScrollAnimationDirective,
+    LinkButton,
+    SectionTitle,
+    SkillsShowcase,
+  ],
   providers: [
     provideIcons({
       lucideUsers,
@@ -85,7 +92,7 @@ export interface GithubProfile {
       lucideBug,
     }),
   ],
-  templateUrl: './about-me.html',
+  templateUrl: "./about-me.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: [
     `
@@ -103,18 +110,17 @@ export interface GithubProfile {
       }
     `,
   ],
-
 })
 export class AboutMe implements OnInit, AfterViewInit {
   private readonly gitApi = inject(GithubApiService);
   private readonly platform = inject(PLATFORM_ID);
 
-  @ViewChild('separator') separator!: ElementRef<HTMLElement>;
-  @ViewChild('experienceArrow') experienceArrow!: ElementRef<HTMLElement>;
-  @ViewChild('yearsCount') yearsCount!: ElementRef<HTMLElement>;
-  @ViewChild('followersCount') followersCount!: ElementRef<HTMLElement>;
-  @ViewChild('reposCount') reposCount!: ElementRef<HTMLElement>;
-  
+  @ViewChild("separator") separator!: ElementRef<HTMLElement>;
+  @ViewChild("experienceArrow") experienceArrow!: ElementRef<HTMLElement>;
+  @ViewChild("yearsCount") yearsCount!: ElementRef<HTMLElement>;
+  @ViewChild("followersCount") followersCount!: ElementRef<HTMLElement>;
+  @ViewChild("reposCount") reposCount!: ElementRef<HTMLElement>;
+
   private arrowTween: gsap.core.Tween | null = null;
   private remoteStatsAnimated = false;
   private isDataLoaded = false;
@@ -122,13 +128,13 @@ export class AboutMe implements OnInit, AfterViewInit {
   // Final values (source of truth from API)
   readonly publicRepos = signal(0);
   readonly followers = signal(0);
-  
+
   // Custom Stats
   readonly githubStars = signal(0);
   readonly githubCommits = signal(0);
   readonly githubPRs = signal(0);
   readonly githubIssues = signal(0);
-  
+
   // Display values (animated)
   readonly yearsDisplay = signal(0);
   readonly followersDisplay = signal(0);
@@ -137,24 +143,23 @@ export class AboutMe implements OnInit, AfterViewInit {
   readonly githubCommitsDisplay = signal(0);
   readonly githubPRsDisplay = signal(0);
   readonly githubIssuesDisplay = signal(0);
-  
-  readonly bioTitle = "I'm Aziz - a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
+
+  readonly bioTitle =
+    "I'm Aziz - a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
   readonly bioDescription =
     "I'm Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
 
   get splitBioTitle() {
-    return this.bioTitle.split(' ');
+    return this.bioTitle.split(" ");
   }
 
   get splitBioDescription() {
-    return this.bioDescription.split(' ');
+    return this.bioDescription.split(" ");
   }
 
-  readonly yearsExperience = signal(2);
+  readonly yearsExperience = signal(3);
   readonly usersServed = signal(1000);
   readonly projectsCompleted = signal(4);
-
-  protected readonly techCategories = signal<TechCategory[]>(techCategoriesData);
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platform)) {
@@ -167,10 +172,10 @@ export class AboutMe implements OnInit, AfterViewInit {
           this.initRemoteStatsAnimations();
         },
         error: (err) => {
-          console.error('Error fetching Github info', err);
-        }
+          console.error("Error fetching Github info", err);
+        },
       });
-      
+
       this.gitApi.getCustomStats().subscribe({
         next: (data) => {
           if (!data.error) {
@@ -181,12 +186,12 @@ export class AboutMe implements OnInit, AfterViewInit {
             // Re-trigger animation logic if needed, or animate separately
             this.animateCustomStats();
           } else {
-            console.error('Error in custom stats:', data.error);
+            console.error("Error in custom stats:", data.error);
           }
         },
         error: (err) => {
-          console.error('Error fetching Custom Github stats', err);
-        }
+          console.error("Error fetching Custom Github stats", err);
+        },
       });
     }
   }
@@ -203,42 +208,48 @@ export class AboutMe implements OnInit, AfterViewInit {
           },
           {
             yPercent: -100,
-            ease: 'none',
+            ease: "none",
             scrollTrigger: {
               trigger: this.separator.nativeElement,
-              start: 'top bottom',
-              end: 'top top',
+              start: "top bottom",
+              end: "top top",
               scrub: true,
             },
-          }
+          },
         );
       }
 
       // Animate Years
       if (this.yearsCount) {
-         const yearsObj = { val: 0 };
-         // The target year is constant 2
-         gsap.to(yearsObj, {
-           val: 2,
-           duration: 2,
-           delay: 1.2,
-           ease: 'power2.out',
-           scrollTrigger: {
-             trigger: this.yearsCount.nativeElement,
-             start: 'top 85%',
-             once: true
-           },
-           onUpdate: () => {
-             this.yearsDisplay.set(Math.round(yearsObj.val));
-           }
-         });
+        const yearsObj = { val: 0 };
+        // The target year is constant 2
+        gsap.to(yearsObj, {
+          val: 3,
+          duration: 2,
+          delay: 1.2,
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: this.yearsCount.nativeElement,
+            start: "top 85%",
+            once: true,
+          },
+          onUpdate: () => {
+            this.yearsDisplay.set(Math.round(yearsObj.val));
+          },
+        });
       }
     }
   }
 
   private initRemoteStatsAnimations() {
-    if (this.remoteStatsAnimated || !this.isDataLoaded || !this.followersCount || !this.reposCount) return;
-    
+    if (
+      this.remoteStatsAnimated ||
+      !this.isDataLoaded ||
+      !this.followersCount ||
+      !this.reposCount
+    )
+      return;
+
     this.remoteStatsAnimated = true;
 
     // Animate Followers
@@ -247,15 +258,15 @@ export class AboutMe implements OnInit, AfterViewInit {
       val: this.followers(),
       duration: 2,
       delay: 1.3,
-      ease: 'power2.out',
+      ease: "power2.out",
       scrollTrigger: {
         trigger: this.followersCount.nativeElement,
-        start: 'top 85%',
-        once: true 
+        start: "top 85%",
+        once: true,
       },
       onUpdate: () => {
         this.followersDisplay.set(Math.round(followersObj.val));
-      }
+      },
     });
 
     // Animate Repos
@@ -264,31 +275,38 @@ export class AboutMe implements OnInit, AfterViewInit {
       val: this.publicRepos(),
       duration: 2,
       delay: 1.4,
-      ease: 'power2.out',
+      ease: "power2.out",
       scrollTrigger: {
-          trigger: this.reposCount.nativeElement,
-          start: 'top 85%',
-          once: true
+        trigger: this.reposCount.nativeElement,
+        start: "top 85%",
+        once: true,
       },
       onUpdate: () => {
         this.reposDisplay.set(Math.round(reposObj.val));
-      }
+      },
     });
   }
 
   private animateCustomStats() {
     // Only animate if values are loaded
     const duration = 2.5;
-    const ease = 'power2.out';
+    const ease = "power2.out";
     const delay = 0.5;
 
     // Stars
     if (this.githubStars() > 0) {
       const starsObj = { val: 0 };
       gsap.to(starsObj, {
-        val: this.githubStars(), duration, delay, ease,
-        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
-        onUpdate: () => this.githubStarsDisplay.set(Math.round(starsObj.val))
+        val: this.githubStars(),
+        duration,
+        delay,
+        ease,
+        scrollTrigger: {
+          trigger: "#custom-stats",
+          start: "top 85%",
+          once: true,
+        },
+        onUpdate: () => this.githubStarsDisplay.set(Math.round(starsObj.val)),
       });
     }
 
@@ -296,9 +314,17 @@ export class AboutMe implements OnInit, AfterViewInit {
     if (this.githubCommits() > 0) {
       const commitsObj = { val: 0 };
       gsap.to(commitsObj, {
-        val: this.githubCommits(), duration, delay: delay + 0.1, ease,
-        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
-        onUpdate: () => this.githubCommitsDisplay.set(Math.round(commitsObj.val))
+        val: this.githubCommits(),
+        duration,
+        delay: delay + 0.1,
+        ease,
+        scrollTrigger: {
+          trigger: "#custom-stats",
+          start: "top 85%",
+          once: true,
+        },
+        onUpdate: () =>
+          this.githubCommitsDisplay.set(Math.round(commitsObj.val)),
       });
     }
 
@@ -306,9 +332,16 @@ export class AboutMe implements OnInit, AfterViewInit {
     if (this.githubPRs() > 0) {
       const prsObj = { val: 0 };
       gsap.to(prsObj, {
-        val: this.githubPRs(), duration, delay: delay + 0.2, ease,
-        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
-        onUpdate: () => this.githubPRsDisplay.set(Math.round(prsObj.val))
+        val: this.githubPRs(),
+        duration,
+        delay: delay + 0.2,
+        ease,
+        scrollTrigger: {
+          trigger: "#custom-stats",
+          start: "top 85%",
+          once: true,
+        },
+        onUpdate: () => this.githubPRsDisplay.set(Math.round(prsObj.val)),
       });
     }
 
@@ -316,13 +349,20 @@ export class AboutMe implements OnInit, AfterViewInit {
     if (this.githubIssues() > 0) {
       const issuesObj = { val: 0 };
       gsap.to(issuesObj, {
-        val: this.githubIssues(), duration, delay: delay + 0.3, ease,
-        scrollTrigger: { trigger: '#custom-stats', start: 'top 85%', once: true },
-        onUpdate: () => this.githubIssuesDisplay.set(Math.round(issuesObj.val))
+        val: this.githubIssues(),
+        duration,
+        delay: delay + 0.3,
+        ease,
+        scrollTrigger: {
+          trigger: "#custom-stats",
+          start: "top 85%",
+          once: true,
+        },
+        onUpdate: () => this.githubIssuesDisplay.set(Math.round(issuesObj.val)),
       });
     }
   }
-  
+
   onExperienceHover() {
     if (this.experienceArrow && isPlatformBrowser(this.platform)) {
       if (this.arrowTween) this.arrowTween.kill();
@@ -331,11 +371,11 @@ export class AboutMe implements OnInit, AfterViewInit {
         y: -15,
         opacity: 0.15,
         duration: 0.4,
-        ease: 'power2.out',
+        ease: "power2.out",
       });
     }
   }
-  
+
   onExperienceLeave() {
     if (this.experienceArrow && isPlatformBrowser(this.platform)) {
       if (this.arrowTween) this.arrowTween.kill();
@@ -344,7 +384,7 @@ export class AboutMe implements OnInit, AfterViewInit {
         y: 0,
         opacity: 0.05,
         duration: 0.4,
-        ease: 'power2.out',
+        ease: "power2.out",
       });
     }
   }
