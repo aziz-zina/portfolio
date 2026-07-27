@@ -1,15 +1,29 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { provideIcons } from '@ng-icons/core';
-import { lucideCopy, lucideCheck, lucideMail, lucideArrowRight, lucideGithub, lucideLinkedin, lucideTwitter } from '@ng-icons/lucide';
-import { HlmButtonImports } from '@spartan-ng/helm/button';
-import { HlmIconImports } from '@spartan-ng/helm/icon';
-import { ScrollAnimationDirective } from '../../../shared/directives/scroll-animation.directive';
+import { CommonModule } from "@angular/common";
+import { Component } from "@angular/core";
+import { provideIcons } from "@ng-icons/core";
+import {
+  lucideArrowRight,
+  lucideCheck,
+  lucideCopy,
+  lucideGithub,
+  lucideLinkedin,
+  lucideMail,
+  lucideTwitter,
+} from "@ng-icons/lucide";
+import { HlmButtonImports } from "@spartan-ng/helm/button";
+import { HlmIconImports } from "@spartan-ng/helm/icon";
+import { bind } from "cuelume";
+import { ScrollAnimationDirective } from "../../../shared/directives/scroll-animation.directive";
 
 @Component({
-  selector: 'app-contact',
+  selector: "app-contact",
   standalone: true,
-  imports: [CommonModule, HlmButtonImports, HlmIconImports, ScrollAnimationDirective],
+  imports: [
+    CommonModule,
+    HlmButtonImports,
+    HlmIconImports,
+    ScrollAnimationDirective,
+  ],
   providers: [
     provideIcons({
       lucideCopy,
@@ -18,20 +32,22 @@ import { ScrollAnimationDirective } from '../../../shared/directives/scroll-anim
       lucideArrowRight,
       lucideGithub,
       lucideLinkedin,
-      lucideTwitter
+      lucideTwitter,
     }),
   ],
-  templateUrl: './contact.html',
+  templateUrl: "./contact.html",
 })
 export class Contact {
   copied = false;
-  email = 'aziz.zina2001@gmail.com';
+  email = "aziz.zina2001@gmail.com";
 
   copyEmail() {
+    bind();
     navigator.clipboard.writeText(this.email);
     this.copied = true;
     setTimeout(() => {
       this.copied = false;
     }, 2000);
+    // play("success")
   }
 }

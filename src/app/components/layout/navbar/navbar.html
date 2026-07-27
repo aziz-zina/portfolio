@@ -1,11 +1,14 @@
 <!-- Normal Navbar (visible when at top) -->
-<nav 
+<nav
   class="fixed top-0 left-0 w-full p-6 md:p-8 flex justify-between items-center z-50 transition-all duration-500"
   [class.translate-y-0]="!isScrolled()"
   [class.-translate-y-full]="isScrolled()"
 >
   <!-- Logo -->
-  <a routerLink="/" class="block hover:scale-110 transition-transform duration-300 ease-out">
+  <a
+    routerLink="/"
+    class="block hover:scale-110 transition-transform duration-300 ease-out"
+  >
     <img src="/favicon.ico" alt="Logo" class="w-8 h-8 object-contain" />
   </a>
 
@@ -13,48 +16,75 @@
   <div class="flex items-center gap-8">
     <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
       <li>
-        <a routerLink="/" class="relative py-1 hover:text-black transition-all duration-300 group">
+        <a
+          data-cuelume-hover="tick"
+          routerLink="/"
+          class="relative py-1 hover:text-black transition-all duration-300 group"
+        >
           Home
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"
+          ></span>
         </a>
       </li>
       <li>
-        <a href="#about" (click)="scrollToSection($event, 'about')" class="relative py-1 hover:text-black transition-all duration-300 group">
+        <a
+          data-cuelume-hover="tick"
+          href="#about"
+          (click)="scrollToSection($event, 'about')"
+          class="relative py-1 hover:text-black transition-all duration-300 group"
+        >
           About
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"
+          ></span>
         </a>
       </li>
       <li>
-        <a href="#experience" (click)="scrollToSection($event, 'experience')" class="relative py-1 hover:text-black transition-all duration-300 group">
+        <a
+          data-cuelume-hover="tick"
+          href="#experience"
+          (click)="scrollToSection($event, 'experience')"
+          class="relative py-1 hover:text-black transition-all duration-300 group"
+        >
           Experience
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"
+          ></span>
         </a>
       </li>
       <li>
-        <a href="#projects" (click)="scrollToSection($event, 'projects')" class="relative py-1 hover:text-black transition-all duration-300 group">
+        <a
+          data-cuelume-hover="tick"
+          href="#projects"
+          (click)="scrollToSection($event, 'projects')"
+          class="relative py-1 hover:text-black transition-all duration-300 group"
+        >
           Projects
-          <span class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"></span>
+          <span
+            class="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"
+          ></span>
         </a>
       </li>
     </ul>
-    
+
     <app-now-playing />
     <app-link-button link="#contact" title="Contact Me" />
   </div>
 </nav>
 
 <!-- Hamburger Button -->
-<app-hamburger-button 
+<app-hamburger-button
   #hamburgerBtn
-  [isVisible]="isScrolled()" 
-  [isOpen]="isMenuOpen()" 
-  (toggle)="toggleMenu()" 
+  [isVisible]="isScrolled()"
+  [isOpen]="isMenuOpen()"
+  (toggle)="toggleMenu()"
 />
 
 <!-- Fullscreen Menu Overlay -->
-<app-menu-overlay 
+<app-menu-overlay
   #menuOverlay
-  [isOpen]="isMenuOpen()" 
-  [menuItems]="menuItems" 
-  (close)="closeMenu()" 
+  [isOpen]="isMenuOpen()"
+  [menuItems]="menuItems"
+  (close)="closeMenu()"
 />

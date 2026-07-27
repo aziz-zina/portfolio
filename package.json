@@ -52,6 +52,7 @@
     "camera-controls": "^3.1.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "cuelume": "^0.1.2",
     "embla-carousel-angular": "^20.0.0",
     "express": "^5.1.0",
     "front-matter": "^4.0.2",

@@ -40,8 +40,30 @@ export class Experience implements AfterViewInit, OnDestroy {
 
   readonly experience = signal([
     {
+      title: "Software Engineer",
+      date: "Jun 2026 — Present",
+      company: "Accent",
+      logo: "companies/accent_logo.jfif",
+      current: true,
+      description: [
+        "Developing and maintaining a comprehensive fleet management platform using Angular and Spring Boot.",
+        "Implementing new features, resolving bugs, and improving system performance across both frontend and backend.",
+        "Building modules for fleet, vehicle, mission, maintenance, driver, and expense management while ensuring scalability, security, and reliability.",
+      ],
+      skills: [
+        "Angular",
+        "Spring Boot",
+        "Java",
+        "TypeScript",
+        "PostgreSQL",
+        "REST APIs",
+        "Git",
+        "Fleet Management",
+      ],
+    },
+    {
       title: "Software Developer",
-      date: "Jan 2024 — Present",
+      date: "Jan 2024 — Jun 2026",
       company: "Inspark",
       logo: "companies/inspark.png",
       current: true,
