@@ -1,43 +1,65 @@
-<section id="about" class="relative py-5 overflow-visible bg-background z-10">
-  <!-- Background blobs -->
-  <div
-    class="absolute top-0 left-1/2 -translate-x-1/2 w-200 h-200 bg-blue-500/10 dark:bg-blue-500/5 blur-[120px] rounded-full -z-10 pointer-events-none"
-  ></div>
-  <!--<div
-    class="absolute bottom-0 right-0 w-150 h-150 bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] rounded-full -z-10 pointer-events-none"
-  ></div>-->
-
+<section id="about" class="relative py-5 bg-background z-10">
   <app-section-title title="About Me" />
 
   <div class="max-w-5xl mx-auto px-6 lg:px-8">
-    <!-- About Me -->
-    <div class="w-full mx-auto text-center mb-24 space-y-12">
+    <!-- Intro -->
+    <div class="mb-28">
+      <!-- Headline: words brighten as you scroll through it -->
       <h2
-        class="text-3xl md:text-5xl font-thin tracking-tight text-zinc-900 dark:text-zinc-100 leading-tight flex flex-wrap gap-x-3 justify-center"
-        appScrollAnimation="word-reveal"
-        [stagger]="0.05"
+        #headline
+        class="max-w-4xl text-[clamp(1.875rem,4.2vw,3.25rem)] font-medium leading-[1.15] tracking-tight text-balance"
+        [attr.aria-label]="bioTitle"
       >
-        @for (word of splitBioTitle; track $index) {
-        <span class="inline-block">{{ word }}</span>
-        }
+        @for (word of splitBioTitle; track $index) {<span
+          data-word
+          aria-hidden="true"
+          >{{ word }} </span
+        >}
       </h2>
-      <p
-        class="text-thin md:text-xl mt-10 text-zinc-600 dark:text-zinc-400 w-full mx-auto leading-relaxed flex flex-wrap justify-center gap-x-1.5"
-        appScrollAnimation="word-reveal"
-        [stagger]="0.02"
-        [delay]="0.5"
-      >
-        @for (word of splitBioDescription; track $index) {
-        <span class="inline-block">{{ word }}</span>
-        }
-      </p>
 
       <div
-        class="flex justify-center pt-4"
-        appScrollAnimation="fade-up"
-        [delay]="1"
+        #intro
+        class="mt-14 md:mt-20 grid gap-12 md:grid-cols-[minmax(0,1fr)_17rem] md:gap-16"
       >
-        <app-link-button link="#contact" title="Contact Me" />
+        <!-- Bio -->
+        <p
+          data-reveal
+          class="text-lg md:text-xl leading-relaxed text-muted-foreground text-pretty"
+        >
+          @for (seg of bioSegments; track $index) {<span
+            [attr.data-mark]="seg.highlight ? '' : null"
+            [class]="seg.highlight ? markClass : ''"
+            >{{ seg.text }}</span
+          >}
+        </p>
+
+        <!-- At a glance -->
+        <aside data-reveal class="flex flex-col gap-8">
+          <dl class="divide-y divide-border border-y border-border text-sm">
+            @for (fact of facts; track fact.label) {
+            <div class="flex items-baseline justify-between gap-4 py-3">
+              <dt class="shrink-0 text-muted-foreground">{{ fact.label }}</dt>
+              <dd class="font-medium text-right">{{ fact.value }}</dd>
+            </div>
+            }
+          </dl>
+
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+            <app-link-button link="#contact" title="Contact Me" />
+            <a
+              href="#experience"
+              class="group/exp inline-flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              (click)="scrollToExperience($event)"
+            >
+              My experience
+              <ng-icon
+                name="lucideArrowDown"
+                size="0.875rem"
+                class="transition-transform duration-200 group-hover/exp:translate-y-0.5"
+              />
+            </a>
+          </div>
+        </aside>
       </div>
     </div>
 

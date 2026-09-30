@@ -14,6 +14,7 @@ import {
 } from "@angular/core";
 import { provideIcons } from "@ng-icons/core";
 import {
+  lucideArrowDown,
   lucideArrowUpRight,
   lucideCircleDot,
   lucideFolders,
@@ -46,6 +47,13 @@ const LEVEL_CLASSES = [
 ];
 
 /** Empty year shown while the real calendar loads (or if it can't). */
+/** Terms in the bio that get the green marker underline. */
+const BIO_HIGHLIGHTS = ["Aziz Zina", "Angular", "Spring Boot", "FastAPI"];
+
+/** Marker underline; GSAP draws it in, hover fills the whole word. */
+const MARK_CLASS =
+  "font-medium text-foreground box-decoration-clone bg-no-repeat bg-[position:0_100%] bg-[length:100%_0.3em] bg-[linear-gradient(rgb(10_228_72/0.45),rgb(10_228_72/0.45))] transition-[background-size] duration-300 ease-out hover:bg-[length:100%_100%]";
+
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 const PLACEHOLDER_WEEKS: ContributionDay[][] = Array.from({ length: 53 }, () =>
@@ -89,6 +97,7 @@ export interface GithubProfile {
   ],
   providers: [
     provideIcons({
+      lucideArrowDown,
       lucideArrowUpRight,
       lucideCircleDot,
       lucideFolders,
@@ -106,6 +115,8 @@ export class AboutMe implements AfterViewInit, OnDestroy {
   private readonly platform = inject(PLATFORM_ID);
 
   @ViewChild("separator") separator?: ElementRef<HTMLElement>;
+  @ViewChild("headline") headline!: ElementRef<HTMLElement>;
+  @ViewChild("intro") intro!: ElementRef<HTMLElement>;
   @ViewChild("statsPanel") statsPanel!: ElementRef<HTMLElement>;
   @ViewChild("heatmap") heatmap!: ElementRef<HTMLElement>;
   @ViewChild("tooltip") tooltip!: ElementRef<HTMLElement>;
@@ -153,16 +164,34 @@ export class AboutMe implements AfterViewInit, OnDestroy {
   });
 
   readonly bioTitle =
-    "I'm Aziz - a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
+    "I’m Aziz — a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
   readonly bioDescription =
-    "I'm Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
+    "I’m Aziz Zina, a results-driven Fullstack Developer from Tunisia specializing in Angular, Spring Boot, and FastAPI. I build scalable, secure, and AI-powered web applications using clean architecture, modern frameworks, and intelligent integrations.";
 
   get splitBioTitle() {
     return this.bioTitle.split(" ");
   }
 
-  get splitBioDescription() {
-    return this.bioDescription.split(" ");
+  readonly markClass = MARK_CLASS;
+
+  /** Bio split into plain runs and highlighted terms. */
+  readonly bioSegments = this.bioDescription
+    .split(new RegExp(`(${BIO_HIGHLIGHTS.join("|")})`))
+    .filter(Boolean)
+    .map((text) => ({ text, highlight: BIO_HIGHLIGHTS.includes(text) }));
+
+  readonly facts = [
+    { label: "Name", value: "Aziz Zina" },
+    { label: "Role", value: "Full Stack Developer" },
+    { label: "Based in", value: "Tunisia" },
+    { label: "Core stack", value: "Angular · Spring Boot · FastAPI" },
+  ];
+
+  scrollToExperience(event: MouseEvent) {
+    event.preventDefault();
+    document
+      .getElementById("experience")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   readonly yearsExperience = signal(3);
@@ -315,7 +344,10 @@ export class AboutMe implements AfterViewInit, OnDestroy {
         );
       }
 
-      if (!this.reduceMotion) this.revealPanel();
+      if (!this.reduceMotion) {
+        this.revealIntro();
+        this.revealPanel();
+      }
     });
 
     const tip = this.tooltip.nativeElement;
@@ -362,6 +394,56 @@ export class AboutMe implements AfterViewInit, OnDestroy {
       },
       error: (err) => console.error("Error fetching Custom Github stats", err),
     });
+  }
+
+  /**
+   * Headline "reads itself" as you scroll: each word goes from dim to full ink,
+   * scrubbed to the scroll position. Then the bio + facts rise in and the
+   * marker underlines draw across the key terms.
+   */
+  private revealIntro() {
+    const headline = this.headline.nativeElement;
+    gsap.fromTo(
+      headline.querySelectorAll("[data-word]"),
+      { opacity: 0.15 },
+      {
+        opacity: 1,
+        ease: "none",
+        stagger: 0.1,
+        scrollTrigger: {
+          trigger: headline,
+          start: "top 85%",
+          end: "bottom 45%",
+          scrub: 0.6,
+        },
+      },
+    );
+
+    const intro = this.intro.nativeElement;
+    gsap
+      .timeline({
+        scrollTrigger: { trigger: intro, start: "top 80%", once: true },
+        defaults: { ease: "power3.out" },
+      })
+      .from(intro.querySelectorAll("[data-reveal]"), {
+        y: 24,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.12,
+        clearProps: "opacity,transform",
+      })
+      .from(
+        intro.querySelectorAll("[data-mark]"),
+        {
+          backgroundSize: "0% 0.3em",
+          duration: 0.6,
+          stagger: 0.18,
+          ease: "power2.inOut",
+          // Hand background-size back to CSS so the hover fill works
+          clearProps: "backgroundSize",
+        },
+        0.5,
+      );
   }
 
   /** Panel slides up, the heatmap sweeps in column by column, then the stat cells follow. */
