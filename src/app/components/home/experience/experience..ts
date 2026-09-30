@@ -57,7 +57,10 @@ interface ExperienceItem {
   /** "YYYY-MM", or null while ongoing */
   end: string | null;
   current: boolean;
-  description: string[];
+  /** One sentence of context, shown under the title. */
+  summary: string;
+  /** What you did; `tags` are the `skills` it used, linked on hover. */
+  highlights: { text: string; tags: string[] }[];
   skills: string[];
 }
 
@@ -104,21 +107,23 @@ export class Experience implements AfterViewInit, OnDestroy {
       company: "Accent",
       logo: "companies/accent_logo.jfif",
       current: true,
-      description: [
-        "Developing and maintaining a comprehensive fleet management platform using Angular and Spring Boot.",
-        "Implementing new features, resolving bugs, and improving system performance across both frontend and backend.",
-        "Building modules for fleet, vehicle, mission, maintenance, driver, and expense management while ensuring scalability, security, and reliability.",
+      summary:
+        "Building a fleet management platform end to end, from the Angular frontend to the Spring Boot backend.",
+      highlights: [
+        {
+          text: "Building the fleet, vehicle, mission, maintenance, driver and expense modules.",
+          tags: ["Angular", "TypeScript", "Spring Boot", "Java", "PostgreSQL"],
+        },
+        {
+          text: "Shipping new features and fixing bugs across both the frontend and the backend.",
+          tags: ["Angular", "TypeScript", "Spring Boot", "Git"],
+        },
+        {
+          text: "Improving performance while keeping the platform scalable, secure and reliable.",
+          tags: ["Spring Boot", "REST APIs", "PostgreSQL"],
+        },
       ],
-      skills: [
-        "Angular",
-        "Spring Boot",
-        "Java",
-        "TypeScript",
-        "PostgreSQL",
-        "REST APIs",
-        "Git",
-        "Fleet Management",
-      ],
+      skills: ["Angular", "Spring Boot", "Java", "TypeScript", "PostgreSQL", "REST APIs", "Git"],
     },
     {
       title: "Software Developer",
@@ -127,21 +132,27 @@ export class Experience implements AfterViewInit, OnDestroy {
       company: "Inspark",
       logo: "companies/inspark.png",
       current: false,
-      description: [
-        "Maintaining enterprise-grade Angular/Spring Boot apps with Keycloak SSO and modular component architecture.",
-        "Refactored core services into reusable modules using domain-driven design, increasing maintainability by 30%.",
-        "Integrated RabbitMQ and WebSocket for real-time messaging; deployed and monitored apps via AWS and Azure.",
+      summary:
+        "Maintained enterprise-grade Angular and Spring Boot applications for two and a half years.",
+      highlights: [
+        {
+          text: "Kept the apps secure with Keycloak single sign-on and a modular component architecture.",
+          tags: ["Angular", "Spring Boot", "Keycloak", "PostgreSQL"],
+        },
+        {
+          text: "Refactored core services into reusable, domain-driven modules, making them 30% easier to maintain.",
+          tags: ["Spring Boot"],
+        },
+        {
+          text: "Added real-time messaging with RabbitMQ and WebSocket.",
+          tags: ["RabbitMQ", "Spring Boot", "Angular"],
+        },
+        {
+          text: "Deployed and monitored the apps on AWS and Azure.",
+          tags: ["AWS", "Azure", "Docker"],
+        },
       ],
-      skills: [
-        "Angular",
-        "Spring Boot",
-        "Keycloak",
-        "RabbitMQ",
-        "AWS",
-        "Azure",
-        "Docker",
-        "PostgreSQL",
-      ],
+      skills: ["Angular", "Spring Boot", "Keycloak", "RabbitMQ", "AWS", "Azure", "Docker", "PostgreSQL"],
     },
     {
       title: "Advanced Internship Trainee",
@@ -150,16 +161,22 @@ export class Experience implements AfterViewInit, OnDestroy {
       company: "BNA - Banque Nationale Agricole",
       logo: "companies/bna.png",
       current: false,
-      description: [
-        "Designed and developed a full-stack expense management module for the bank's litigation management system.",
-        "Implemented backend services and user interfaces to streamline expense tracking and validation workflows.",
+      summary: "Built an expense management module for the bank's litigation management system.",
+      highlights: [
+        {
+          text: "Designed and developed the module end to end, from the database to the user interface.",
+          tags: ["Spring Boot", "Angular", "Oracle Database"],
+        },
+        {
+          text: "Built the backend services that streamline expense tracking and validation.",
+          tags: ["Spring Boot", "Oracle Database"],
+        },
+        {
+          text: "Created the screens the litigation team uses to record and approve expenses.",
+          tags: ["Angular"],
+        },
       ],
-      skills: [
-        "Spring Boot",
-        "Angular",
-        "Oracle Database",
-        "Full Stack Development",
-      ],
+      skills: ["Spring Boot", "Angular", "Oracle Database"],
     },
     {
       title: "Introductory Internship Trainee",
@@ -168,18 +185,74 @@ export class Experience implements AfterViewInit, OnDestroy {
       company: "QNB - Qatar National Bank",
       logo: "companies/qnb.png",
       current: false,
-      description: [
-        "Performed hardware and software maintenance within the computer systems department.",
-        "Provided technical support for workstations, operating systems, and internal IT infrastructure.",
+      summary: "Supported the computer systems department with hardware and software maintenance.",
+      highlights: [
+        {
+          text: "Maintained the bank's workstations, hardware and software alike.",
+          tags: ["Hardware Maintenance", "Software Maintenance"],
+        },
+        {
+          text: "Provided technical support for operating systems and internal IT infrastructure.",
+          tags: ["IT Support", "Software Maintenance"],
+        },
       ],
-      skills: [
-        "IT Support",
-        "Hardware Maintenance",
-        "Software Maintenance",
-        "Computer Systems",
-      ],
+      skills: ["IT Support", "Hardware Maintenance", "Software Maintenance"],
     },
   ]);
+
+  // ── Stack ↔ highlights linking ──────────────────────────────────
+
+  /** Tool under the pointer (or keyboard focus). */
+  private readonly hoverSkill = signal<string | null>(null);
+  /** Tool tapped/clicked, so it stays lit on touch screens. */
+  private readonly pinnedSkill = signal<string | null>(null);
+  /** Index of the highlight row under the pointer. */
+  readonly hoverRow = signal<number | null>(null);
+
+  readonly activeSkill = computed(() => this.hoverSkill() ?? this.pinnedSkill());
+
+  /** Tools lit by the current focus: the active tool, or the tools behind the hovered row. */
+  readonly litSkills = computed(() => {
+    const skill = this.activeSkill();
+    if (skill) return new Set([skill]);
+    const row = this.hoverRow();
+    const item = this.experience()[this.selected()];
+    return new Set(row === null ? [] : (item.highlights[row]?.tags ?? []));
+  });
+
+  /** Whether anything is being explored — everything unlit then fades back. */
+  readonly exploring = computed(() => this.litSkills().size > 0);
+
+  isRowLit(row: number, tags: string[]): boolean {
+    const skill = this.activeSkill();
+    return skill ? tags.includes(skill) : this.hoverRow() === row;
+  }
+
+  enterSkill(skill: string) {
+    this.hoverSkill.set(skill);
+  }
+
+  leaveSkill() {
+    this.hoverSkill.set(null);
+  }
+
+  toggleSkill(skill: string) {
+    this.pinnedSkill.update((s) => (s === skill ? null : skill));
+  }
+
+  private resetExplore() {
+    this.hoverSkill.set(null);
+    this.pinnedSkill.set(null);
+    this.hoverRow.set(null);
+  }
+
+  /** Soft glow that follows the pointer across the card (CSS vars, no change detection). */
+  onCardPointer(event: PointerEvent) {
+    const card = this.card.nativeElement;
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${event.clientX - rect.left}px`);
+    card.style.setProperty("--my", `${event.clientY - rect.top}px`);
+  }
 
   /**
    * Career bar: each role as a slice of the span from the first job to today.
@@ -252,6 +325,7 @@ export class Experience implements AfterViewInit, OnDestroy {
     }
 
     this.selected.set(index);
+    this.resetExplore();
     if (focusTab) {
       this.tabs.get(index)?.nativeElement.focus({ preventScroll: true });
     }
@@ -275,6 +349,8 @@ export class Experience implements AfterViewInit, OnDestroy {
         ease: "power3.out",
         stagger: 0.05,
         overwrite: true,
+        // Hand opacity back to CSS so the explore dimming works afterwards
+        clearProps: "opacity,transform",
       },
     );
     gsap.fromTo(
@@ -288,6 +364,7 @@ export class Experience implements AfterViewInit, OnDestroy {
         stagger: 0.025,
         delay: 0.2,
         overwrite: true,
+        clearProps: "opacity,transform",
       },
     );
   }

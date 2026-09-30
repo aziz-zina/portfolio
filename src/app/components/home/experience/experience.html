@@ -122,11 +122,18 @@
     <!-- Detail card -->
     <article
       #card
-      class="flex flex-col rounded-3xl border border-border bg-card p-6 md:p-8 xl:p-10 shadow-[0_1px_2px_rgb(0_0_0/0.04)]"
+      class="group/card relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-6 md:p-8 xl:p-10 shadow-[0_1px_2px_rgb(0_0_0/0.04)]"
+      (pointermove)="onCardPointer($event)"
     >
+      <!-- Spotlight: a soft accent glow that follows the pointer -->
+      <div
+        class="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/card:opacity-100 bg-[radial-gradient(28rem_circle_at_var(--mx,50%)_var(--my,0%),rgb(10_228_72/0.08),transparent_65%)]"
+        aria-hidden="true"
+      ></div>
+
       <!-- Every panel shares one grid cell: the card is always as tall as the
            longest role, so switching never makes the page jump -->
-      <div class="grid flex-1">
+      <div class="relative grid flex-1">
         @for (item of experience(); track item.company; let i = $index) {
         <div
           #panel
@@ -134,106 +141,143 @@
           [id]="'exp-panel-' + i"
           [attr.aria-labelledby]="'exp-tab-' + i"
           [attr.inert]="selected() === i ? null : ''"
-          class="[grid-area:1/1] grid gap-8 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-12"
+          class="[grid-area:1/1] flex flex-col min-w-0"
           [class.invisible]="selected() !== i"
         >
-          <!-- Main: who, what -->
-          <div class="flex flex-col min-w-0">
-            <header data-anim class="flex items-start gap-4">
-              <div
-                class="size-14 shrink-0 rounded-2xl bg-white ring-1 ring-black/5 dark:ring-white/10 grid place-items-center overflow-hidden"
-              >
-                <img
-                  [ngSrc]="item.logo"
-                  [alt]="item.company + ' logo'"
-                  width="36"
-                  height="36"
-                  class="size-9 object-contain"
-                />
-              </div>
-              <div class="min-w-0 flex-1 pt-0.5">
-                <h3
-                  class="text-2xl md:text-3xl font-semibold tracking-tight text-balance"
-                >
-                  {{ item.title }}
-                </h3>
-                <p class="mt-1 text-[15px] text-muted-foreground">
-                  {{ item.company }}
-                </p>
-              </div>
-            </header>
-
-            <ul
-              class="mt-7 space-y-3.5 text-base xl:text-[17px] leading-relaxed text-muted-foreground text-pretty"
+          <!-- Who, where, when -->
+          <header data-anim class="flex flex-wrap items-start gap-x-4 gap-y-3">
+            <div
+              class="size-14 shrink-0 rounded-2xl bg-white ring-1 ring-black/5 dark:ring-white/10 grid place-items-center overflow-hidden"
             >
-              @for (desc of item.description; track $index) {
-              <li data-anim class="flex gap-4">
-                <span
-                  class="mt-[0.75em] h-px w-4 shrink-0 bg-foreground/30"
-                  aria-hidden="true"
-                ></span>
-                {{ desc }}
+              <img
+                [ngSrc]="item.logo"
+                [alt]="item.company + ' logo'"
+                width="36"
+                height="36"
+                class="size-9 object-contain"
+              />
+            </div>
+            <div class="min-w-0 flex-1 pt-0.5">
+              <h3
+                class="text-2xl md:text-3xl font-semibold tracking-tight text-balance"
+              >
+                {{ item.title }}
+              </h3>
+              <p class="mt-1 text-[15px] text-muted-foreground">
+                {{ item.company }}
+              </p>
+            </div>
+            <div class="w-full sm:w-auto sm:text-right pt-1">
+              <p class="text-sm font-medium tabular-nums">
+                {{ formatMonth(item.start) }} –
+                {{ item.end ? formatMonth(item.end) : 'Present' }}
+              </p>
+              <p
+                class="mt-1 inline-flex items-center gap-1.5 text-xs text-muted-foreground tabular-nums"
+              >
+                @if (item.current) {
+                <span class="relative flex size-1.5">
+                  <span
+                    class="absolute inset-0 rounded-full bg-[#0AE448] motion-safe:animate-ping opacity-60"
+                  ></span>
+                  <span class="relative size-1.5 rounded-full bg-[#0AE448]"></span>
+                </span>
+                Current ·
+                }
+                {{ duration(item.start, item.end) }}
+              </p>
+            </div>
+          </header>
+
+          <p
+            data-anim
+            class="mt-6 max-w-2xl text-base xl:text-[17px] leading-relaxed text-muted-foreground text-pretty"
+          >
+            {{ item.summary }}
+          </p>
+
+          <!-- Highlights: hover a row to light up the tools behind it -->
+          <ol class="mt-6 -mx-3 flex flex-col gap-1" (mouseleave)="hoverRow.set(null)">
+            @for (h of item.highlights; track $index; let j = $index) {
+            @let lit = isRowLit(j, h.tags);
+            <li
+              data-anim
+              class="group/row relative flex gap-4 rounded-xl px-3 py-3 transition-[background-color,opacity] duration-300"
+              [class.bg-muted]="lit"
+              [class.opacity-35]="exploring() && !lit"
+              (mouseenter)="hoverRow.set(j)"
+            >
+              <span
+                class="absolute left-0 top-3 bottom-3 w-0.5 origin-center rounded-full bg-[#0AE448] transition-transform duration-300 ease-out"
+                [class.scale-y-0]="!lit"
+                aria-hidden="true"
+              ></span>
+              <span
+                class="pt-[0.2em] font-mono text-xs tabular-nums transition-colors duration-300"
+                [class]="lit ? 'text-emerald-700 dark:text-[#0AE448]' : 'text-muted-foreground/70'"
+                aria-hidden="true"
+                >{{ j + 1 < 10 ? '0' + (j + 1) : j + 1 }}</span
+              >
+              <span
+                class="text-[15px] xl:text-base leading-relaxed text-pretty transition-colors duration-300"
+                [class]="lit ? 'text-foreground' : 'text-foreground/80'"
+                >{{ h.text }}</span
+              >
+            </li>
+            }
+          </ol>
+
+          <!-- Stack: hover or tap a tool to see where it was used -->
+          @if (item.skills.length) {
+          <div data-anim class="mt-auto pt-8">
+            <div class="mb-3 flex items-baseline justify-between gap-4">
+              <p class="text-xs text-muted-foreground">Stack</p>
+              <p class="hidden sm:block text-xs text-muted-foreground/70">
+                Hover a tool to see where I used it
+              </p>
+            </div>
+            <ul
+              class="flex flex-wrap gap-1.5"
+              [attr.aria-label]="'Technologies used at ' + item.company"
+            >
+              @for (skill of item.skills; track skill) {
+              @let on = litSkills().has(skill);
+              <li data-chip>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium cursor-pointer transition-[background-color,border-color,color,opacity] duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                  [class]="
+                    on
+                      ? 'border-[#0AE448]/50 bg-[#0AE448]/12 text-emerald-800 dark:text-[#0AE448]'
+                      : 'border-border bg-background/60 text-foreground/70 hover:text-foreground'
+                  "
+                  [class.opacity-40]="exploring() && !on"
+                  [attr.aria-pressed]="activeSkill() === skill"
+                  (mouseenter)="enterSkill(skill)"
+                  (mouseleave)="leaveSkill()"
+                  (focus)="enterSkill(skill)"
+                  (blur)="leaveSkill()"
+                  (click)="toggleSkill(skill)"
+                >
+                  <span
+                    class="size-1.5 rounded-full transition-colors duration-300"
+                    [class]="on ? 'bg-[#0AE448]' : 'bg-foreground/25'"
+                    aria-hidden="true"
+                  ></span>
+                  {{ skill }}
+                </button>
               </li>
               }
             </ul>
           </div>
-
-          <!-- Side: when, with what -->
-          <aside
-            class="flex flex-col gap-7 lg:border-l lg:border-border lg:pl-10"
-          >
-            @if (item.current) {
-            <span
-              data-anim
-              class="self-start inline-flex items-center gap-1.5 rounded-full bg-[#0AE448]/12 px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-[#0AE448]"
-            >
-              <span class="size-1.5 rounded-full bg-[#0AE448]"></span>
-              Current role
-            </span>
-            }
-
-            <dl data-anim class="grid gap-5 text-sm">
-              <div>
-                <dt class="text-xs text-muted-foreground">Period</dt>
-                <dd class="mt-1 font-medium tabular-nums">
-                  {{ formatMonth(item.start) }} –
-                  {{ item.end ? formatMonth(item.end) : 'Present' }}
-                </dd>
-              </div>
-              <div>
-                <dt class="text-xs text-muted-foreground">Duration</dt>
-                <dd class="mt-1 font-medium tabular-nums">
-                  {{ duration(item.start, item.end) }}
-                </dd>
-              </div>
-            </dl>
-
-            @if (item.skills.length) {
-            <div data-anim>
-              <p class="text-xs text-muted-foreground mb-2.5">Stack</p>
-              <ul
-                class="flex flex-wrap gap-1.5"
-                [attr.aria-label]="'Technologies used at ' + item.company"
-              >
-                @for (skill of item.skills; track skill) {
-                <li
-                  data-chip
-                  class="rounded-md bg-muted px-2 py-0.5 text-xs font-medium text-foreground/70"
-                >
-                  {{ skill }}
-                </li>
-                }
-              </ul>
-            </div>
-            }
-          </aside>
+          }
         </div>
         }
       </div>
 
       <!-- Step through roles in order -->
       <footer
-        class="mt-8 pt-5 border-t border-border flex items-center justify-between gap-4"
+        class="relative mt-8 pt-5 border-t border-border flex items-center justify-between gap-4"
       >
         <span class="text-sm text-muted-foreground tabular-nums">
           {{ selected() + 1 }} / {{ experience().length }}
