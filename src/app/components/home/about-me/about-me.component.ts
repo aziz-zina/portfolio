@@ -4,42 +4,58 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
-  OnInit,
+  OnDestroy,
   PLATFORM_ID,
   ViewChild,
+  WritableSignal,
+  computed,
   inject,
   signal,
 } from "@angular/core";
 import { provideIcons } from "@ng-icons/core";
 import {
   lucideArrowUpRight,
-  lucideBug,
-  lucideCloud,
-  lucideCode,
-  lucideDatabase,
-  lucideDumbbell,
+  lucideCircleDot,
   lucideFolders,
   lucideGitCommit,
   lucideGitPullRequest,
-  lucideLayout,
-  lucideServer,
-  lucideShield,
   lucideStar,
-  lucideTrendingUp,
   lucideUsers,
 } from "@ng-icons/lucide";
-import { HlmButtonImports } from "@spartan-ng/helm/button";
-import { HlmCardImports } from "@spartan-ng/helm/card";
 import { HlmIconImports } from "@spartan-ng/helm/icon";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { GithubApiService } from "../../../lib/github/github-api.service";
+import {
+  ContributionDay,
+  GithubApiService,
+} from "../../../lib/github/github-api.service";
 import { LinkButton } from "../../../shared/components/link-button/link-button";
 import { SectionTitle } from "../../../shared/components/section-title/section-title";
 import { ScrollAnimationDirective } from "../../../shared/directives/scroll-animation.directive";
 import { SkillsShowcase } from "./skills-showcase/skills-showcase";
 
 gsap.registerPlugin(ScrollTrigger);
+
+/** Heatmap tint per GitHub quartile — empty days stay neutral, active days use the accent green. */
+const LEVEL_CLASSES = [
+  "bg-foreground/[0.07]",
+  "bg-[#0AE448]/30",
+  "bg-[#0AE448]/55",
+  "bg-[#0AE448]/80",
+  "bg-[#0AE448]",
+];
+
+/** Empty year shown while the real calendar loads (or if it can't). */
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const PLACEHOLDER_WEEKS: ContributionDay[][] = Array.from({ length: 53 }, () =>
+  Array.from({ length: 7 }, (_, weekday) => ({
+    date: "",
+    weekday,
+    count: 0,
+    level: 0,
+  })),
+);
 
 export interface GithubProfile {
   login: string;
@@ -65,9 +81,7 @@ export interface GithubProfile {
 @Component({
   selector: "app-about-me",
   imports: [
-    HlmCardImports,
     HlmIconImports,
-    HlmButtonImports,
     ScrollAnimationDirective,
     LinkButton,
     SectionTitle,
@@ -75,74 +89,68 @@ export interface GithubProfile {
   ],
   providers: [
     provideIcons({
-      lucideUsers,
-      lucideFolders,
-      lucideTrendingUp,
-      lucideDumbbell,
       lucideArrowUpRight,
-      lucideLayout,
-      lucideServer,
-      lucideDatabase,
-      lucideCloud,
-      lucideShield,
-      lucideCode,
-      lucideStar,
+      lucideCircleDot,
+      lucideFolders,
       lucideGitCommit,
       lucideGitPullRequest,
-      lucideBug,
+      lucideStar,
+      lucideUsers,
     }),
   ],
   templateUrl: "./about-me.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: [
-    `
-      @keyframes float {
-        0%,
-        100% {
-          transform: translateY(0px);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-      }
-      .animate-float {
-        animation: float 6s ease-in-out infinite;
-      }
-    `,
-  ],
 })
-export class AboutMe implements OnInit, AfterViewInit {
+export class AboutMe implements AfterViewInit, OnDestroy {
   private readonly gitApi = inject(GithubApiService);
   private readonly platform = inject(PLATFORM_ID);
 
-  @ViewChild("separator") separator!: ElementRef<HTMLElement>;
-  @ViewChild("experienceArrow") experienceArrow!: ElementRef<HTMLElement>;
-  @ViewChild("yearsCount") yearsCount!: ElementRef<HTMLElement>;
-  @ViewChild("followersCount") followersCount!: ElementRef<HTMLElement>;
-  @ViewChild("reposCount") reposCount!: ElementRef<HTMLElement>;
+  @ViewChild("separator") separator?: ElementRef<HTMLElement>;
+  @ViewChild("statsPanel") statsPanel!: ElementRef<HTMLElement>;
+  @ViewChild("heatmap") heatmap!: ElementRef<HTMLElement>;
+  @ViewChild("tooltip") tooltip!: ElementRef<HTMLElement>;
 
-  private arrowTween: gsap.core.Tween | null = null;
-  private remoteStatsAnimated = false;
-  private isDataLoaded = false;
+  private gsapContext: gsap.Context | null = null;
+  private reduceMotion = false;
 
-  // Final values (source of truth from API)
-  readonly publicRepos = signal(0);
-  readonly followers = signal(0);
+  /** Final value of each counter, so hover can replay the roll-up. */
+  private readonly finals = new Map<WritableSignal<number | null>, number>();
 
-  // Custom Stats
-  readonly githubStars = signal(0);
-  readonly githubCommits = signal(0);
-  readonly githubPRs = signal(0);
-  readonly githubIssues = signal(0);
+  private hoveredDay: HTMLElement | null = null;
+  private tooltipVisible = false;
+  private tooltipX?: gsap.QuickToFunc;
+  private tooltipY?: gsap.QuickToFunc;
 
-  // Display values (animated)
-  readonly yearsDisplay = signal(0);
-  readonly followersDisplay = signal(0);
-  readonly reposDisplay = signal(0);
-  readonly githubStarsDisplay = signal(0);
-  readonly githubCommitsDisplay = signal(0);
-  readonly githubPRsDisplay = signal(0);
-  readonly githubIssuesDisplay = signal(0);
+  readonly levelClasses = LEVEL_CLASSES;
+
+  // Display values — null until the data arrives, then animated up from 0
+  readonly yearsDisplay = signal<number | null>(null);
+  readonly followersDisplay = signal<number | null>(null);
+  readonly reposDisplay = signal<number | null>(null);
+  readonly starsDisplay = signal<number | null>(null);
+  readonly commitsDisplay = signal<number | null>(null);
+  readonly prsDisplay = signal<number | null>(null);
+  readonly issuesDisplay = signal<number | null>(null);
+  readonly contributionTotalDisplay = signal<number | null>(null);
+
+  readonly stats = [
+    { label: "Followers", icon: "lucideUsers", value: this.followersDisplay },
+    { label: "Repositories", icon: "lucideFolders", value: this.reposDisplay },
+    { label: "Stars", icon: "lucideStar", value: this.starsDisplay },
+    { label: "Commits", icon: "lucideGitCommit", value: this.commitsDisplay },
+    {
+      label: "Pull requests",
+      icon: "lucideGitPullRequest",
+      value: this.prsDisplay,
+    },
+    { label: "Issues", icon: "lucideCircleDot", value: this.issuesDisplay },
+  ];
+
+  private readonly contributionWeeks = signal<ContributionDay[][]>([]);
+  readonly heatmapWeeks = computed(() => {
+    const weeks = this.contributionWeeks();
+    return weeks.length ? weeks : PLACEHOLDER_WEEKS;
+  });
 
   readonly bioTitle =
     "I'm Aziz - a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
@@ -158,54 +166,142 @@ export class AboutMe implements OnInit, AfterViewInit {
   }
 
   readonly yearsExperience = signal(3);
-  readonly usersServed = signal(1000);
-  readonly projectsCompleted = signal(4);
 
-  ngOnInit(): void {
-    if (isPlatformBrowser(this.platform)) {
-      this.gitApi.getInfo().subscribe({
-        next: (data: any) => {
-          // Store final values
-          this.followers.set(data.followers);
-          this.publicRepos.set(data.public_repos);
-          this.isDataLoaded = true;
-          this.initRemoteStatsAnimations();
-        },
-        error: (err) => {
-          console.error("Error fetching Github info", err);
-        },
-      });
+  format(value: number | null): string {
+    return value === null ? "—" : value.toLocaleString("en-US");
+  }
 
-      this.gitApi.getCustomStats().subscribe({
-        next: (data) => {
-          if (!data.error) {
-            this.githubStars.set(data.stars);
-            this.githubCommits.set(data.commits);
-            this.githubPRs.set(data.prs);
-            this.githubIssues.set(data.issues);
-            // Re-trigger animation logic if needed, or animate separately
-            this.animateCustomStats();
-          } else {
-            console.error("Error in custom stats:", data.error);
-          }
-        },
-        error: (err) => {
-          console.error("Error fetching Custom Github stats", err);
-        },
+  /** "4 contributions · Mar 12, 2026" (fixed month names so SSR and browser agree). */
+  dayLabel(day: ContributionDay): string | null {
+    if (!day.date) return null;
+    const [y, m, d] = day.date.split("-").map(Number);
+    const noun = day.count === 1 ? "contribution" : "contributions";
+    return `${day.count || "No"} ${noun} · ${MONTHS[m - 1]} ${d}, ${y}`;
+  }
+
+  // ── Hover interactions ────────────────────────────────────────────
+
+  /** Delegated from the heatmap: grow the hovered day and float the tooltip above it. */
+  onDayOver(event: PointerEvent) {
+    const cell = (event.target as HTMLElement).closest<HTMLElement>(
+      "[data-day]",
+    );
+    if (!cell || cell === this.hoveredDay) return;
+
+    this.releaseDay();
+    const label = cell.dataset["label"];
+    if (!label) {
+      this.hideTooltip();
+      return;
+    }
+
+    this.hoveredDay = cell;
+    if (!this.reduceMotion) {
+      gsap.to(cell, {
+        scale: 1.6,
+        duration: 0.25,
+        ease: "back.out(3)",
+        overwrite: "auto",
       });
+    }
+
+    // Set text first so the width used for clamping is the real one
+    const tip = this.tooltip.nativeElement;
+    tip.textContent = label;
+    const box = this.heatmap.nativeElement.getBoundingClientRect();
+    const rect = cell.getBoundingClientRect();
+    const half = tip.offsetWidth / 2;
+    const x = gsap.utils.clamp(
+      half,
+      box.width - half,
+      rect.left - box.left + rect.width / 2,
+    );
+    const y = rect.top - box.top - 8;
+
+    if (!this.tooltipVisible || this.reduceMotion) {
+      gsap.set(tip, { x, y });
+      gsap.to(tip, {
+        autoAlpha: 1,
+        scale: 1,
+        duration: this.reduceMotion ? 0 : 0.18,
+        ease: "power2.out",
+        overwrite: "auto",
+      });
+      this.tooltipVisible = true;
+    } else {
+      // Already showing — glide to the next cell instead of popping
+      this.tooltipX?.(x, gsap.getProperty(tip, "x") as number);
+      this.tooltipY?.(y, gsap.getProperty(tip, "y") as number);
     }
   }
 
-  ngAfterViewInit() {
-    if (isPlatformBrowser(this.platform)) {
-      this.initRemoteStatsAnimations();
+  onHeatmapLeave() {
+    this.releaseDay();
+    this.hideTooltip();
+  }
 
+  /** Icon does a little spin-pop, and the number quickly rolls up to its value again. */
+  onStatEnter(event: MouseEvent, value: WritableSignal<number | null>) {
+    if (this.reduceMotion) return;
+
+    const icon = (event.currentTarget as HTMLElement).querySelector(
+      "[data-icon]",
+    );
+    if (icon) {
+      gsap.fromTo(
+        icon,
+        { rotate: -30, scale: 0.6 },
+        { rotate: 0, scale: 1, duration: 0.6, ease: "back.out(3)", overwrite: true },
+      );
+    }
+
+    const final = this.finals.get(value);
+    // Skip while the first count-up (or a previous roll) is still running
+    if (final === undefined || final < 2 || value() !== final) return;
+    const counter = { val: Math.floor(final * 0.6) };
+    gsap.to(counter, {
+      val: final,
+      duration: 0.6,
+      ease: "power3.out",
+      onUpdate: () => value.set(Math.round(counter.val)),
+    });
+  }
+
+  private releaseDay() {
+    if (!this.hoveredDay) return;
+    gsap.to(this.hoveredDay, {
+      scale: 1,
+      duration: 0.3,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    this.hoveredDay = null;
+  }
+
+  private hideTooltip() {
+    if (!this.tooltipVisible) return;
+    this.tooltipVisible = false;
+    gsap.to(this.tooltip.nativeElement, {
+      autoAlpha: 0,
+      scale: 0.9,
+      duration: 0.15,
+      ease: "power2.in",
+      overwrite: "auto",
+    });
+  }
+
+  ngAfterViewInit() {
+    if (!isPlatformBrowser(this.platform)) return;
+
+    this.reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    this.gsapContext = gsap.context(() => {
       if (this.separator) {
         gsap.fromTo(
           this.separator.nativeElement,
-          {
-            yPercent: -30,
-          },
+          { yPercent: -30 },
           {
             yPercent: -100,
             ease: "none",
@@ -219,173 +315,121 @@ export class AboutMe implements OnInit, AfterViewInit {
         );
       }
 
-      // Animate Years
-      if (this.yearsCount) {
-        const yearsObj = { val: 0 };
-        // The target year is constant 2
-        gsap.to(yearsObj, {
-          val: 3,
-          duration: 2,
-          delay: 1.2,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: this.yearsCount.nativeElement,
-            start: "top 85%",
-            once: true,
-          },
-          onUpdate: () => {
-            this.yearsDisplay.set(Math.round(yearsObj.val));
-          },
-        });
-      }
-    }
+      if (!this.reduceMotion) this.revealPanel();
+    });
+
+    const tip = this.tooltip.nativeElement;
+    gsap.set(tip, { xPercent: -50, yPercent: -100, autoAlpha: 0, scale: 0.9 });
+    this.tooltipX = gsap.quickTo(tip, "x", { duration: 0.25, ease: "power3.out" });
+    this.tooltipY = gsap.quickTo(tip, "y", { duration: 0.25, ease: "power3.out" });
+
+    this.countUp(this.yearsDisplay, this.yearsExperience(), 0.3);
+    this.loadStats();
   }
 
-  private initRemoteStatsAnimations() {
-    if (
-      this.remoteStatsAnimated ||
-      !this.isDataLoaded ||
-      !this.followersCount ||
-      !this.reposCount
-    )
+  ngOnDestroy() {
+    this.gsapContext?.revert();
+  }
+
+  private loadStats() {
+    this.gitApi.getInfo().subscribe({
+      next: (data: any) => {
+        this.countUp(this.followersDisplay, data.followers, 0.5);
+        this.countUp(this.reposDisplay, data.public_repos, 0.55);
+      },
+      error: (err) => console.error("Error fetching Github info", err),
+    });
+
+    this.gitApi.getCustomStats().subscribe({
+      next: (data) => {
+        if (data.error) {
+          console.error("Error in custom stats:", data.error);
+          return;
+        }
+        this.countUp(this.starsDisplay, data.stars, 0.6);
+        this.countUp(this.commitsDisplay, data.commits, 0.65);
+        this.countUp(this.prsDisplay, data.prs, 0.7);
+        this.countUp(this.issuesDisplay, data.issues, 0.75);
+
+        if (data.contributions?.weeks.length) {
+          this.contributionWeeks.set(data.contributions.weeks);
+          this.countUp(
+            this.contributionTotalDisplay,
+            data.contributions.total,
+            0.3,
+          );
+        }
+      },
+      error: (err) => console.error("Error fetching Custom Github stats", err),
+    });
+  }
+
+  /** Panel slides up, the heatmap sweeps in column by column, then the stat cells follow. */
+  private revealPanel() {
+    const panel = this.statsPanel.nativeElement;
+    const days = this.heatmap.nativeElement.querySelectorAll("[data-day]");
+    const statCells = panel.querySelectorAll("[data-stat]");
+
+    gsap
+      .timeline({
+        scrollTrigger: { trigger: panel, start: "top 80%", once: true },
+        defaults: { ease: "power3.out" },
+      })
+      .from(panel, { y: 32, opacity: 0, duration: 0.8 })
+      .from(
+        days,
+        {
+          scale: 0,
+          opacity: 0,
+          duration: 0.4,
+          ease: "back.out(2)",
+          // DOM order is week by week, so this sweeps left → right
+          stagger: { amount: 1.1 },
+          // Hand opacity back to CSS so the hover dimming works afterwards
+          clearProps: "opacity,transform",
+        },
+        0.25,
+      )
+      .from(
+        statCells,
+        {
+          y: 16,
+          opacity: 0,
+          duration: 0.6,
+          stagger: 0.06,
+          clearProps: "opacity,transform",
+        },
+        0.45,
+      );
+  }
+
+  /** Counts a stat up from 0 once the panel is on screen (immediately if it already is). */
+  private countUp(
+    target: WritableSignal<number | null>,
+    value: number,
+    delay: number,
+  ) {
+    this.finals.set(target, value);
+    if (this.reduceMotion || !this.gsapContext) {
+      target.set(value);
       return;
+    }
 
-    this.remoteStatsAnimated = true;
-
-    // Animate Followers
-    const followersObj = { val: 0 };
-    gsap.to(followersObj, {
-      val: this.followers(),
-      duration: 2,
-      delay: 1.3,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: this.followersCount.nativeElement,
-        start: "top 85%",
-        once: true,
-      },
-      onUpdate: () => {
-        this.followersDisplay.set(Math.round(followersObj.val));
-      },
-    });
-
-    // Animate Repos
-    const reposObj = { val: 0 };
-    gsap.to(reposObj, {
-      val: this.publicRepos(),
-      duration: 2,
-      delay: 1.4,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: this.reposCount.nativeElement,
-        start: "top 85%",
-        once: true,
-      },
-      onUpdate: () => {
-        this.reposDisplay.set(Math.round(reposObj.val));
-      },
-    });
-  }
-
-  private animateCustomStats() {
-    // Only animate if values are loaded
-    const duration = 2.5;
-    const ease = "power2.out";
-    const delay = 0.5;
-
-    // Stars
-    if (this.githubStars() > 0) {
-      const starsObj = { val: 0 };
-      gsap.to(starsObj, {
-        val: this.githubStars(),
-        duration,
+    const counter = { val: 0 };
+    target.set(0);
+    this.gsapContext.add(() => {
+      gsap.to(counter, {
+        val: value,
+        duration: 1.8,
         delay,
-        ease,
-        scrollTrigger: {
-          trigger: "#custom-stats",
-          start: "top 85%",
-          once: true,
-        },
-        onUpdate: () => this.githubStarsDisplay.set(Math.round(starsObj.val)),
-      });
-    }
-
-    // Commits
-    if (this.githubCommits() > 0) {
-      const commitsObj = { val: 0 };
-      gsap.to(commitsObj, {
-        val: this.githubCommits(),
-        duration,
-        delay: delay + 0.1,
-        ease,
-        scrollTrigger: {
-          trigger: "#custom-stats",
-          start: "top 85%",
-          once: true,
-        },
-        onUpdate: () =>
-          this.githubCommitsDisplay.set(Math.round(commitsObj.val)),
-      });
-    }
-
-    // PRs
-    if (this.githubPRs() > 0) {
-      const prsObj = { val: 0 };
-      gsap.to(prsObj, {
-        val: this.githubPRs(),
-        duration,
-        delay: delay + 0.2,
-        ease,
-        scrollTrigger: {
-          trigger: "#custom-stats",
-          start: "top 85%",
-          once: true,
-        },
-        onUpdate: () => this.githubPRsDisplay.set(Math.round(prsObj.val)),
-      });
-    }
-
-    // Issues
-    if (this.githubIssues() > 0) {
-      const issuesObj = { val: 0 };
-      gsap.to(issuesObj, {
-        val: this.githubIssues(),
-        duration,
-        delay: delay + 0.3,
-        ease,
-        scrollTrigger: {
-          trigger: "#custom-stats",
-          start: "top 85%",
-          once: true,
-        },
-        onUpdate: () => this.githubIssuesDisplay.set(Math.round(issuesObj.val)),
-      });
-    }
-  }
-
-  onExperienceHover() {
-    if (this.experienceArrow && isPlatformBrowser(this.platform)) {
-      if (this.arrowTween) this.arrowTween.kill();
-      this.arrowTween = gsap.to(this.experienceArrow.nativeElement, {
-        scale: 1.1,
-        y: -15,
-        opacity: 0.15,
-        duration: 0.4,
         ease: "power2.out",
+        scrollTrigger: {
+          trigger: this.statsPanel.nativeElement,
+          start: "top 80%",
+          once: true,
+        },
+        onUpdate: () => target.set(Math.round(counter.val)),
       });
-    }
-  }
-
-  onExperienceLeave() {
-    if (this.experienceArrow && isPlatformBrowser(this.platform)) {
-      if (this.arrowTween) this.arrowTween.kill();
-      this.arrowTween = gsap.to(this.experienceArrow.nativeElement, {
-        scale: 1,
-        y: 0,
-        opacity: 0.05,
-        duration: 0.4,
-        ease: "power2.out",
-      });
-    }
+    });
   }
 }

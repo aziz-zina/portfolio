@@ -1,5 +1,13 @@
 import { defineEventHandler } from 'h3';
 
+const CONTRIBUTION_LEVELS: Record<string, number> = {
+  NONE: 0,
+  FIRST_QUARTILE: 1,
+  SECOND_QUARTILE: 2,
+  THIRD_QUARTILE: 3,
+  FOURTH_QUARTILE: 4,
+};
+
 export default defineEventHandler(async (event) => {
   const token = process.env['GITHUB_PAT'];
   
@@ -28,6 +36,17 @@ export default defineEventHandler(async (event) => {
           contributionsCollection {
             totalCommitContributions
             restrictedContributionsCount
+            contributionCalendar {
+              totalContributions
+              weeks {
+                contributionDays {
+                  date
+                  weekday
+                  contributionCount
+                  contributionLevel
+                }
+              }
+            }
           }
           pullRequests(first: 1) {
             totalCount
@@ -87,7 +106,21 @@ export default defineEventHandler(async (event) => {
       console.error('Failed to fetch all-time commits, falling back to current year', e);
     }
 
+    const calendar = user?.contributionsCollection?.contributionCalendar;
+    const contributions = {
+      total: calendar?.totalContributions ?? 0,
+      weeks: (calendar?.weeks ?? []).map((week: any) =>
+        week.contributionDays.map((day: any) => ({
+          date: day.date,
+          weekday: day.weekday,
+          count: day.contributionCount,
+          level: CONTRIBUTION_LEVELS[day.contributionLevel] ?? 0,
+        })),
+      ),
+    };
+
     return {
+      contributions,
       stars: totalStars,
       commits: totalCommits,
       prs: totalPRs,

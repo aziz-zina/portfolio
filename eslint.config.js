@@ -1,10 +1,11 @@
 // @ts-check
-const eslint = require("@eslint/js");
-const { defineConfig } = require("eslint/config");
-const tseslint = require("typescript-eslint");
-const angular = require("angular-eslint");
+import eslint from "@eslint/js";
+import angular from "angular-eslint";
+import { defineConfig, globalIgnores } from "eslint/config";
+import tseslint from "typescript-eslint";
 
-module.exports = defineConfig([
+export default defineConfig([
+  globalIgnores(["dist/", ".angular/", ".nx/", ".agents/", ".claude/"]),
   {
     files: ["**/*.ts"],
     extends: [

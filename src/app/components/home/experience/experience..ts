@@ -1,4 +1,4 @@
-import { isPlatformBrowser } from "@angular/common";
+import { isPlatformBrowser, NgOptimizedImage } from "@angular/common";
 import {
   AfterViewInit,
   ChangeDetectionStrategy,
@@ -18,10 +18,25 @@ import { SectionTitle } from "../../../shared/components/section-title/section-t
 
 gsap.registerPlugin(ScrollTrigger);
 
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+interface ExperienceItem {
+  title: string;
+  company: string;
+  logo: string;
+  /** "YYYY-MM" */
+  start: string;
+  /** "YYYY-MM", or null while ongoing */
+  end: string | null;
+  current: boolean;
+  description: string[];
+  skills: string[];
+}
+
 @Component({
   selector: "app-experience",
   standalone: true,
-  imports: [SectionTitle],
+  imports: [SectionTitle, NgOptimizedImage],
   templateUrl: "./experience.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -38,10 +53,11 @@ export class Experience implements AfterViewInit, OnDestroy {
 
   private gsapContext: gsap.Context | null = null;
 
-  readonly experience = signal([
+  readonly experience = signal<ExperienceItem[]>([
     {
       title: "Software Engineer",
-      date: "Jun 2026 — Present",
+      start: "2026-06",
+      end: null,
       company: "Accent",
       logo: "companies/accent_logo.jfif",
       current: true,
@@ -63,10 +79,11 @@ export class Experience implements AfterViewInit, OnDestroy {
     },
     {
       title: "Software Developer",
-      date: "Jan 2024 — Jun 2026",
+      start: "2024-01",
+      end: "2026-06",
       company: "Inspark",
       logo: "companies/inspark.png",
-      current: true,
+      current: false,
       description: [
         "Maintaining enterprise-grade Angular/Spring Boot apps with Keycloak SSO and modular component architecture.",
         "Refactored core services into reusable modules using domain-driven design, increasing maintainability by 30%.",
@@ -85,7 +102,8 @@ export class Experience implements AfterViewInit, OnDestroy {
     },
     {
       title: "Advanced Internship Trainee",
-      date: "Jan 2022 — Feb 2022",
+      start: "2022-01",
+      end: "2022-02",
       company: "BNA - Banque Nationale Agricole",
       logo: "companies/bna.png",
       current: false,
@@ -102,7 +120,8 @@ export class Experience implements AfterViewInit, OnDestroy {
     },
     {
       title: "Introductory Internship Trainee",
-      date: "Jul 2021 — Aug 2021",
+      start: "2021-07",
+      end: "2021-08",
       company: "QNB - Qatar National Bank",
       logo: "companies/qnb.png",
       current: false,
@@ -118,6 +137,28 @@ export class Experience implements AfterViewInit, OnDestroy {
       ],
     },
   ]);
+
+  /** "2024-01" → "Jan 2024". Fixed month names so SSR and browser render identically. */
+  formatMonth(value: string): string {
+    const [year, month] = value.split("-").map(Number);
+    return `${MONTHS[month - 1]} ${year}`;
+  }
+
+  /** Inclusive duration, LinkedIn-style: "2 yrs 6 mos", "2 mos". */
+  duration(start: string, end: string | null): string {
+    const [sy, sm] = start.split("-").map(Number);
+    const now = new Date();
+    const [ey, em] = end
+      ? end.split("-").map(Number)
+      : [now.getFullYear(), now.getMonth() + 1];
+    const total = Math.max(1, (ey - sy) * 12 + (em - sm) + 1);
+    const years = Math.floor(total / 12);
+    const months = total % 12;
+    const parts: string[] = [];
+    if (years) parts.push(`${years} yr${years > 1 ? "s" : ""}`);
+    if (months) parts.push(`${months} mo${months > 1 ? "s" : ""}`);
+    return parts.join(" ");
+  }
 
   ngAfterViewInit() {
     if (isPlatformBrowser(this.platform)) {

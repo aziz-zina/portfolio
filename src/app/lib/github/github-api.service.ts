@@ -2,6 +2,24 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { shareReplay } from 'rxjs';
 
+export interface ContributionDay {
+  date: string;
+  /** 0 = Sunday … 6 = Saturday */
+  weekday: number;
+  count: number;
+  /** 0–4, GitHub's quartile buckets */
+  level: number;
+}
+
+export interface GithubCustomStats {
+  stars: number;
+  commits: number;
+  prs: number;
+  issues: number;
+  contributions?: { total: number; weeks: ContributionDay[][] };
+  error?: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -16,7 +34,7 @@ export class GithubApiService {
 
   getCustomStats() {
     return this.http
-      .get<{stars: number, commits: number, prs: number, issues: number, error?: string}>('/api/github/stats')
+      .get<GithubCustomStats>('/api/github/stats')
       .pipe(shareReplay(1));
   }
 }
