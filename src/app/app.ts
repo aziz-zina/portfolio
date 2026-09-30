@@ -16,6 +16,7 @@ import { BackToTop } from "./components/layout/back-to-top/back-to-top";
 import { CursorComponent } from "./components/layout/cursor/cursor.component";
 import { Footer } from "./components/layout/footer/footer";
 import { Navbar } from "./components/layout/navbar/navbar";
+import { SmoothScrollService } from "./lib/scroll/smooth-scroll.service";
 @Component({
   selector: "app-root",
   standalone: true,
@@ -39,6 +40,7 @@ import { Navbar } from "./components/layout/navbar/navbar";
 export class App {
   private readonly router = inject(Router);
   private readonly platform = inject(PLATFORM_ID);
+  private readonly smoothScroll = inject(SmoothScrollService);
   private lenis: Lenis | null = null;
 
   constructor() {
@@ -128,6 +130,7 @@ export class App {
       wheelMultiplier: 1,
     });
 
+    this.smoothScroll.lenis = this.lenis;
     this.lenis.on("scroll", ScrollTrigger.update);
 
     gsap.ticker.add((time) => {

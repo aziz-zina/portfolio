@@ -18,11 +18,21 @@ import { lucideArrowLeft, lucideArrowRight } from "@ng-icons/lucide";
 import { HlmIconImports } from "@spartan-ng/helm/icon";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SmoothScrollService } from "../../../lib/scroll/smooth-scroll.service";
 import { SectionTitle } from "../../../shared/components/section-title/section-title";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/**
+ * Pin + scroll-through only where the whole section fits on screen; smaller
+ * screens get the normal, click-to-switch layout.
+ */
+const PIN_QUERY = "(min-width: 1024px) and (min-height: 760px)";
+
+/** Scroll distance given to each role while pinned, in viewport heights. */
+const SCROLL_PER_ROLE = 0.7;
 
 /** Arrow keys move through the role list (vertical list, but left/right work too). */
 const KEY_STEP: Record<string, number> = {
@@ -61,6 +71,7 @@ interface ExperienceItem {
 })
 export class Experience implements AfterViewInit, OnDestroy {
   private readonly platform = inject(PLATFORM_ID);
+  private readonly smoothScroll = inject(SmoothScrollService);
 
   @ViewChild("section") section!: ElementRef<HTMLElement>;
   @ViewChild("tablist") tablist!: ElementRef<HTMLElement>;
@@ -72,6 +83,13 @@ export class Experience implements AfterViewInit, OnDestroy {
   private gsapContext: gsap.Context | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private reduceMotion = false;
+  private mm: gsap.MatchMedia | null = null;
+  private pinTrigger: ScrollTrigger | null = null;
+  /** True while we're scrolling to a role the user clicked — ignore scroll-driven switching meanwhile. */
+  private scrollingToRole = false;
+
+  /** Whether the section is currently scroll-driven (pinned). Drives the "scroll" hint. */
+  readonly pinned = signal(false);
 
   readonly selected = signal(0);
 
@@ -234,7 +252,9 @@ export class Experience implements AfterViewInit, OnDestroy {
     }
 
     this.selected.set(index);
-    if (focusTab) this.tabs.get(index)?.nativeElement.focus();
+    if (focusTab) {
+      this.tabs.get(index)?.nativeElement.focus({ preventScroll: true });
+    }
     if (!isPlatformBrowser(this.platform)) return;
 
     this.moveIndicator();
@@ -272,6 +292,21 @@ export class Experience implements AfterViewInit, OnDestroy {
     );
   }
 
+  /**
+   * User picked a role (click, keys, arrows, timeline). When pinned, scroll to
+   * that role's slice of the pin so scroll position and selection stay in sync.
+   */
+  goTo(index: number, focusTab = false) {
+    this.select(index, focusTab);
+    const st = this.pinTrigger;
+    if (!st) return;
+
+    const n = this.experience().length;
+    const y = st.start + ((index + 0.5) / n) * (st.end - st.start);
+    this.scrollingToRole = true;
+    this.smoothScroll.scrollTo(y, () => (this.scrollingToRole = false));
+  }
+
   onTabKeydown(event: KeyboardEvent) {
     const last = this.experience().length - 1;
     let next: number;
@@ -282,7 +317,7 @@ export class Experience implements AfterViewInit, OnDestroy {
     } else return;
 
     event.preventDefault();
-    this.select(next, true);
+    this.goTo(next, true);
   }
 
   // ── Lifecycle ─────────────────────────────────────────────────────
@@ -298,6 +333,8 @@ export class Experience implements AfterViewInit, OnDestroy {
     // Keep the highlight glued to the active row when text wraps / fonts load
     this.resizeObserver = new ResizeObserver(() => this.moveIndicator(true));
     this.resizeObserver.observe(this.tablist.nativeElement);
+
+    this.initPin();
 
     if (this.reduceMotion) return;
 
@@ -346,8 +383,38 @@ export class Experience implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.mm?.revert();
     this.resizeObserver?.disconnect();
     this.gsapContext?.revert();
+  }
+
+  /**
+   * Pins the section and splits the pinned scroll into one equal slice per
+   * role: scrolling moves through the roles, then the page carries on.
+   */
+  private initPin() {
+    const n = this.experience().length;
+    this.mm = gsap.matchMedia();
+    this.mm.add(PIN_QUERY, () => {
+      this.pinTrigger = ScrollTrigger.create({
+        trigger: this.section.nativeElement,
+        start: "top top",
+        end: () => `+=${n * window.innerHeight * SCROLL_PER_ROLE}`,
+        pin: true,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (this.scrollingToRole) return;
+          this.select(Math.min(n - 1, Math.floor(self.progress * n)));
+        },
+      });
+      this.pinned.set(true);
+
+      return () => {
+        this.pinTrigger = null;
+        this.pinned.set(false);
+      };
+    });
   }
 
   /** Slides the highlight card behind the active row, and the playhead to its slice of the timeline. */

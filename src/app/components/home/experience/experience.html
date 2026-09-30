@@ -1,7 +1,7 @@
 <section
   id="experience"
   #section
-  class="relative z-10 bg-transparent py-24"
+  class="relative z-10 bg-transparent py-24 lg:min-h-screen lg:flex lg:flex-col lg:justify-center lg:py-10"
 >
   <app-section-title title="Experience" />
 
@@ -35,7 +35,7 @@
           [attr.aria-selected]="selected() === i"
           [tabindex]="selected() === i ? 0 : -1"
           class="group/tab relative flex w-full items-center gap-3.5 rounded-xl px-4 py-3.5 text-left transition-colors duration-200 not-aria-selected:hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-          (click)="select(i)"
+          (click)="goTo(i)"
         >
           <!-- Logos stay grey until the row is active or hovered -->
           <span
@@ -92,7 +92,7 @@
             [attr.data-active]="selected() === i ? '' : null"
             [style.left.%]="seg.left"
             [style.width.%]="seg.width"
-            (click)="select(i)"
+            (click)="goTo(i)"
           ></span>
           }
 
@@ -122,7 +122,7 @@
     <!-- Detail card -->
     <article
       #card
-      class="flex flex-col rounded-3xl border border-border bg-card p-6 md:p-8 lg:p-10 shadow-[0_1px_2px_rgb(0_0_0/0.04)]"
+      class="flex flex-col rounded-3xl border border-border bg-card p-6 md:p-8 xl:p-10 shadow-[0_1px_2px_rgb(0_0_0/0.04)]"
     >
       <!-- Every panel shares one grid cell: the card is always as tall as the
            longest role, so switching never makes the page jump -->
@@ -164,7 +164,7 @@
             </header>
 
             <ul
-              class="mt-8 space-y-4 text-base md:text-[17px] leading-relaxed text-muted-foreground text-pretty"
+              class="mt-7 space-y-3.5 text-base xl:text-[17px] leading-relaxed text-muted-foreground text-pretty"
             >
               @for (desc of item.description; track $index) {
               <li data-anim class="flex gap-4">
@@ -233,10 +233,16 @@
 
       <!-- Step through roles in order -->
       <footer
-        class="mt-10 pt-6 border-t border-border flex items-center justify-between"
+        class="mt-8 pt-5 border-t border-border flex items-center justify-between gap-4"
       >
         <span class="text-sm text-muted-foreground tabular-nums">
           {{ selected() + 1 }} / {{ experience().length }}
+          @if (pinned()) {
+          <span class="ml-3 text-xs">
+            @if (selected() < experience().length - 1) { Keep scrolling for
+            the next role } @else { Keep scrolling to continue }
+          </span>
+          }
         </span>
         <div class="flex gap-2">
           <button
@@ -244,7 +250,7 @@
             class="size-10 rounded-full border border-border grid place-items-center transition-colors hover:bg-muted disabled:opacity-40 disabled:pointer-events-none"
             [disabled]="selected() === 0"
             aria-label="Newer role"
-            (click)="select(selected() - 1)"
+            (click)="goTo(selected() - 1)"
           >
             <ng-icon name="lucideArrowLeft" size="1rem" />
           </button>
@@ -253,7 +259,7 @@
             class="size-10 rounded-full border border-border grid place-items-center transition-colors hover:bg-muted disabled:opacity-40 disabled:pointer-events-none"
             [disabled]="selected() === experience().length - 1"
             aria-label="Older role"
-            (click)="select(selected() + 1)"
+            (click)="goTo(selected() + 1)"
           >
             <ng-icon name="lucideArrowRight" size="1rem" />
           </button>
