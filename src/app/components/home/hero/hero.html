@@ -8,7 +8,7 @@
 
   <!-- Main Content -->
   <div class="absolute inset-0 flex flex-col items-center justify-center z-40 pointer-events-none">
-    <div class="text-center">
+    <div #heroText class="w-full max-w-5xl px-6 text-center">
       <p class="mb-5 font-mono text-sm md:text-base font-medium tracking-tight text-muted-foreground hero-text-reveal opacity-0">
         Hi! I'm Aziz
       </p>
@@ -22,8 +22,17 @@
     </div>
   </div>
 
-  <!-- 3D Canvas Container -->
-  <div #canvasContainer class="absolute inset-0 z-30 opacity-0"></div>
+  <!-- Planet ring, back half: behind the headline, over a soft glow (HeroScene adds the canvas) -->
+  <div #canvasContainer class="absolute inset-0 z-30 opacity-0">
+    <div class="pointer-events-none absolute inset-0 -z-10 grid place-items-center" aria-hidden="true">
+      <div
+        class="h-[42vh] w-[min(78vw,60rem)] rounded-full blur-3xl opacity-50 dark:opacity-70 bg-[radial-gradient(closest-side_at_32%_50%,rgb(49_133_255/0.45),transparent),radial-gradient(closest-side_at_68%_50%,rgb(252_65_62/0.4),transparent)]"
+      ></div>
+    </div>
+  </div>
+
+  <!-- Planet ring, front half: passes in front of the headline -->
+  <div #canvasFront class="pointer-events-none absolute inset-0 z-[45] opacity-0" aria-hidden="true"></div>
 
   <!-- Scroll Indicator -->
   <app-scroll-indicator />

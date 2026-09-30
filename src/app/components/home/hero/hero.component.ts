@@ -40,6 +40,8 @@ gsap.registerPlugin(ScrollTrigger);
 })
 export class Hero implements AfterViewInit, OnDestroy {
   @ViewChild('canvasContainer') canvasContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('canvasFront') canvasFront!: ElementRef<HTMLDivElement>;
+  @ViewChild('heroText') heroText!: ElementRef<HTMLElement>;
 
   private platformId = inject(PLATFORM_ID);
   private ngZone = inject(NgZone);
@@ -54,7 +56,13 @@ export class Hero implements AfterViewInit, OnDestroy {
 
       // Dynamic import Three.js in background
       const THREE = await import('three');
-      this.heroScene = new HeroScene(this.canvasContainer.nativeElement, this.ngZone, THREE);
+      this.heroScene = new HeroScene(
+        this.canvasContainer.nativeElement,
+        this.canvasFront.nativeElement,
+        this.heroText.nativeElement,
+        this.ngZone,
+        THREE,
+      );
 
     }
   }
@@ -72,7 +80,7 @@ export class Hero implements AfterViewInit, OnDestroy {
       ease: 'power4.out',
     });
     
-    gsap.to(this.canvasContainer.nativeElement, {
+    gsap.to([this.canvasContainer.nativeElement, this.canvasFront.nativeElement], {
         scale: 1,
         opacity: 1,
         duration: 2,
