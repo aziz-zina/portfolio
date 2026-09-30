@@ -20,6 +20,7 @@ import {
   template: `
     <div class="flex flex-col gap-6">
       <a
+        data-cuelume-hover="tick"
         href="https://wa.me/21693505147"
         target="_blank"
         rel="noopener noreferrer"
@@ -33,6 +34,7 @@ import {
         />
       </a>
       <a
+        data-cuelume-hover="tick"
         href="https://www.linkedin.com/in/aziz-zina/"
         target="_blank"
         rel="noopener noreferrer"
@@ -46,6 +48,7 @@ import {
         />
       </a>
       <a
+        data-cuelume-hover="tick"
         href="https://github.com/aziz-zina"
         target="_blank"
         rel="noopener noreferrer"

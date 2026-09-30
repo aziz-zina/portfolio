@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideMoon, lucideSun } from '@ng-icons/lucide';
+import { playThemeSound } from '../../../lib/theme/theme-sound';
 import { ThemeService } from '../../../lib/theme/theme.service';
 
 /**
@@ -22,7 +23,7 @@ import { ThemeService } from '../../../lib/theme/theme.service';
   template: `
     <button
       type="button"
-      (click)="themeService.toggleTheme($event)"
+      (click)="toggle($event)"
       [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
       [attr.aria-pressed]="isDark()"
       [title]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
@@ -55,4 +56,9 @@ export class ThemeToggle {
   readonly tone = input<'default' | 'inverse'>('default');
 
   protected readonly isDark = computed(() => this.themeService.theme() === 'dark');
+
+  protected toggle(event: MouseEvent) {
+    playThemeSound(this.isDark() ? 'light' : 'dark');
+    this.themeService.toggleTheme(event);
+  }
 }
