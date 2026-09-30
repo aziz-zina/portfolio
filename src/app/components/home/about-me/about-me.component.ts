@@ -8,7 +8,6 @@ import {
   PLATFORM_ID,
   ViewChild,
   WritableSignal,
-  computed,
   inject,
   signal,
 } from "@angular/core";
@@ -27,9 +26,11 @@ import { HlmIconImports } from "@spartan-ng/helm/icon";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
-  ContributionDay,
-  GithubApiService,
-} from "../../../lib/github/github-api.service";
+  HlmContributionSkylineImports,
+  type PaletteInput,
+  type SkylineDay,
+} from "@spartan-ng/helm/contribution-skyline";
+import { GithubApiService } from "../../../lib/github/github-api.service";
 import { LinkButton } from "../../../shared/components/link-button/link-button";
 import { SectionTitle } from "../../../shared/components/section-title/section-title";
 import { ScrollAnimationDirective } from "../../../shared/directives/scroll-animation.directive";
@@ -37,33 +38,18 @@ import { SkillsShowcase } from "./skills-showcase/skills-showcase";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/** Heatmap tint per GitHub quartile — empty days stay neutral, active days use the accent green. */
-const LEVEL_CLASSES = [
-  "bg-foreground/[0.07]",
-  "bg-[#0AE448]/30",
-  "bg-[#0AE448]/55",
-  "bg-[#0AE448]/80",
-  "bg-[#0AE448]",
-];
+/** The site accent (#0AE448) at the old heatmap's 30/55/80/100% strengths, flattened onto each theme's card. */
+const SKYLINE_PALETTE: PaletteInput = {
+  light: ["#b6f7c8", "#78f09a", "#3be96d", "#0ae448"],
+  dark: ["#0f4a22", "#0e8434", "#0cb840", "#0ae448"],
+};
 
-/** Empty year shown while the real calendar loads (or if it can't). */
 /** Terms in the bio that get the green marker underline. */
 const BIO_HIGHLIGHTS = ["Aziz Zina", "Angular", "Spring Boot", "FastAPI"];
 
 /** Marker underline; GSAP draws it in, hover fills the whole word. */
 const MARK_CLASS =
   "font-medium text-foreground box-decoration-clone bg-no-repeat bg-[position:0_100%] bg-[length:100%_0.3em] bg-[linear-gradient(rgb(10_228_72/0.45),rgb(10_228_72/0.45))] transition-[background-size] duration-300 ease-out hover:bg-[length:100%_100%]";
-
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-const PLACEHOLDER_WEEKS: ContributionDay[][] = Array.from({ length: 53 }, () =>
-  Array.from({ length: 7 }, (_, weekday) => ({
-    date: "",
-    weekday,
-    count: 0,
-    level: 0,
-  })),
-);
 
 export interface GithubProfile {
   login: string;
@@ -94,6 +80,7 @@ export interface GithubProfile {
     LinkButton,
     SectionTitle,
     SkillsShowcase,
+    HlmContributionSkylineImports,
   ],
   providers: [
     provideIcons({
@@ -118,8 +105,6 @@ export class AboutMe implements AfterViewInit, OnDestroy {
   @ViewChild("headline") headline!: ElementRef<HTMLElement>;
   @ViewChild("intro") intro!: ElementRef<HTMLElement>;
   @ViewChild("statsPanel") statsPanel!: ElementRef<HTMLElement>;
-  @ViewChild("heatmap") heatmap!: ElementRef<HTMLElement>;
-  @ViewChild("tooltip") tooltip!: ElementRef<HTMLElement>;
 
   private gsapContext: gsap.Context | null = null;
   private reduceMotion = false;
@@ -127,12 +112,7 @@ export class AboutMe implements AfterViewInit, OnDestroy {
   /** Final value of each counter, so hover can replay the roll-up. */
   private readonly finals = new Map<WritableSignal<number | null>, number>();
 
-  private hoveredDay: HTMLElement | null = null;
-  private tooltipVisible = false;
-  private tooltipX?: gsap.QuickToFunc;
-  private tooltipY?: gsap.QuickToFunc;
-
-  readonly levelClasses = LEVEL_CLASSES;
+  readonly skylinePalette = SKYLINE_PALETTE;
 
   // Display values — null until the data arrives, then animated up from 0
   readonly yearsDisplay = signal<number | null>(null);
@@ -157,11 +137,8 @@ export class AboutMe implements AfterViewInit, OnDestroy {
     { label: "Issues", icon: "lucideCircleDot", value: this.issuesDisplay },
   ];
 
-  private readonly contributionWeeks = signal<ContributionDay[][]>([]);
-  readonly heatmapWeeks = computed(() => {
-    const weeks = this.contributionWeeks();
-    return weeks.length ? weeks : PLACEHOLDER_WEEKS;
-  });
+  /** Empty until the real calendar arrives — never the component's generated sample year. */
+  readonly contributionDays = signal<SkylineDay[]>([]);
 
   readonly bioTitle =
     "I’m Aziz — a Full Stack Developer crafting fast, scalable, and immersive digital experiences that merge creativity with engineering precision.";
@@ -200,75 +177,6 @@ export class AboutMe implements AfterViewInit, OnDestroy {
     return value === null ? "—" : value.toLocaleString("en-US");
   }
 
-  /** "4 contributions · Mar 12, 2026" (fixed month names so SSR and browser agree). */
-  dayLabel(day: ContributionDay): string | null {
-    if (!day.date) return null;
-    const [y, m, d] = day.date.split("-").map(Number);
-    const noun = day.count === 1 ? "contribution" : "contributions";
-    return `${day.count || "No"} ${noun} · ${MONTHS[m - 1]} ${d}, ${y}`;
-  }
-
-  // ── Hover interactions ────────────────────────────────────────────
-
-  /** Delegated from the heatmap: grow the hovered day and float the tooltip above it. */
-  onDayOver(event: PointerEvent) {
-    const cell = (event.target as HTMLElement).closest<HTMLElement>(
-      "[data-day]",
-    );
-    if (!cell || cell === this.hoveredDay) return;
-
-    this.releaseDay();
-    const label = cell.dataset["label"];
-    if (!label) {
-      this.hideTooltip();
-      return;
-    }
-
-    this.hoveredDay = cell;
-    if (!this.reduceMotion) {
-      gsap.to(cell, {
-        scale: 1.6,
-        duration: 0.25,
-        ease: "back.out(3)",
-        overwrite: "auto",
-      });
-    }
-
-    // Set text first so the width used for clamping is the real one
-    const tip = this.tooltip.nativeElement;
-    tip.textContent = label;
-    const box = this.heatmap.nativeElement.getBoundingClientRect();
-    const rect = cell.getBoundingClientRect();
-    const half = tip.offsetWidth / 2;
-    const x = gsap.utils.clamp(
-      half,
-      box.width - half,
-      rect.left - box.left + rect.width / 2,
-    );
-    const y = rect.top - box.top - 8;
-
-    if (!this.tooltipVisible || this.reduceMotion) {
-      gsap.set(tip, { x, y });
-      gsap.to(tip, {
-        autoAlpha: 1,
-        scale: 1,
-        duration: this.reduceMotion ? 0 : 0.18,
-        ease: "power2.out",
-        overwrite: "auto",
-      });
-      this.tooltipVisible = true;
-    } else {
-      // Already showing — glide to the next cell instead of popping
-      this.tooltipX?.(x, gsap.getProperty(tip, "x") as number);
-      this.tooltipY?.(y, gsap.getProperty(tip, "y") as number);
-    }
-  }
-
-  onHeatmapLeave() {
-    this.releaseDay();
-    this.hideTooltip();
-  }
-
   /** Icon does a little spin-pop, and the number quickly rolls up to its value again. */
   onStatEnter(event: MouseEvent, value: WritableSignal<number | null>) {
     if (this.reduceMotion) return;
@@ -293,29 +201,6 @@ export class AboutMe implements AfterViewInit, OnDestroy {
       duration: 0.6,
       ease: "power3.out",
       onUpdate: () => value.set(Math.round(counter.val)),
-    });
-  }
-
-  private releaseDay() {
-    if (!this.hoveredDay) return;
-    gsap.to(this.hoveredDay, {
-      scale: 1,
-      duration: 0.3,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-    this.hoveredDay = null;
-  }
-
-  private hideTooltip() {
-    if (!this.tooltipVisible) return;
-    this.tooltipVisible = false;
-    gsap.to(this.tooltip.nativeElement, {
-      autoAlpha: 0,
-      scale: 0.9,
-      duration: 0.15,
-      ease: "power2.in",
-      overwrite: "auto",
     });
   }
 
@@ -350,11 +235,6 @@ export class AboutMe implements AfterViewInit, OnDestroy {
       }
     });
 
-    const tip = this.tooltip.nativeElement;
-    gsap.set(tip, { xPercent: -50, yPercent: -100, autoAlpha: 0, scale: 0.9 });
-    this.tooltipX = gsap.quickTo(tip, "x", { duration: 0.25, ease: "power3.out" });
-    this.tooltipY = gsap.quickTo(tip, "y", { duration: 0.25, ease: "power3.out" });
-
     this.countUp(this.yearsDisplay, this.yearsExperience(), 0.3);
     this.loadStats();
   }
@@ -384,7 +264,11 @@ export class AboutMe implements AfterViewInit, OnDestroy {
         this.countUp(this.issuesDisplay, data.issues, 0.75);
 
         if (data.contributions?.weeks.length) {
-          this.contributionWeeks.set(data.contributions.weeks);
+          this.contributionDays.set(
+            data.contributions.weeks
+              .flat()
+              .map(({ date, count }) => ({ date, count })),
+          );
           this.countUp(
             this.contributionTotalDisplay,
             data.contributions.total,
@@ -446,10 +330,9 @@ export class AboutMe implements AfterViewInit, OnDestroy {
       );
   }
 
-  /** Panel slides up, the heatmap sweeps in column by column, then the stat cells follow. */
+  /** Panel slides up, then the stat cells follow (the skyline animates itself when it scrolls into view). */
   private revealPanel() {
     const panel = this.statsPanel.nativeElement;
-    const days = this.heatmap.nativeElement.querySelectorAll("[data-day]");
     const statCells = panel.querySelectorAll("[data-stat]");
 
     gsap
@@ -458,20 +341,6 @@ export class AboutMe implements AfterViewInit, OnDestroy {
         defaults: { ease: "power3.out" },
       })
       .from(panel, { y: 32, opacity: 0, duration: 0.8 })
-      .from(
-        days,
-        {
-          scale: 0,
-          opacity: 0,
-          duration: 0.4,
-          ease: "back.out(2)",
-          // DOM order is week by week, so this sweeps left → right
-          stagger: { amount: 1.1 },
-          // Hand opacity back to CSS so the hover dimming works afterwards
-          clearProps: "opacity,transform",
-        },
-        0.25,
-      )
       .from(
         statCells,
         {

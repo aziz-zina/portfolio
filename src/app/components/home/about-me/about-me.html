@@ -92,80 +92,35 @@
           </div>
         </div>
 
-        <!-- Contribution graph -->
-        <div class="p-7 md:p-10 flex flex-col gap-6 min-w-0">
-          <div class="flex items-baseline justify-between gap-4">
-            <p class="text-sm md:text-base text-muted-foreground">
+        <!-- Contribution skyline: flat heat map that folds up into 3D -->
+        <div class="p-7 md:p-10 min-w-0">
+          <hlm-contribution-skyline
+            [data]="contributionDays()"
+            [palette]="skylinePalette"
+            class="border-0 rounded-none bg-card p-0 sm:p-0"
+          >
+            <span hlmSkylineTitle class="text-muted-foreground">
               @if (contributionTotalDisplay() !== null) {
               <span class="font-medium text-foreground tabular-nums">
                 {{ format(contributionTotalDisplay()) }}
               </span>
               contributions in the last year } @else { Contributions in the
               last year }
-            </p>
-            <a
-              href="https://github.com/aziz-zina"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="group/link shrink-0 inline-flex items-center gap-0.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              aziz-zina
-              <ng-icon
-                name="lucideArrowUpRight"
-                size="0.875rem"
-                class="transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
-              />
-            </a>
-          </div>
-
-          <div class="relative">
-            <!-- 26 weeks on small screens, the full year from md up -->
-            <div
-              #heatmap
-              class="group/heat grid gap-1 grid-cols-[repeat(26,minmax(0,1fr))] md:grid-cols-[repeat(var(--weeks),minmax(0,1fr))]"
-              [style.--weeks]="heatmapWeeks().length"
-              role="img"
-              aria-label="GitHub contribution graph for the last year"
-              (pointerover)="onDayOver($event)"
-              (pointerleave)="onHeatmapLeave()"
-            >
-              @for (week of heatmapWeeks(); track $index; let w = $index) {
-              <div
-                class="grid-rows-7 gap-1"
-                [class]="w < heatmapWeeks().length - 26 ? 'hidden md:grid' : 'grid'"
+              <a
+                href="https://github.com/aziz-zina"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group/link ml-2 inline-flex items-center gap-0.5 text-sm hover:text-foreground transition-colors"
               >
-                @for (day of week; track day.weekday) {
-                <span
-                  data-day
-                  class="aspect-square rounded-[3px] [transition:background-color_700ms,opacity_200ms] group-hover/heat:opacity-50 hover:opacity-100!"
-                  [class]="levelClasses[day.level]"
-                  [style.grid-row]="day.weekday + 1"
-                  [attr.data-label]="dayLabel(day)"
-                ></span>
-                }
-              </div>
-              }
-            </div>
-
-            <!-- Positioned by GSAP above the hovered day -->
-            <div
-              #tooltip
-              class="pointer-events-none absolute left-0 top-0 z-10 whitespace-nowrap rounded-md bg-foreground px-2.5 py-1.5 text-xs font-medium text-background shadow-lg origin-bottom"
-              style="visibility: hidden; opacity: 0"
-              aria-hidden="true"
-            ></div>
-          </div>
-
-          <div
-            class="flex items-center justify-end gap-1.5 text-xs text-muted-foreground"
-            aria-hidden="true"
-          >
-            Less
-            @for (cls of levelClasses; track cls) {
-            <span class="size-3 rounded-[3px]" [class]="cls"></span>
-            }
-            More
-          </div>
+                aziz-zina
+                <ng-icon
+                  name="lucideArrowUpRight"
+                  size="0.875rem"
+                  class="transition-transform duration-200 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5"
+                />
+              </a>
+            </span>
+          </hlm-contribution-skyline>
         </div>
       </div>
 

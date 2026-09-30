@@ -53,6 +53,9 @@
       ],
       "@spartan-ng/helm/carousel": [
         "./src/app/components/ui/carousel/src/index.ts"
+      ],
+      "@spartan-ng/helm/contribution-skyline": [
+        "./src/app/components/ui/contribution-skyline/src/index.ts"
       ]
     }
   },
