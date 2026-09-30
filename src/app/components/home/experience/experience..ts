@@ -9,9 +9,13 @@ import {
   QueryList,
   ViewChild,
   ViewChildren,
+  computed,
   inject,
   signal,
 } from "@angular/core";
+import { provideIcons } from "@ng-icons/core";
+import { lucideArrowLeft, lucideArrowRight } from "@ng-icons/lucide";
+import { HlmIconImports } from "@spartan-ng/helm/icon";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SectionTitle } from "../../../shared/components/section-title/section-title";
@@ -19,6 +23,20 @@ import { SectionTitle } from "../../../shared/components/section-title/section-t
 gsap.registerPlugin(ScrollTrigger);
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+/** Arrow keys move through the role list (vertical list, but left/right work too). */
+const KEY_STEP: Record<string, number> = {
+  ArrowDown: 1,
+  ArrowRight: 1,
+  ArrowUp: -1,
+  ArrowLeft: -1,
+};
+
+/** "2024-01" → months since year 0, for arithmetic on the timeline. */
+function monthIndex(value: string): number {
+  const [year, month] = value.split("-").map(Number);
+  return year * 12 + month - 1;
+}
 
 interface ExperienceItem {
   title: string;
@@ -36,22 +54,29 @@ interface ExperienceItem {
 @Component({
   selector: "app-experience",
   standalone: true,
-  imports: [SectionTitle, NgOptimizedImage],
+  imports: [SectionTitle, NgOptimizedImage, HlmIconImports],
+  providers: [provideIcons({ lucideArrowLeft, lucideArrowRight })],
   templateUrl: "./experience.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Experience implements AfterViewInit, OnDestroy {
   private readonly platform = inject(PLATFORM_ID);
 
-  @ViewChild("horizontalContainer")
-  horizontalContainer!: ElementRef<HTMLElement>;
-  @ViewChild("horizontalTrack") horizontalTrack!: ElementRef<HTMLElement>;
-  @ViewChild("progressBar") progressBar!: ElementRef<HTMLElement>;
-  @ViewChildren("experienceCard") experienceCards!: QueryList<
-    ElementRef<HTMLElement>
-  >;
+  @ViewChild("section") section!: ElementRef<HTMLElement>;
+  @ViewChild("tablist") tablist!: ElementRef<HTMLElement>;
+  @ViewChild("indicator") indicator!: ElementRef<HTMLElement>;
+  @ViewChild("card") card!: ElementRef<HTMLElement>;
+  @ViewChildren("tab") tabs!: QueryList<ElementRef<HTMLButtonElement>>;
+  @ViewChildren("panel") panels!: QueryList<ElementRef<HTMLElement>>;
 
   private gsapContext: gsap.Context | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+  private reduceMotion = false;
+
+  readonly selected = signal(0);
+
+  @ViewChild("playhead") playhead!: ElementRef<HTMLElement>;
+  @ViewChild("timeline") timeline!: ElementRef<HTMLElement>;
 
   readonly experience = signal<ExperienceItem[]>([
     {
@@ -138,10 +163,50 @@ export class Experience implements AfterViewInit, OnDestroy {
     },
   ]);
 
+  /**
+   * Career bar: each role as a slice of the span from the first job to today.
+   * Very short stints get a minimum width so they stay clickable.
+   */
+  readonly timelineData = computed(() => {
+    const items = this.experience();
+    const now = new Date();
+    const nowIndex = now.getFullYear() * 12 + now.getMonth();
+    const first = Math.min(...items.map((it) => monthIndex(it.start)));
+    const span = Math.max(1, nowIndex + 1 - first);
+    const pct = (month: number) => ((month - first) / span) * 100;
+
+    const segments = items.map((it) => {
+      const start = monthIndex(it.start);
+      // End month is exclusive so back-to-back roles sit side by side instead of overlapping
+      const end = it.end ? Math.max(monthIndex(it.end), start + 1) : nowIndex + 1;
+      return { left: pct(start), width: pct(end) - pct(start) };
+    });
+
+    // A label on every January in range, plus the start year
+    const firstYear = Math.floor(first / 12);
+    const years = Array.from(
+      { length: now.getFullYear() - firstYear + 1 },
+      (_, i) => firstYear + i,
+    ).map((year) => ({
+      year,
+      left: Math.max(0, pct(year * 12)),
+    }));
+
+    return { segments, years };
+  });
+
   /** "2024-01" → "Jan 2024". Fixed month names so SSR and browser render identically. */
   formatMonth(value: string): string {
     const [year, month] = value.split("-").map(Number);
     return `${MONTHS[month - 1]} ${year}`;
+  }
+
+  /** Compact range for the list: "2024 – 2026", "2026 – Now", or "2022" for a same-year stint. */
+  yearRange(item: ExperienceItem): string {
+    const start = item.start.slice(0, 4);
+    if (!item.end) return `${start} – Now`;
+    const end = item.end.slice(0, 4);
+    return start === end ? start : `${start} – ${end}`;
   }
 
   /** Inclusive duration, LinkedIn-style: "2 yrs 6 mos", "2 mos". */
@@ -160,84 +225,153 @@ export class Experience implements AfterViewInit, OnDestroy {
     return parts.join(" ");
   }
 
-  ngAfterViewInit() {
-    if (isPlatformBrowser(this.platform)) {
-      setTimeout(() => this.initHorizontalScroll(), 150);
+  // ── Interaction ───────────────────────────────────────────────────
+
+  select(index: number, focusTab = false) {
+    const prev = this.selected();
+    if (index === prev || index < 0 || index >= this.experience().length) {
+      return;
     }
+
+    this.selected.set(index);
+    if (focusTab) this.tabs.get(index)?.nativeElement.focus();
+    if (!isPlatformBrowser(this.platform)) return;
+
+    this.moveIndicator();
+    if (this.reduceMotion) return;
+
+    // New content slides in from the direction you're moving through the timeline
+    const panel = this.panels.get(index)?.nativeElement;
+    if (!panel) return;
+    const dir = index > prev ? 1 : -1;
+
+    gsap.fromTo(
+      panel.querySelectorAll("[data-anim]"),
+      { y: 14 * dir, opacity: 0 },
+      {
+        y: 0,
+        opacity: 1,
+        duration: 0.45,
+        ease: "power3.out",
+        stagger: 0.05,
+        overwrite: true,
+      },
+    );
+    gsap.fromTo(
+      panel.querySelectorAll("[data-chip]"),
+      { scale: 0.85, opacity: 0 },
+      {
+        scale: 1,
+        opacity: 1,
+        duration: 0.3,
+        ease: "back.out(2)",
+        stagger: 0.025,
+        delay: 0.2,
+        overwrite: true,
+      },
+    );
+  }
+
+  onTabKeydown(event: KeyboardEvent) {
+    const last = this.experience().length - 1;
+    let next: number;
+    if (event.key === "Home") next = 0;
+    else if (event.key === "End") next = last;
+    else if (event.key in KEY_STEP) {
+      next = gsap.utils.clamp(0, last, this.selected() + KEY_STEP[event.key]);
+    } else return;
+
+    event.preventDefault();
+    this.select(next, true);
+  }
+
+  // ── Lifecycle ─────────────────────────────────────────────────────
+
+  ngAfterViewInit() {
+    if (!isPlatformBrowser(this.platform)) return;
+
+    this.reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    this.moveIndicator(true);
+    // Keep the highlight glued to the active row when text wraps / fonts load
+    this.resizeObserver = new ResizeObserver(() => this.moveIndicator(true));
+    this.resizeObserver.observe(this.tablist.nativeElement);
+
+    if (this.reduceMotion) return;
+
+    this.gsapContext = gsap.context(() => {
+      gsap
+        .timeline({
+          scrollTrigger: {
+            trigger: this.section.nativeElement,
+            start: "top 70%",
+            once: true,
+          },
+          defaults: { ease: "power3.out" },
+        })
+        .from(this.indicator.nativeElement, { opacity: 0, duration: 0.6 }, 0)
+        .from(
+          this.tabs.map((t) => t.nativeElement),
+          {
+            x: -16,
+            opacity: 0,
+            duration: 0.6,
+            stagger: 0.07,
+            clearProps: "opacity,transform",
+          },
+          0,
+        )
+        .from(
+          this.card.nativeElement,
+          { y: 24, opacity: 0, duration: 0.7, clearProps: "opacity,transform" },
+          0.15,
+        )
+        // Career bar fills in left → right, oldest role first
+        .from(
+          [...this.timeline.nativeElement.querySelectorAll("[data-segment]")].reverse(),
+          {
+            scaleX: 0,
+            transformOrigin: "left center",
+            duration: 0.5,
+            stagger: 0.12,
+            ease: "power2.out",
+            clearProps: "transform",
+          },
+          0.4,
+        )
+        .from(this.playhead.nativeElement, { scale: 0, duration: 0.4, ease: "back.out(3)" }, 0.9);
+    });
   }
 
   ngOnDestroy() {
+    this.resizeObserver?.disconnect();
     this.gsapContext?.revert();
   }
 
-  private initHorizontalScroll() {
-    const track = this.horizontalTrack.nativeElement;
-    const container = this.horizontalContainer.nativeElement;
-    const progressBar = this.progressBar.nativeElement;
-    const cards = this.experienceCards.toArray().map((c) => c.nativeElement);
+  /** Slides the highlight card behind the active row, and the playhead to its slice of the timeline. */
+  private moveIndicator(immediate = false) {
+    const tab = this.tabs?.get(this.selected())?.nativeElement;
+    if (!tab) return;
+    const duration = immediate || this.reduceMotion ? 0 : 0.45;
 
-    // Cards beyond the first start hidden
-    const laterCards = cards.slice(1);
-    gsap.set(laterCards, { opacity: 0, y: 60, scale: 0.95 });
+    gsap.to(this.indicator.nativeElement, {
+      y: tab.offsetTop,
+      height: tab.offsetHeight,
+      visibility: "visible",
+      duration,
+      ease: "power3.out",
+      overwrite: "auto",
+    });
 
-    this.gsapContext = gsap.context(() => {
-      // Master timeline drives everything — ScrollTrigger scrubs it
-      const tl = gsap.timeline({ paused: true });
-
-      // 1. Slide the track left by its full overflow amount
-      tl.to(
-        track,
-        {
-          x: () => -(track.scrollWidth - container.offsetWidth),
-          ease: "none",
-          duration: 1,
-        },
-        0,
-      );
-
-      // 2. Progress bar fills from 0 → 100% in sync
-      tl.to(
-        progressBar,
-        {
-          width: "100%",
-          ease: "none",
-          duration: 1,
-        },
-        0,
-      );
-
-      // 3. Each later card animates in staggered across the timeline
-      const n = laterCards.length;
-      laterCards.forEach((card, i) => {
-        // Spread entries evenly across 0.15 → 0.85 of the timeline
-        const start = 0.15 + (i / n) * 0.55;
-        const end = start + 0.3;
-
-        tl.to(
-          card,
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            ease: "power3.out",
-            duration: end - start,
-          },
-          start,
-        );
-      });
-
-      // 4. ScrollTrigger scrubs the timeline
-      ScrollTrigger.create({
-        trigger: container,
-        start: "top top",
-        // Give enough scroll distance — 150% of viewport per card after the first
-        end: () => `+=${(cards.length - 1) * window.innerHeight * 1.2}`,
-        pin: true,
-        anticipatePin: 1,
-        scrub: 0.8,
-        invalidateOnRefresh: true,
-        animation: tl,
-      });
+    const seg = this.timelineData().segments[this.selected()];
+    gsap.to(this.playhead.nativeElement, {
+      left: `${seg.left + seg.width / 2}%`,
+      visibility: "visible",
+      duration: duration * 1.2,
+      ease: "power3.inOut",
+      overwrite: "auto",
     });
   }
 }
