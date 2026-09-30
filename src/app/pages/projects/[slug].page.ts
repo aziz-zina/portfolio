@@ -81,14 +81,7 @@ export const routeMeta: RouteMeta = {
     <app-reading-progress />
 
     <!-- Hero Banner -->
-    <div class="relative w-full bg-background dark:bg-black overflow-hidden">
-      <!-- Ambient glow -->
-      <div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
-      ></div>
-      <div
-        class="absolute bottom-0 right-0 w-[600px] h-[600px] bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"
-      ></div>
+    <div class="relative w-full bg-background overflow-hidden">
 
       <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-12">
         <!-- Breadcrumb -->

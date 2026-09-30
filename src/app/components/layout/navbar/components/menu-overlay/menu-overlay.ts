@@ -1,4 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
+import { ThemeToggle } from '../../../theme-toggle/theme-toggle';
 import { 
   ChangeDetectionStrategy, 
   Component, 
@@ -25,7 +26,7 @@ interface MenuItem {
 @Component({
   selector: 'app-menu-overlay',
   standalone: true,
-  imports: [NgIconComponent],
+  imports: [NgIconComponent, ThemeToggle],
   providers: [provideIcons({ lucideX })],
   templateUrl: './menu-overlay.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

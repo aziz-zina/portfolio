@@ -192,11 +192,17 @@
     <link rel="apple-touch-icon" href="fapple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
+    <!-- Apply the saved (or system) theme before first paint, so there's no flash -->
     <script>
-      if (document && document.documentElement) {
-        document.documentElement.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-      }
+      (function () {
+        try {
+          var saved = localStorage.getItem("theme");
+          var dark = saved
+            ? saved === "dark"
+            : window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", dark);
+        } catch (e) {}
+      })();
     </script>
 
     <!-- GOOGLE analytics -->

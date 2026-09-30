@@ -24,7 +24,7 @@ import {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contact me on WhatsApp"
-        class="group p-2 -m-2 rounded-full text-gray-600 hover:text-black hover:scale-110 transition-all duration-300 ease-out"
+        class="group p-2 -m-2 rounded-full text-muted-foreground hover:text-foreground hover:scale-110 transition-all duration-300 ease-out"
       >
         <ng-icon
           name="lucideMessageCircle"
@@ -37,7 +37,7 @@ import {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Connect with me on LinkedIn"
-        class="group p-2 -m-2 rounded-full text-gray-600 hover:text-black hover:scale-110 transition-all duration-300 ease-out"
+        class="group p-2 -m-2 rounded-full text-muted-foreground hover:text-foreground hover:scale-110 transition-all duration-300 ease-out"
       >
         <ng-icon
           name="lucideLinkedin"
@@ -50,7 +50,7 @@ import {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="View my GitHub profile"
-        class="group p-2 -m-2 rounded-full text-gray-600 hover:text-black hover:scale-110 transition-all duration-300 ease-out"
+        class="group p-2 -m-2 rounded-full text-muted-foreground hover:text-foreground hover:scale-110 transition-all duration-300 ease-out"
       >
         <ng-icon
           name="lucideGithub"

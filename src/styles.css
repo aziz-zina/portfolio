@@ -201,3 +201,15 @@ app-root {
 .theme-transition::view-transition-old(root) {
   z-index: 1;
 }
+
+/* Fallback when View Transitions aren't supported: a short colour cross-fade */
+.theme-fade,
+.theme-fade *,
+.theme-fade *::before,
+.theme-fade *::after {
+  transition:
+    background-color 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease,
+    fill 300ms ease !important;
+}

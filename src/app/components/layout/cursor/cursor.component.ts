@@ -160,7 +160,7 @@ export class CursorComponent implements AfterViewInit, OnDestroy {
         gsap.to(this.cursor.nativeElement, { scale: 0, duration: 0.3 });
         gsap.to(this.follower.nativeElement, {
           scale: 1.5,
-          backgroundColor: 'rgba(255,255,255,0.1)',
+          backgroundColor: 'rgba(128,128,128,0.15)',
           duration: 0.3,
         });
       });

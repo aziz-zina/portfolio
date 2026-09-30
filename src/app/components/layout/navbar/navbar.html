@@ -14,16 +14,16 @@
 
   <!-- Menu -->
   <div class="flex items-center gap-8">
-    <ul class="hidden md:flex gap-6 text-sm font-medium text-gray-600">
+    <ul class="hidden md:flex gap-6 text-sm font-medium text-muted-foreground">
       <li>
         <a
           data-cuelume-hover="tick"
           routerLink="/"
-          class="relative py-1 hover:text-black transition-all duration-300 group"
+          class="relative py-1 hover:text-foreground transition-all duration-300 group"
         >
           Home
           <span
-            class="absolute bottom-0 left-0 w-0 h-[2px] bg-black transition-all duration-300 group-hover:w-full"
+            class="absolute bottom-0 left-0 w-0 h-[2px] bg-foreground transition-all duration-300 group-hover:w-full"
           ></span>
         </a>
       </li>
@@ -32,11 +32,11 @@
           data-cuelume-hover="tick"
           href="#about"
           (click)="scrollToSection($event, 'about')"
-          class="relative py-1 hover:text-black transition-all duration-300 group"
+          class="relative py-1 hover:text-foreground transition-all duration-300 group"
         >
           About
           <span
-            class="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"
+            class="absolute bottom-0 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full"
           ></span>
         </a>
       </li>
@@ -45,11 +45,11 @@
           data-cuelume-hover="tick"
           href="#experience"
           (click)="scrollToSection($event, 'experience')"
-          class="relative py-1 hover:text-black transition-all duration-300 group"
+          class="relative py-1 hover:text-foreground transition-all duration-300 group"
         >
           Experience
           <span
-            class="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"
+            class="absolute bottom-0 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full"
           ></span>
         </a>
       </li>
@@ -58,17 +58,18 @@
           data-cuelume-hover="tick"
           href="#projects"
           (click)="scrollToSection($event, 'projects')"
-          class="relative py-1 hover:text-black transition-all duration-300 group"
+          class="relative py-1 hover:text-foreground transition-all duration-300 group"
         >
           Projects
           <span
-            class="absolute bottom-0 left-0 w-0 h-0.5 bg-black transition-all duration-300 group-hover:w-full"
+            class="absolute bottom-0 left-0 w-0 h-0.5 bg-foreground transition-all duration-300 group-hover:w-full"
           ></span>
         </a>
       </li>
     </ul>
 
     <app-now-playing />
+    <app-theme-toggler />
     <app-link-button link="#contact" title="Contact Me" />
   </div>
 </nav>

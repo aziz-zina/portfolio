@@ -16,13 +16,21 @@ import { gsap } from "gsap";
 import { LinkButton } from "../../../shared/components/link-button/link-button";
 import { CursorService } from "../../../shared/services/cursor.service";
 import { NowPlaying } from "../now-playing/now-playing";
+import { ThemeToggle } from "../theme-toggle/theme-toggle";
 import { HamburgerButton } from "./components/hamburger-button/hamburger-button";
 import { MenuOverlay } from "./components/menu-overlay/menu-overlay";
 
 @Component({
   selector: "app-navbar",
   standalone: true,
-  imports: [RouterLink, LinkButton, HamburgerButton, MenuOverlay, NowPlaying],
+  imports: [
+    RouterLink,
+    LinkButton,
+    HamburgerButton,
+    MenuOverlay,
+    NowPlaying,
+    ThemeToggle,
+  ],
   templateUrl: "./navbar.html",
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -3,84 +3,71 @@ import { inject, Injectable, PLATFORM_ID, signal } from '@angular/core';
 
 export type Theme = 'light' | 'dark';
 
+const STORAGE_KEY = 'theme';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ThemeService {
-  private readonly _platformId = inject(PLATFORM_ID);
+  private readonly platformId = inject(PLATFORM_ID);
   private readonly document = inject(DOCUMENT);
 
-  readonly theme = signal<Theme>('dark');
+  readonly theme = signal<Theme>('light');
 
   constructor() {
     this.initializeTheme();
   }
 
   /**
-   * Toggles the theme between light and dark.
-   * If a MouseEvent is provided and the browser supports View Transitions,
-   * it triggers a circular reveal animation from the click location.
-   * * @param event - The mouse event from the button click (optional)
+   * Toggles between light and dark.
+   * With a click position and View Transitions support, the new theme is
+   * revealed as a circle growing from the click; otherwise colours cross-fade.
    */
   toggleTheme(event?: MouseEvent): void {
-    const x = event?.clientX;
-    const y = event?.clientY;
+    if (!isPlatformBrowser(this.platformId)) return;
 
-    // 1. Check strict requirements for animation:
-    // - Must be in a browser (not SSR)
-    // - Browser must support View Transitions API
-    // - Coordinates (x, y) must exist
-    if (
-      !isPlatformBrowser(this._platformId) ||
-      !document.startViewTransition ||
-      x === undefined ||
-      y === undefined
-    ) {
-      this.executeToggle();
+    const next: Theme = this.theme() === 'dark' ? 'light' : 'dark';
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    if (reduceMotion) {
+      this.setTheme(next);
       return;
     }
 
-    // 2. If all checks pass, run the animated switch
-    this.animateThemeSwitch(x, y);
+    if (!this.document.startViewTransition || !event) {
+      this.crossFade(() => this.setTheme(next));
+      return;
+    }
+
+    // Keyboard "clicks" report 0,0 — start the circle from the button instead
+    let { clientX: x, clientY: y } = event;
+    if (x === 0 && y === 0 && event.currentTarget instanceof Element) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+    this.circularReveal(x, y, () => this.setTheme(next));
   }
 
-  /**
-   * Logic to flip the theme state.
-   * This is separated so it can be called inside the View Transition callback.
-   */
-  private executeToggle(): void {
-    const newTheme = this.theme() === 'light' ? 'dark' : 'light';
-    this.setTheme(newTheme);
-  }
-
-  /**
-   * Handles the "Circular Reveal" animation using View Transitions and WAAPI.
-   */
-  private animateThemeSwitch(x: number, y: number) {
-    // Calculate distance to the farthest corner of the screen to ensure
-    // the circle covers the entire viewport.
+  /** New theme grows as a circle from (x, y) over the old one. */
+  private circularReveal(x: number, y: number, apply: () => void) {
+    const root = this.document.documentElement;
+    // Farthest corner, so the circle ends up covering the whole viewport
     const endRadius = Math.hypot(
       Math.max(x, innerWidth - x),
-      Math.max(y, innerHeight - y)
+      Math.max(y, innerHeight - y),
     );
 
-    // Add a specific class to <html>.
-    // WHY? This allows us to scope our CSS (z-index, animation: none)
-    // specifically to this transaction, preventing it from breaking
-    // the Angular Router's default page animations.
-    this.document.documentElement.classList.add('theme-transition');
+    // Scopes the pseudo-element CSS in styles.css to this transition only,
+    // so it doesn't affect other view transitions (e.g. the router's)
+    root.classList.add('theme-transition');
 
-    // Start the View Transition.
-    // The browser captures the "Old" state, runs this callback,
-    // then captures the "New" state.
-    const transition = document.startViewTransition(() => {
-      this.executeToggle();
-    });
+    const transition = this.document.startViewTransition(apply);
 
-    // Once the pseudo-elements are ready, animate the "New" view
-    // expanding from a small dot to the full screen.
     transition.ready.then(() => {
-      document.documentElement.animate(
+      root.animate(
         {
           clipPath: [
             `circle(0px at ${x}px ${y}px)`,
@@ -88,63 +75,63 @@ export class ThemeService {
           ],
         },
         {
-          duration: 500,
-          easing: 'ease-in',
-          // We animate the ::view-transition-new pseudo-element
-          // because we want the NEW theme to reveal itself on top.
+          duration: 650,
+          easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
           pseudoElement: '::view-transition-new(root)',
-        }
+        },
       );
     });
 
-    // CLEANUP: Remove the marker class when animation finishes.
-    // This returns the View Transition behavior to normal (for Router).
-    transition.finished.finally(() => {
-      this.document.documentElement.classList.remove('theme-transition');
-    });
+    transition.finished.finally(() => root.classList.remove('theme-transition'));
+  }
+
+  /** Fallback for browsers without View Transitions. */
+  private crossFade(apply: () => void) {
+    const root = this.document.documentElement;
+    root.classList.add('theme-fade');
+    apply();
+    setTimeout(() => root.classList.remove('theme-fade'), 320);
   }
 
   /**
-   * Initializes the theme based on LocalStorage or System Preference.
-   * Runs only on the browser side.
+   * The inline script in index.html has already applied the right class before
+   * first paint — read it from there so the service and the page always agree.
    */
   private initializeTheme(): void {
-    if (isPlatformBrowser(this._platformId)) {
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)'
-      ).matches;
+    if (!isPlatformBrowser(this.platformId)) return;
 
-      // Default to dark if saved is dark OR (no save AND system is dark)
-      const theme =
-        savedTheme === 'dark' || (!savedTheme && prefersDark)
-          ? 'dark'
-          : 'light';
+    const root = this.document.documentElement;
+    this.theme.set(root.classList.contains('dark') ? 'dark' : 'light');
 
-      this.theme.set(theme);
+    // Follow the OS setting until the visitor makes an explicit choice
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', (e) => {
+        if (this.readSaved()) return;
+        this.crossFade(() => this.applyTheme(e.matches ? 'dark' : 'light'));
+      });
+  }
 
-      if (theme === 'dark') {
-        this.document.documentElement.classList.add('dark');
-      }
+  /** Explicit choice: apply and remember it. */
+  private setTheme(theme: Theme): void {
+    this.applyTheme(theme);
+    try {
+      localStorage.setItem(STORAGE_KEY, theme);
+    } catch {
+      // Storage can be blocked (private mode); the theme still applies for this visit
     }
   }
 
-  /**
-   * Updates the Signal, LocalStorage, and DOM Class.
-   */
-  private setTheme(theme: Theme): void {
-    if (!isPlatformBrowser(this._platformId)) {
-      return;
-    }
-
+  private applyTheme(theme: Theme): void {
     this.theme.set(theme);
+    this.document.documentElement.classList.toggle('dark', theme === 'dark');
+  }
 
-    if (theme === 'dark') {
-      localStorage.setItem('theme', 'dark');
-      this.document.documentElement.classList.add('dark');
-    } else {
-      localStorage.setItem('theme', 'light');
-      this.document.documentElement.classList.remove('dark');
+  private readSaved(): string | null {
+    try {
+      return localStorage.getItem(STORAGE_KEY);
+    } catch {
+      return null;
     }
   }
 }

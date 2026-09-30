@@ -1,18 +1,19 @@
 import { isPlatformBrowser } from '@angular/common';
 import {
-  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  ElementRef,
   PLATFORM_ID,
-  ViewChild,
   inject,
   input,
 } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideArrowUpRight } from '@ng-icons/lucide';
-import { gsap } from 'gsap';
 
+/**
+ * Pill link. Uses the theme's foreground/background pair, so it's a dark pill
+ * in light mode and a light pill in dark mode. On hover the arrow's disc
+ * inverts (was a GSAP tween between hardcoded #000/#fff, which broke in dark mode).
+ */
 @Component({
   selector: 'app-link-button',
   standalone: true,
@@ -20,86 +21,40 @@ import { gsap } from 'gsap';
   viewProviders: [provideIcons({ lucideArrowUpRight })],
   template: `
     <a
-      #linkBtn
       [href]="link()"
-      class="cursor-pointer group inline-flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ease-out hover:scale-105"
+      class="cursor-pointer group inline-flex items-center gap-2 bg-foreground text-background px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-300 ease-out hover:scale-105"
       (click)="onClick($event)"
-      (mouseenter)="onMouseEnter()"
-      (mouseleave)="onMouseLeave()"
     >
       {{ title() }}
       <span
-        #iconBg
-        class="w-6 h-6 rounded-full flex items-center justify-center"
-        style="background-color: #000000"
+        class="w-6 h-6 rounded-full flex items-center justify-center bg-foreground text-background transition-colors duration-300 group-hover:bg-background group-hover:text-foreground"
       >
         <ng-icon
-          #iconRef
           name="lucideArrowUpRight"
           size="0.9rem"
-          style="color: #ffffff"
+          class="transition-transform duration-300 group-hover:rotate-45"
         />
       </span>
     </a>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class LinkButton implements AfterViewInit {
+export class LinkButton {
   private readonly platformId = inject(PLATFORM_ID);
-
-  @ViewChild('iconRef', { read: ElementRef }) iconRef!: ElementRef<HTMLElement>;
-  @ViewChild('iconBg', { read: ElementRef }) iconBg!: ElementRef<HTMLElement>;
 
   link = input.required<string>();
   title = input.required<string>();
 
-  ngAfterViewInit() {
-  }
-
   onClick(event: MouseEvent) {
     if (!isPlatformBrowser(this.platformId)) return;
-    
+
     const href = this.link();
     // Handle anchor links with smooth scroll
     if (href.startsWith('#')) {
       event.preventDefault();
-      const targetId = href.substring(1);
-      const targetElement = document.getElementById(targetId);
-      if (targetElement) {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
+      document
+        .getElementById(href.substring(1))
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  }
-
-  onMouseEnter() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    gsap.to(this.iconBg.nativeElement, {
-      backgroundColor: '#ffffff',
-      duration: 0.3,
-      ease: 'power2.out',
-    });
-
-    gsap.to(this.iconRef.nativeElement, {
-      color: '#000000',
-      duration: 0.3,
-      ease: 'power2.out',
-    });
-  }
-
-  onMouseLeave() {
-    if (!isPlatformBrowser(this.platformId)) return;
-
-    gsap.to(this.iconBg.nativeElement, {
-      backgroundColor: '#000000',
-      duration: 0.3,
-      ease: 'power2.inOut',
-    });
-
-    gsap.to(this.iconRef.nativeElement, {
-      color: '#ffffff',
-      duration: 0.3,
-      ease: 'power2.inOut',
-    });
   }
 }

@@ -21,9 +21,9 @@ import { gsap } from 'gsap';
   providers: [provideIcons({ lucideChevronDown })],
   template: `
     <div #indicator class="flex flex-col items-center gap-2">
-      <span class="text-sm text-gray-500">scroll down</span>
-      <div class="w-10 h-10 rounded-full bg-black/5 flex items-center justify-center animate-bounce">
-        <ng-icon name="lucideChevronDown" size="1.25rem" class="text-gray-600" />
+      <span class="text-sm text-muted-foreground">scroll down</span>
+      <div class="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center animate-bounce">
+        <ng-icon name="lucideChevronDown" size="1.25rem" class="text-muted-foreground" />
       </div>
     </div>
   `,

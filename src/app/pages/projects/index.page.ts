@@ -54,15 +54,8 @@ gsap.registerPlugin(ScrollTrigger);
   ],
   template: `
     <section
-      class="relative w-full min-h-screen bg-background dark:bg-black z-10 pt-32 pb-24"
+      class="relative w-full min-h-screen bg-background z-10 pt-32 pb-24"
     >
-      <!-- Ambient Background -->
-      <div
-        class="absolute top-0 left-1/2 -translate-x-1/2 w-250 h-150 bg-blue-500/10 blur-[120px] rounded-full pointer-events-none"
-      ></div>
-      <div
-        class="absolute bottom-0 right-0 w-200 h-200 bg-purple-500/10 blur-[120px] rounded-full pointer-events-none"
-      ></div>
 
       <!-- Back Navigation -->
       <div class="max-w-7xl mx-auto px-6 mb-8 relative z-10">
@@ -75,11 +68,11 @@ gsap.registerPlugin(ScrollTrigger);
       <!-- Section Header -->
       <div class="max-w-7xl mx-auto px-6 pb-16 relative z-10">
         <h1
-          class="text-4xl md:text-5xl lg:text-6xl font-bold text-zinc-900 mb-4"
+          class="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4"
         >
           All Projects
         </h1>
-        <p class="text-lg text-gray-400 max-w-2xl">
+        <p class="text-lg text-muted-foreground max-w-2xl">
           A complete showcase of my work, featuring web applications,
           open-source contributions, and innovative solutions.
         </p>
