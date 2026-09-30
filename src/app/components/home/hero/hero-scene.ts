@@ -139,11 +139,11 @@ export class HeroScene {
   private mouseMoveListener: (event: MouseEvent) => void;
 
   constructor(
-    private back: HTMLDivElement,
-    private front: HTMLDivElement,
-    private text: HTMLElement,
-    private ngZone: NgZone,
-    private THREE: typeof import('three')
+    private readonly back: HTMLDivElement,
+    private readonly front: HTMLDivElement,
+    private readonly text: HTMLElement,
+    private readonly ngZone: NgZone,
+    private readonly THREE: typeof import('three')
   ) {
     this.resizeListener = this.onResize.bind(this);
     this.mouseMoveListener = this.onMouseMove.bind(this);
@@ -186,7 +186,7 @@ export class HeroScene {
     this.fitToViewport(width, height);
     this.measureText();
     // Web fonts can shift the headline once they load
-    document.fonts?.ready.then(() => this.measureText());
+    void document.fonts?.ready.then(() => this.measureText());
     this.startAnimation();
     this.addEventListeners();
   }
@@ -327,7 +327,7 @@ export class HeroScene {
       if (!renderer) continue;
       renderer.dispose();
       if (renderer.domElement.parentNode === container) {
-        container.removeChild(renderer.domElement);
+        renderer.domElement.remove();
       }
     }
   }

@@ -20,6 +20,10 @@ import { ThemeToggle } from "../theme-toggle/theme-toggle";
 import { HamburgerButton } from "./components/hamburger-button/hamburger-button";
 import { MenuOverlay } from "./components/menu-overlay/menu-overlay";
 
+const LOGO_NAME = "Aziz";
+const GLYPHS = "01{}[]<>/#$%&*+=?;_";
+const DECODE_MS = 420;
+
 @Component({
   selector: "app-navbar",
   standalone: true,
@@ -41,6 +45,10 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("menuOverlay") menuOverlay!: MenuOverlay;
   @ViewChild("hamburgerBtn") hamburgerBtn!: HamburgerButton;
 
+  /** The name in the `<Aziz />` wordmark; briefly scrambled while it "decodes" on hover. */
+  readonly logoName = signal(LOGO_NAME);
+  private decodeFrame = 0;
+
   isScrolled = signal(false);
   isMenuOpen = signal(false);
 
@@ -60,12 +68,42 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    if (this.decodeFrame) cancelAnimationFrame(this.decodeFrame);
     if (this.scrollHandler) {
       window.removeEventListener("scroll", this.scrollHandler);
     }
     if (this.menuTimeline) {
       this.menuTimeline.kill();
     }
+  }
+
+  /**
+   * Letters flicker through code glyphs and lock in left to right, like a
+   * terminal resolving a string. Runs once per hover; skipped with reduced motion.
+   */
+  decodeLogo() {
+    if (!isPlatformBrowser(this.platform) || this.decodeFrame) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const start = performance.now();
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - start) / DECODE_MS);
+      const locked = Math.floor(progress * (LOGO_NAME.length + 1));
+      this.logoName.set(
+        [...LOGO_NAME]
+          .map((char, i) =>
+            i < locked ? char : GLYPHS[Math.floor(Math.random() * GLYPHS.length)],
+          )
+          .join(""),
+      );
+      if (progress < 1) {
+        this.decodeFrame = requestAnimationFrame(tick);
+      } else {
+        this.logoName.set(LOGO_NAME);
+        this.decodeFrame = 0;
+      }
+    };
+    this.decodeFrame = requestAnimationFrame(tick);
   }
 
   private handleScroll() {

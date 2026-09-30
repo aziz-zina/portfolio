@@ -8,9 +8,20 @@
   <a
     routerLink="/"
     aria-label="Aziz Zina, home"
-    class="rounded-md font-mono text-lg md:text-xl font-semibold tracking-tight whitespace-pre text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
+    class="group/logo rounded-md font-mono text-lg md:text-xl font-semibold tracking-tight whitespace-pre text-foreground focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-foreground"
+    (mouseenter)="decodeLogo()"
+    (focus)="decodeLogo()"
   >
-    <span aria-hidden="true">&lt;Aziz /&gt;</span>
+    <!-- On hover the name "decodes" through code glyphs and the tag opens up a touch -->
+    <span aria-hidden="true"
+      ><span
+        class="inline-block transition-transform duration-300 ease-out group-hover/logo:-translate-x-0.5 group-focus-visible/logo:-translate-x-0.5 motion-reduce:transition-none"
+        >&lt;</span
+      >{{ logoName() }}<span
+        class="inline-block transition-transform duration-300 ease-out group-hover/logo:translate-x-0.5 group-focus-visible/logo:translate-x-0.5 motion-reduce:transition-none"
+        > /&gt;</span
+      ></span
+    >
   </a>
 
   <!-- Menu -->
