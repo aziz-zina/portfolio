@@ -1,0 +1,181 @@
+<section
+  role="dialog"
+  aria-label="Portfolio assistant"
+  class="fixed inset-x-3 bottom-24 z-[60] flex h-[min(40rem,calc(100dvh-7.5rem))] flex-col overflow-hidden rounded-3xl border border-border bg-popover/95 text-popover-foreground shadow-2xl shadow-black/15 backdrop-blur-xl origin-bottom-right animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200 sm:inset-x-auto sm:right-6 sm:w-[25rem]"
+>
+  <!-- Header -->
+  <header class="flex items-center gap-2 px-4 pt-4">
+    <div class="min-w-0 flex-1">
+      <p class="font-mono text-sm font-semibold tracking-tight">&lt;Ask Aziz /&gt;</p>
+      <p class="text-xs text-muted-foreground">Runs entirely in your browser</p>
+    </div>
+    @if (speech.canSpeak) {
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      class="rounded-full"
+      type="button"
+      [attr.aria-pressed]="assistant.voiceReplies()"
+      [attr.aria-label]="assistant.voiceReplies() ? 'Mute spoken answers' : 'Read answers aloud'"
+      [title]="assistant.voiceReplies() ? 'Mute spoken answers' : 'Read answers aloud'"
+      (click)="assistant.setVoiceReplies(!assistant.voiceReplies())"
+    >
+      <ng-icon [name]="assistant.voiceReplies() ? 'lucideVolume2' : 'lucideVolumeX'" size="1rem" />
+    </button>
+    }
+    <button
+      hlmBtn
+      variant="ghost"
+      size="icon-sm"
+      class="rounded-full"
+      type="button"
+      aria-label="Close assistant"
+      title="Close"
+      (click)="assistant.close()"
+    >
+      <ng-icon name="lucideX" size="1rem" />
+    </button>
+  </header>
+
+  <!-- Orb: also the voice button -->
+  <div class="flex shrink-0 flex-col items-center px-4 pt-1">
+    <div class="relative size-32">
+      <hlm-voice-orb
+        class="absolute inset-0"
+        [enableVoiceControl]="speech.listening()"
+        [level]="speakLevel()"
+      />
+      <button
+        type="button"
+        class="absolute inset-0 m-auto grid size-14 place-items-center rounded-full text-foreground/80 transition-[background-color,color,scale] duration-200 hover:bg-foreground/5 hover:text-foreground active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+        [disabled]="!speech.canListen && !speech.speaking()"
+        [attr.aria-label]="
+          speech.listening() ? 'Stop listening' : speech.speaking() ? 'Stop speaking' : speech.canListen ? 'Ask by voice' : 'Voice input is not supported in this browser'
+        "
+        [title]="speech.canListen ? '' : 'Voice input is not supported in this browser'"
+        [attr.aria-pressed]="speech.listening()"
+        (click)="orbPressed()"
+      >
+        <ng-icon
+          [name]="speech.listening() || speech.speaking() ? 'lucideSquare' : speech.canListen ? 'lucideMic' : 'lucideMicOff'"
+          size="1.25rem"
+        />
+      </button>
+    </div>
+    <p
+      class="mt-1 h-5 max-w-full truncate px-2 text-center text-xs text-muted-foreground tabular-nums"
+      aria-live="polite"
+    >
+      {{ status() }}
+    </p>
+  </div>
+
+  <!-- Conversation -->
+  <div
+    #scroller
+    data-lenis-prevent
+    class="flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4"
+    aria-live="polite"
+    aria-relevant="additions"
+  >
+    @if (!assistant.messages().length) {
+    <p class="text-sm leading-relaxed text-muted-foreground text-pretty">
+      Hi! I can answer questions about Aziz — his experience, projects, skills, and how to reach him.
+    </p>
+    <div class="flex flex-wrap gap-1.5">
+      @for (s of assistant.starters; track s.id) {
+      <button
+        type="button"
+        class="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+        (click)="pick(s.id)"
+      >
+        {{ s.label }}
+      </button>
+      }
+    </div>
+    }
+
+    @for (m of assistant.messages(); track m.id) {
+    @if (m.role === 'user') {
+    <p
+      class="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-foreground px-3.5 py-2 text-sm text-background animate-in fade-in slide-in-from-bottom-1 duration-200"
+    >
+      {{ m.text }}
+    </p>
+    } @else {
+    <div class="max-w-[92%] space-y-2 animate-in fade-in slide-in-from-bottom-1 duration-300">
+      <p class="w-fit rounded-2xl rounded-bl-md bg-muted px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-line text-pretty">
+        {{ m.text }}
+      </p>
+      @if (m.link) {
+      <a
+        [href]="m.link.href"
+        [attr.target]="m.link.href.startsWith('http') ? '_blank' : null"
+        [attr.rel]="m.link.href.startsWith('http') ? 'noopener noreferrer' : null"
+        class="group/link inline-flex items-center gap-1 pl-1 text-xs font-medium text-foreground underline-offset-4 hover:underline"
+        (click)="follow($event, m.link.href)"
+      >
+        {{ m.link.label }}
+        <ng-icon
+          name="lucideArrowUpRight"
+          size="0.8rem"
+          class="transition-transform duration-200 group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5"
+        />
+      </a>
+      }
+      @if (m.id === lastAssistant() && m.suggestions?.length) {
+      <div class="flex flex-wrap gap-1.5 pt-0.5">
+        @for (s of m.suggestions; track s.id) {
+        <button
+          type="button"
+          class="rounded-full border border-border px-3 py-1 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+          (click)="pick(s.id)"
+        >
+          {{ s.label }}
+        </button>
+        }
+      </div>
+      }
+    </div>
+    }
+    }
+
+    @if (assistant.phase() !== 'idle') {
+    <div class="flex w-fit gap-1 rounded-2xl rounded-bl-md bg-muted px-3.5 py-3" aria-label="Thinking">
+      @for (dot of [0, 1, 2]; track dot) {
+      <span
+        class="size-1.5 rounded-full bg-foreground/40 motion-safe:animate-bounce"
+        [style.animation-delay.ms]="dot * 150"
+      ></span>
+      }
+    </div>
+    }
+  </div>
+
+  <!-- Ask -->
+  <form class="flex items-center gap-2 border-t border-border p-3" (submit)="submit($event)">
+    <input
+      #field
+      hlmInput
+      class="h-10 flex-1 rounded-full px-4"
+      type="text"
+      placeholder="Ask about Aziz…"
+      aria-label="Your question"
+      maxlength="300"
+      autocomplete="off"
+      [value]="draft()"
+      (input)="draft.set($any($event.target).value)"
+    />
+    <button
+      hlmBtn
+      size="icon-lg"
+      class="rounded-full"
+      type="submit"
+      aria-label="Send"
+      [disabled]="!draft().trim() || busy()"
+    >
+      <ng-icon name="lucideArrowUp" size="1.1rem" />
+    </button>
+  </form>
+</section>

@@ -66,6 +66,7 @@
     "marked-mangle": "^1.1.10",
     "marked-shiki": "^1.1.0",
     "ngxtension": "^7.0.2",
+    "ogl": "1.0.11",
     "rxjs": "~7.8.0",
     "shiki": "^1.6.1",
     "tailwind-merge": "^3.3.1",

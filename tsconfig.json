@@ -56,6 +56,9 @@
       ],
       "@spartan-ng/helm/contribution-skyline": [
         "./src/app/components/ui/contribution-skyline/src/index.ts"
+      ],
+      "@spartan-ng/helm/voice-orb": [
+        "./src/app/components/ui/voice-orb/src/index.ts"
       ]
     }
   },

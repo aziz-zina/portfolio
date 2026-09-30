@@ -12,6 +12,7 @@ import Lenis from "lenis";
 
 gsap.registerPlugin(ScrollTrigger);
 
+import { AssistantLauncher } from "./components/assistant/assistant-launcher";
 import { BackToTop } from "./components/layout/back-to-top/back-to-top";
 import { CursorComponent } from "./components/layout/cursor/cursor.component";
 import { Footer } from "./components/layout/footer/footer";
@@ -20,7 +21,7 @@ import { SmoothScrollService } from "./lib/scroll/smooth-scroll.service";
 @Component({
   selector: "app-root",
   standalone: true,
-  imports: [RouterOutlet, Navbar, Footer, BackToTop, CursorComponent],
+  imports: [RouterOutlet, Navbar, Footer, BackToTop, CursorComponent, AssistantLauncher],
   template: `
     <app-cursor />
     <app-navbar />
@@ -34,6 +35,7 @@ import { SmoothScrollService } from "./lib/scroll/smooth-scroll.service";
       position="bottom-right"
       [showAfter]="200"
     />
+    <app-assistant />
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
