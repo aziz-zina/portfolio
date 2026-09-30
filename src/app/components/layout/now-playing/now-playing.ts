@@ -95,7 +95,7 @@ function clock(ms: number): string {
           ></span>
         </span>
 
-        <span class="hidden min-w-0 max-w-36 flex-col gap-[3px] pb-1.5 text-left leading-tight sm:flex">
+        <span class="hidden min-w-0 max-w-36 flex-col gap-px pb-2.5 text-left leading-tight sm:flex">
           <span class="truncate text-xs font-semibold">{{ np.title }}</span>
           <span class="truncate text-[11px] text-muted-foreground">{{ np.artist }}</span>
         </span>
@@ -112,7 +112,7 @@ function clock(ms: number): string {
 
         <!-- Song progress along the bottom edge -->
         <span
-          class="absolute bottom-1 left-12 right-4 h-[2px] overflow-hidden rounded-full bg-foreground/10"
+          class="absolute bottom-[3px] left-12 right-4 h-[2px] overflow-hidden rounded-full bg-foreground/10"
           aria-hidden="true"
         >
           <span
