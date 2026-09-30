@@ -8,6 +8,10 @@
 @theme {
   --animate-aurora: aurora 60s linear infinite;
 
+  /* Hero headline: a characterful grotesk, with a serif italic for accents */
+  --font-display: "Bricolage Grotesque", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-accent: "Instrument Serif", Georgia, "Times New Roman", serif;
+
   @keyframes aurora {
     from {
       background-position:
