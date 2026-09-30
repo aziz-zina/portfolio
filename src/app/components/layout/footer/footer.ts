@@ -44,11 +44,11 @@ export class Footer {
   readonly currentYear = signal(new Date().getFullYear());
 
   onFooterEnter() {
-    this.cursorService.setMenuOpen(true);
+    this.cursorService.setOverInverse(true);
   }
 
   onFooterLeave() {
-    this.cursorService.setMenuOpen(false);
+    this.cursorService.setOverInverse(false);
   }
 
   onNavClick(event: MouseEvent, url: string) {

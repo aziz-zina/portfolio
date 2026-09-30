@@ -55,22 +55,29 @@ export class CursorComponent implements AfterViewInit, OnDestroy {
   private hoverListeners: (() => void)[] = [];
 
   constructor() {
+    // Cursor colour per surface. Class sets (not inline colours) so a theme
+    // switch while hovering still repaints it correctly via the dark: variant.
+    const CURSOR = {
+      normal: { dot: ['bg-black', 'dark:bg-white'], ring: ['border-black', 'dark:border-white'] },
+      // Menu overlay is dark in both themes
+      menu: { dot: ['!bg-white'], ring: ['!border-white'] },
+      // Footer inverts the theme, so the cursor inverts with it
+      inverse: { dot: ['bg-white', 'dark:bg-black'], ring: ['border-white', 'dark:border-black'] },
+    };
+    const allDot = Object.values(CURSOR).flatMap((c) => c.dot);
+    const allRing = Object.values(CURSOR).flatMap((c) => c.ring);
+
     effect(() => {
-      const isMenuOpen = this.cursorService.isMenuOpen();
+      const mode = this.cursorService.isMenuOpen()
+        ? CURSOR.menu
+        : this.cursorService.isOverInverse()
+          ? CURSOR.inverse
+          : CURSOR.normal;
       if (isPlatformBrowser(this.platformId) && this.cursor?.nativeElement && this.follower?.nativeElement) {
-        if (isMenuOpen) {
-           this.cursor.nativeElement.classList.add('!bg-white');
-           this.cursor.nativeElement.classList.remove('bg-black', 'dark:bg-white');
-           
-           this.follower.nativeElement.classList.add('!border-white');
-           this.follower.nativeElement.classList.remove('border-black', 'dark:border-white');
-        } else {
-           this.cursor.nativeElement.classList.remove('!bg-white');
-           this.cursor.nativeElement.classList.add('bg-black', 'dark:bg-white');
-           
-           this.follower.nativeElement.classList.remove('!border-white');
-           this.follower.nativeElement.classList.add('border-black', 'dark:border-white');
-        }
+        this.cursor.nativeElement.classList.remove(...allDot);
+        this.cursor.nativeElement.classList.add(...mode.dot);
+        this.follower.nativeElement.classList.remove(...allRing);
+        this.follower.nativeElement.classList.add(...mode.ring);
       }
     });
   }
