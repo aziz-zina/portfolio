@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 570" width="1200" height="570" role="img" aria-labelledby="t d" font-family="'JetBrains Mono','IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace">
+<title id="t">How a DPoP proof is tied to the access token</title>
+<desc id="d">The proof JWT carries the public key in its jwk header and a hash of the access token in its ath claim. The access token carries the thumbprint of the same public key in cnf.jkt. The API accepts a request only when both links hold.</desc>
+<defs>
+  <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#3b82f6"/><stop offset="0.5" stop-color="#a855f7"/><stop offset="1" stop-color="#ef4444"/>
+  </linearGradient>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#fafafa"/></marker>
+  <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3b82f6"/></marker>
+  <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ef4444"/></marker>
+  <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#a1a1a1"/></marker>
+</defs>
+<rect x="0.5" y="0.5" width="1199" height="569" rx="16" fill="#0a0a0a" stroke="#2a2a2a"/>
+<line x1="153.60000000000002" y1="44" x2="185.60000000000002" y2="44" stroke="#3f3f46"/><line x1="454.4" y1="44" x2="486.4" y2="44" stroke="#3f3f46"/>
+<text x="320.0" y="48" font-size="14" fill="#a1a1a1" text-anchor="middle" font-weight="400" >DPoP proof (one per request)</text>
+<rect x="40" y="70" width="560" height="440" rx="10" fill="#171717" stroke="#2a2a2a" stroke-width="1"/>
+<text x="68" y="110" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="600" letter-spacing="1.5">HEADER</text>
+<text x="68" y="140" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"typ"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"dpop+jwt"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="68" y="166" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"alg"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"ES256"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="68" y="192" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"jwk"</tspan><tspan fill="#a1a1a1">: { </tspan><tspan fill="#93c5fd">"kty"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"EC"</tspan><tspan fill="#a1a1a1">, … }</tspan></text>
+<text x="572" y="192" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="400" >// public key</text>
+<line x1="40" y1="218" x2="600" y2="218" stroke="#2a2a2a"/>
+<text x="68" y="250" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="600" letter-spacing="1.5">PAYLOAD</text>
+<text x="68" y="280" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"htm"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"GET"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="572" y="280" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="400" >// HTTP method</text>
+<text x="68" y="306" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"htu"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"http://localhost:8081/api/orders"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="572" y="306" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="400" >// target URL</text>
+<text x="68" y="332" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"iat"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fafafa">1794838800</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="572" y="332" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="400" >// issued at</text>
+<text x="68" y="358" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"jti"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"b1f6c0c2-6c1e…"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="572" y="358" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="400" >// unique id</text>
+<text x="68" y="384" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"ath"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"fUHyO2r2Z3DZ…"</tspan></text>
+<text x="572" y="384" font-size="12" fill="#6b6b6b" text-anchor="end" font-weight="400" >// hash of the access token</text>
+<line x1="40" y1="410" x2="600" y2="410" stroke="#2a2a2a"/>
+<text x="68" y="442" font-size="11" fill="#6b6b6b" text-anchor="start" font-weight="600" letter-spacing="1.5">SIGNATURE</text>
+<text x="68" y="470" font-size="13" fill="#a1a1a1" text-anchor="start" font-weight="400" >signed with the private key in the browser</text>
+<line x1="882.4" y1="124" x2="914.4" y2="124" stroke="#3f3f46"/><line x1="1045.6" y1="124" x2="1077.6" y2="124" stroke="#3f3f46"/>
+<text x="980.0" y="128" font-size="14" fill="#a1a1a1" text-anchor="middle" font-weight="400" >access token</text>
+<rect x="800" y="150" width="360" height="290" rx="10" fill="#171717" stroke="#2a2a2a" stroke-width="1"/>
+<text x="828" y="198" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"iss"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">".../realms/demo"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="828" y="226" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"sub"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"5f1c…"</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="828" y="254" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"exp"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fafafa">1794839100</tspan><tspan fill="#a1a1a1">,</tspan></text>
+<text x="828" y="282" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">"cnf"</tspan><tspan fill="#a1a1a1">: {</tspan></text>
+<text x="828" y="310" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">  "jkt"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"0ZcOCORZNYy-DWpq…"</tspan></text>
+<text x="828" y="338" font-size="13" xml:space="preserve"><tspan fill="#a1a1a1">}</tspan></text>
+<rect x="816" y="291" width="328" height="28" rx="6" fill="#3b82f6" fill-opacity="0.10" stroke="#3b82f6" stroke-opacity="0.6"/>
+<text x="828" y="310" font-size="13" xml:space="preserve"><tspan fill="#93c5fd">  "jkt"</tspan><tspan fill="#a1a1a1">: </tspan><tspan fill="#fca5a5">"0ZcOCORZNYy-DWpq…"</tspan></text>
+<path d="M 606 188 C 710 188, 690 305, 810 305" fill="none" stroke="#3b82f6" stroke-width="1.5" marker-end="url(#arrowBlue)"/>
+<rect x="632" y="222" width="136" height="44" rx="8" fill="#0a0a0a" stroke="#3b82f6" stroke-opacity="0.5"/>
+<text x="700" y="240" font-size="12" fill="#fafafa" text-anchor="middle" font-weight="400" >thumbprint</text>
+<text x="700" y="257" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >must match</text>
+<defs><marker id="arrowP" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#a855f7"/></marker></defs>
+<path d="M 606 380 C 710 380, 690 400, 794 400" fill="none" stroke="#a855f7" stroke-width="1.5" marker-end="url(#arrowP)"/>
+<rect x="625" y="414" width="150" height="44" rx="8" fill="#0a0a0a" stroke="#a855f7" stroke-opacity="0.5"/>
+<text x="700" y="432" font-size="12" fill="#fafafa" text-anchor="middle" font-weight="400" >SHA-256</text>
+<text x="700" y="449" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >of the whole token</text>
+<text x="600.0" y="548" font-size="13" fill="#a1a1a1" text-anchor="middle" font-weight="400" >The API accepts the request only when both links hold.</text>
+</svg>

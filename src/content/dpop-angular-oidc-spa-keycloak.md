@@ -8,6 +8,7 @@ tags:
   - Angular
   - Keycloak
   - Spring Boot
+coverImage: blog/dpop/cover.png
 draft: true
 ---
 
@@ -20,6 +21,8 @@ An access token sent as `Authorization: Bearer ...` is exactly what the name say
 In a single-page app that matters, because the token lives in JavaScript. One XSS hole or one compromised npm dependency is enough to read it and send it somewhere else. From that moment the attacker can call your API from their own machine until the token expires, and nothing in your logs looks unusual.
 
 Short token lifetimes shrink that window. They do not close it.
+
+![Replaying a stolen token: with a bearer token the attacker gets a 200 from any machine, with a DPoP-bound token the API answers 401 because the attacker cannot produce a proof](/blog/dpop/bearer-vs-dpop.svg)
 
 ## What DPoP changes
 
@@ -45,28 +48,13 @@ A proof is only valid for one request. Its payload looks like this:
 
 `htm` and `htu` pin the proof to one HTTP method and one URL. `ath` is a hash of the access token it goes with. `iat` and `jti` let the server reject old or repeated proofs.
 
+![The DPoP proof carries the public key and a hash of the access token, and the access token carries the thumbprint of that public key in cnf.jkt](/blog/dpop/dpop-proof.svg)
+
 So a stolen token is no longer enough. Without the private key, the attacker cannot produce a proof.
 
 ## The whole flow
 
-```text
-Angular SPA (oidc-spa)            Keycloak                 Spring Boot API
-        |                            |                            |
-        | generate key pair          |                            |
-        |                            |                            |
-        | code + PKCE + DPoP proof   |                            |
-        |--------------------------->|                            |
-        |   access token, cnf.jkt =  |                            |
-        |   thumbprint of public key |                            |
-        |<---------------------------|                            |
-        |                                                         |
-        | Authorization: DPoP <token>                             |
-        | DPoP: <proof signed for this method + URL>              |
-        |-------------------------------------------------------->|
-        |                          verify signature, htm, htu,    |
-        |                          ath, and key == cnf.jkt        |
-        |<--------------------------------------------------------|
-```
+![Sequence of the DPoP flow: the Angular SPA generates a key pair, sends a proof to Keycloak with the authorization code, receives a token bound to its key, then calls the Spring Boot API with the token and a fresh proof](/blog/dpop/dpop-flow.svg)
 
 ## Step 1: Keycloak
 
