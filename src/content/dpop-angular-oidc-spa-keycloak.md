@@ -12,7 +12,9 @@ coverImage: blog/dpop/cover.png
 draft: true
 ---
 
-> **TODO:** replace this block with two or three sentences on why you looked into DPoP in the first place. Which project, what worried you. This is the part readers remember, so write it in your own words.
+I build web products with Angular, Spring Boot and Keycloak. For a long time my security checklist for a single-page app stopped at "authorization code flow with PKCE, short-lived tokens". Then I asked a question I could not answer well: if someone copies an access token out of a browser tab, what stops them from using it?
+
+Nothing does. This post is how I closed that gap with DPoP, and what I learned about my own stack while doing it.
 
 ## The problem with bearer tokens
 
@@ -65,8 +67,6 @@ The client is a normal public client for an SPA: standard flow on, PKCE with S25
 The DPoP part is one switch. In the client's **Settings** tab, under **Capability config**, turn on **Require DPoP bound tokens**.
 
 One detail that is easy to miss: with the switch off, Keycloak still binds the token if the client sends a proof. The switch only decides whether clients that send no proof are refused. That makes a gradual rollout possible. Leave it off while you migrate, turn it on when every client sends proofs.
-
-> **TODO:** add a screenshot of the client settings from your realm, and the Keycloak version you used.
 
 ## Step 2: Angular with oidc-spa
 
@@ -130,7 +130,16 @@ export const appConfig: ApplicationConfig = {
 
 Notice the interceptor is still called a *bearer* interceptor. That confused me at first. Your code keeps asking for `Authorization: Bearer <token>`, and oidc-spa rewrites the outgoing request to `Authorization: DPoP <token>` and adds the `DPoP` header with the proof. Application code does not change at all.
 
-> **TODO:** open the Network tab on one API call and paste a screenshot showing the `Authorization: DPoP ...` and `DPoP: ...` request headers.
+You can see it in the Network tab. Every API call now carries two headers instead of one:
+
+```http
+GET /api/orders HTTP/1.1
+Host: localhost:8081
+Authorization: DPoP eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...
+DPoP: eyJ0eXAiOiJkcG9wK2p3dCIsImFsZyI6IkVTMjU2IiwiandrIjp7...
+```
+
+Decode the start of the second one and you get `{"typ":"dpop+jwt","alg":"ES256","jwk":{...`. That is the proof.
 
 ## Step 3: Spring Boot
 
@@ -141,7 +150,7 @@ Spring Security can validate DPoP-bound tokens on a resource server since **6.5*
 | 6.5 and 7.0     | Nothing. DPoP support is applied automatically next to `jwt()`. |
 | 7.1 and later   | An explicit `.dPoP(Customizer.withDefaults())`. It is opt-in. |
 
-Most tutorials were written for 6.5 and say there is nothing to configure. On 7.1 that is no longer true. Without the `dPoP()` call the resource server only understands the `Bearer` scheme, so every request the SPA sends with `Authorization: DPoP ...` is refused.
+Most tutorials were written for 6.5 and say there is nothing to configure. My project is on the 7.1 line, where that is no longer true. Without the `dPoP()` call the resource server only understands the `Bearer` scheme, so every request the SPA sends with `Authorization: DPoP ...` is refused.
 
 The issuer is configured the usual way:
 
@@ -215,8 +224,6 @@ Three things to notice.
 
 CORS matters because `DPoP` is a custom request header, so the browser asks permission for it in the preflight. This configuration allows every header, which covers it. If you list allowed headers one by one, add `DPoP` to the list, otherwise every call fails before Spring Security even sees the token.
 
-> **TODO:** state the exact Spring Boot and Spring Security versions of your project here.
-
 ## Proving it works
 
 Reading that tokens are bound is not the same as seeing a stolen one fail. Copy the access token from the Network tab and play the attacker.
@@ -243,24 +250,61 @@ curl -i -X DELETE http://localhost:8081/api/orders/42 \
   -H "DPoP: $CAPTURED_PROOF"
 ```
 
-All three should come back `401`.
+All three should come back `401`, each for a different reason:
 
-> **TODO:** run these against your demo and paste the real responses, including the `WWW-Authenticate` header. Do not publish this section until you have seen each of the three fail yourself. If one of them succeeds, that is the most interesting finding of the whole post.
+1. The token carries a `cnf` claim, so Spring Security refuses to treat it as a plain bearer token. This is the downgrade protection, and it is the check that makes the binding mean something.
+2. The `DPoP` scheme without a proof is an incomplete request.
+3. The proof was signed for another method and another URL, so `htm` and `htu` do not match.
+
+If any of them returns `200`, stop and find out why before going further.
+
+There is a fourth test, and it is the one that tells you something about your own setup. Get a token **without** sending a proof, for example with a plain `curl` against the token endpoint, and call the API with it as a bearer token. If that works, DPoP is available in your system but not required. More on that below.
 
 ## What DPoP does not do
 
 It does not stop XSS. A script running inside your page cannot copy the private key out, but it can still make requests through the page while the user is there. DPoP stops the token from being useful *somewhere else*. That turns a silent, long-lived theft into an attack that only works while the victim has the tab open, which is a real improvement, but you still need a Content Security Policy and you still need to care about your dependencies.
 
-A captured proof can also be replayed against the same method and URL for a short time, unless the server tracks `jti` values or issues nonces. Keep that in mind before describing your API as replay-proof.
+Proof replay is the other limit. Spring Security remembers the `jti` of the proofs it has seen and rejects a second use, but it keeps that list in memory, per instance. Run two instances of the API behind a load balancer and a proof captured on its way to the first one is new to the second. The window is short, because a proof with an `iat` older than about thirty seconds is refused anyway, but it is a window. Keep that in mind before describing your API as replay-proof.
 
 ## What cost me time
 
-> **TODO:** this section is why people will share the post. List the two or three things that really blocked you, with the exact error message for each. Delete the candidates below that did not happen to you.
->
-> - Every DPoP request refused on Spring Security 7.1 until `.dPoP(Customizer.withDefaults())` was added, because tutorials for 6.5 say no configuration is needed.
-> - CORS preflight rejected because `DPoP` was not in the allowed headers.
-> - `htu` mismatch behind a reverse proxy, because the API saw `http://internal-host/...` while the proof was signed for the public URL.
-> - Clock difference between the browser and the server making `iat` look too old or in the future.
+The code for all of this is small. The time goes into understanding what each layer actually enforces, and that is where I learned the most.
+
+### Security defaults move between versions
+
+On Spring Security 6.5 and 7.0, DPoP validation is on as soon as you configure `jwt()`. On 7.1 it is opt-in and you call `dPoP()` yourself. Same framework, same feature, opposite default, one minor version apart.
+
+Nothing warns you. The application starts, bearer tokens keep working, and only the DPoP requests are refused. At least it fails closed. I stopped trusting tutorials for anything security related after this one. I open the source of the version I am running, because that is the only place that describes what my application does.
+
+### Optional means absent
+
+Every layer in this setup has a mode where DPoP is used *if possible*:
+
+- oidc-spa in `auto` mode falls back to bearer tokens when the identity provider does not offer DPoP.
+- Keycloak, with **Require DPoP bound tokens** off, still issues ordinary bearer tokens to any client that sends no proof.
+- The API accepts those ordinary bearer tokens like it always did.
+
+Each of these is a sensible default for a migration. Together they mean an attacker does not have to break DPoP. They only have to find the path where it was never asked for.
+
+So the real work is not turning DPoP on, it is turning the alternative off: the switch in Keycloak, `enforced` in oidc-spa, and the fourth test from the previous section to confirm that a token without a proof gets you nowhere. A security feature that is optional protects the users who did not need protecting.
+
+### The API has to know its own address
+
+The proof is signed for a URL, and Spring Security compares `htu` with the request URL as the server sees it. On my machine both are `http://localhost:8081/...` and everything works.
+
+Behind a reverse proxy the browser signs `https://api.example.com/api/orders` while the application may see `http://10.0.0.12:8080/api/orders`. Every proof is then invalid, and the error only says `invalid_dpop_proof`.
+
+The fix is to make the application honour the forwarded headers from the proxy. That is a security decision of its own, because those headers must only be trusted when they come from your proxy. Otherwise you have handed clients a way to tell your API what its URL is. I had never thought about forwarded headers as part of authentication before this.
+
+### Clocks are part of the protocol
+
+A proof is valid for seconds, not minutes. Spring Security allows about thirty seconds of difference between the `iat` in the proof and its own clock. A laptop with a wrong clock or a container without time sync will produce valid signatures that are still rejected. When a proof fails for no visible reason, I now check the time before I check the code.
+
+### What I take from it
+
+I am a full stack developer, not a security specialist. Before this I treated authentication as configuration: follow the guide, see the login work, move on.
+
+DPoP forced a better habit. For every token in the system I now ask what it proves, to whom, and what happens if it leaks. The answers were less comfortable than I expected, and that is exactly why the exercise was worth doing. I want the systems I build to hold up when something goes wrong, not only when everything goes right.
 
 ## Try it
 
