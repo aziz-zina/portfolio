@@ -134,7 +134,16 @@ Notice the interceptor is still called a *bearer* interceptor. That confused me 
 
 ## Step 3: Spring Boot
 
-Spring Security validates DPoP-bound tokens on resource servers since **6.5**, which ships with Spring Boot 3.5. If the API is already a JWT resource server, there is nothing DPoP specific to configure.
+Spring Security can validate DPoP-bound tokens on a resource server since **6.5**. How you switch it on depends on the version:
+
+| Spring Security | What you need |
+| --------------- | ------------- |
+| 6.5 and 7.0     | Nothing. DPoP support is applied automatically next to `jwt()`. |
+| 7.1 and later   | An explicit `.dPoP(Customizer.withDefaults())`. It is opt-in. |
+
+Most tutorials were written for 6.5 and say there is nothing to configure. On 7.1 that is no longer true. Without the `dPoP()` call the resource server only understands the `Bearer` scheme, so every request the SPA sends with `Authorization: DPoP ...` is refused.
+
+The issuer is configured the usual way:
 
 ```yaml
 # application.yml
@@ -146,38 +155,67 @@ spring:
           issuer-uri: http://localhost:8080/realms/demo
 ```
 
+And this is the security configuration, trimmed to the parts that matter here:
+
 ```java
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+@EnableMethodSecurity
+public class SecurityConfig {
 
-  @Bean
-  SecurityFilterChain api(HttpSecurity http) throws Exception {
-    http
-        .cors(Customizer.withDefaults())
-        .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
-    return http.build();
-  }
+    @Value("${application.cors.allowed-origins:*}")
+    private List<String> allowedOrigins;
 
-  @Bean
-  CorsConfigurationSource corsConfigurationSource() {
-    CorsConfiguration config = new CorsConfiguration();
-    config.setAllowedOrigins(List.of("http://localhost:4200"));
-    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-    // The browser sends a preflight for the custom DPoP header.
-    config.setAllowedHeaders(List.of("Authorization", "DPoP", "Content-Type"));
-    // Let the SPA read the challenge and a server-issued nonce.
-    config.setExposedHeaders(List.of("WWW-Authenticate", "DPoP-Nonce"));
+    @Bean
+    public SecurityFilterChain jwtAuthorizationSecurityFilterChain(HttpSecurity http) {
+        return http.cors(Customizer.withDefaults())
+                // no CSRF protection needed for token based authentication
+                .csrf(AbstractHttpConfigurer::disable)
+                // tokens are checked on every request, no session
+                .sessionManagement(
+                        session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        request -> {
+                            // let a failing endpoint answer with its own error
+                            // instead of turning every 500 into a 401
+                            request.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll();
+                            request.anyRequest().authenticated();
+                        })
+                .oauth2ResourceServer(
+                        oauth2 ->
+                                oauth2.jwt(
+                                                token ->
+                                                        token.jwtAuthenticationConverter(
+                                                                new KeycloakJwtAuthenticationConverter()))
+                                        // also accept tokens bound to a key of the client
+                                        // (DPoP, RFC 9449)
+                                        .dPoP(Customizer.withDefaults()))
+                .build();
+    }
 
-    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    source.registerCorsConfiguration("/**", config);
-    return source;
-  }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOriginPatterns(allowedOrigins);
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedMethods(List.of("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
 }
 ```
 
-The CORS part is the one place where DPoP does leak into the API configuration. `DPoP` is a custom request header, so the browser asks permission for it in the preflight. If it is missing from the allowed headers, every call fails before Spring Security even sees the token.
+Three things to notice.
+
+`jwt()` stays. DPoP does not replace JWT validation, it adds to it. The token is still verified against Keycloak's keys, and `KeycloakJwtAuthenticationConverter` is my own converter that maps Keycloak roles to Spring authorities. It keeps working unchanged for DPoP-bound tokens.
+
+`.dPoP(Customizer.withDefaults())` is the only DPoP specific line in the whole backend.
+
+CORS matters because `DPoP` is a custom request header, so the browser asks permission for it in the preflight. This configuration allows every header, which covers it. If you list allowed headers one by one, add `DPoP` to the list, otherwise every call fails before Spring Security even sees the token.
+
+> **TODO:** state the exact Spring Boot and Spring Security versions of your project here.
 
 ## Proving it works
 
@@ -219,6 +257,7 @@ A captured proof can also be replayed against the same method and URL for a shor
 
 > **TODO:** this section is why people will share the post. List the two or three things that really blocked you, with the exact error message for each. Delete the candidates below that did not happen to you.
 >
+> - Every DPoP request refused on Spring Security 7.1 until `.dPoP(Customizer.withDefaults())` was added, because tutorials for 6.5 say no configuration is needed.
 > - CORS preflight rejected because `DPoP` was not in the allowed headers.
 > - `htu` mismatch behind a reverse proxy, because the API saw `http://internal-host/...` while the proof was signed for the public URL.
 > - Clock difference between the browser and the server making `iat` look too old or in the future.
@@ -227,4 +266,4 @@ A captured proof can also be replayed against the same method and URL for a shor
 
 > **TODO:** link the demo repository here (docker-compose with Keycloak and a realm import, the Angular app, the Spring Boot API).
 
-If you run a SPA against Keycloak today, the cost of trying this is one switch in the admin console, a few lines in `main.ts` and one CORS header.
+If you run a SPA against Keycloak today, the cost of trying this is one switch in the admin console, a few lines in `main.ts` and one line in your security configuration.
