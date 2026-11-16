@@ -40,6 +40,9 @@ export default defineConfig(({ mode }) => {
                 "shell",
                 "text",
                 "python",
+                "java",
+                "yaml",
+                "http",
               ],
               themes: ["github-dark", "github-light"],
             },
@@ -87,6 +90,10 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       "import.meta.vitest": mode !== "production",
+      // Draft posts are visible in dev and on Vercel preview deployments only.
+      __SHOW_DRAFTS__: JSON.stringify(
+        mode !== "production" || process.env["VERCEL_ENV"] === "preview",
+      ),
     },
   };
 });

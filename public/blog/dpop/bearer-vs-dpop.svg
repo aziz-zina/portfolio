@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" role="img" aria-labelledby="t d" font-family="'JetBrains Mono','IBM Plex Mono',ui-monospace,'SF Mono',Menlo,Consolas,'DejaVu Sans Mono',monospace">
+<title id="t">Replaying a stolen token: bearer versus DPoP</title>
+<desc id="d">With a bearer token, an attacker who copies the token can call the API from anywhere and gets a 200. With a DPoP-bound token the attacker cannot produce a proof without the private key, so the API answers 401.</desc>
+<defs>
+  <linearGradient id="grad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#3b82f6"/><stop offset="0.5" stop-color="#a855f7"/><stop offset="1" stop-color="#ef4444"/>
+  </linearGradient>
+  <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#fafafa"/></marker>
+  <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#3b82f6"/></marker>
+  <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ef4444"/></marker>
+  <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#a1a1a1"/></marker>
+</defs>
+<rect x="0.5" y="0.5" width="1199" height="519" rx="16" fill="#0a0a0a" stroke="#2a2a2a"/>
+<rect x="40" y="30" width="550" height="460" rx="14" fill="#0f0f0f" stroke="#2a2a2a" stroke-width="1"/>
+<line x1="217.4" y1="70" x2="249.4" y2="70" stroke="#3f3f46"/><line x1="380.6" y1="70" x2="412.6" y2="70" stroke="#3f3f46"/>
+<text x="315" y="74" font-size="14" fill="#a1a1a1" text-anchor="middle" font-weight="400" >bearer token</text>
+<rect x="80" y="110" width="150" height="76" rx="10" fill="#171717" stroke="#ef4444" stroke-width="1"/>
+<text x="155" y="143" font-size="15" fill="#fafafa" text-anchor="middle" font-weight="600" >Attacker</text>
+<text x="155" y="165" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >any machine</text>
+<rect x="400" y="110" width="150" height="76" rx="10" fill="#171717" stroke="#2a2a2a" stroke-width="1"/>
+<text x="475" y="143" font-size="15" fill="#fafafa" text-anchor="middle" font-weight="600" >Your API</text>
+<text x="475" y="165" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >Spring Boot</text>
+<line x1="236" y1="148" x2="392" y2="148" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+<text x="315" y="138" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >replay</text>
+<rect x="80" y="222" width="470" height="70" rx="8" fill="#0a0a0a" stroke="#333" stroke-width="1"/>
+<text x="100" y="252" font-size="13" fill="#a1a1a1" text-anchor="start" font-weight="400" >GET /api/orders</text>
+<text x="100" y="276" font-size="13" fill="#fafafa" text-anchor="start" font-weight="400" >Authorization: Bearer &lt;stolen token&gt;</text>
+<rect x="165" y="326" width="300" height="46" rx="23" fill="#ef4444" fill-opacity="0.12" stroke="#ef4444"/>
+<text x="315" y="355" font-size="15" fill="#ef4444" text-anchor="middle" font-weight="600" >200 OK</text>
+<text x="315" y="408" font-size="13" fill="#a1a1a1" text-anchor="middle" font-weight="400" >The token is all the API asks for.</text>
+<text x="315" y="430" font-size="13" fill="#a1a1a1" text-anchor="middle" font-weight="400" >It works from anywhere until it expires.</text>
+<rect x="610" y="30" width="550" height="460" rx="14" fill="#0f0f0f" stroke="#2a2a2a" stroke-width="1"/>
+<line x1="770.2" y1="70" x2="802.2" y2="70" stroke="#3f3f46"/><line x1="967.8" y1="70" x2="999.8" y2="70" stroke="#3f3f46"/>
+<text x="885" y="74" font-size="14" fill="#a1a1a1" text-anchor="middle" font-weight="400" >DPoP-bound token</text>
+<rect x="650" y="110" width="150" height="76" rx="10" fill="#171717" stroke="#ef4444" stroke-width="1"/>
+<text x="725" y="143" font-size="15" fill="#fafafa" text-anchor="middle" font-weight="600" >Attacker</text>
+<text x="725" y="165" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >any machine</text>
+<rect x="970" y="110" width="150" height="76" rx="10" fill="#171717" stroke="#2a2a2a" stroke-width="1"/>
+<text x="1045" y="143" font-size="15" fill="#fafafa" text-anchor="middle" font-weight="600" >Your API</text>
+<text x="1045" y="165" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >Spring Boot</text>
+<line x1="806" y1="148" x2="962" y2="148" stroke="#ef4444" stroke-width="1.5" marker-end="url(#arrowRed)"/>
+<text x="885" y="138" font-size="12" fill="#a1a1a1" text-anchor="middle" font-weight="400" >replay</text>
+<rect x="650" y="222" width="470" height="94" rx="8" fill="#0a0a0a" stroke="#333" stroke-width="1"/>
+<text x="670" y="252" font-size="13" fill="#a1a1a1" text-anchor="start" font-weight="400" >GET /api/orders</text>
+<text x="670" y="276" font-size="13" fill="#fafafa" text-anchor="start" font-weight="400" >Authorization: DPoP &lt;stolen token&gt;</text>
+<text x="670" y="300" font-size="13" fill="#ef4444" text-anchor="start" font-weight="400" >DPoP: ???  no private key, no proof</text>
+<rect x="735" y="350" width="300" height="46" rx="23" fill="#34d399" fill-opacity="0.12" stroke="#34d399"/>
+<text x="885" y="379" font-size="15" fill="#34d399" text-anchor="middle" font-weight="600" >401 Unauthorized</text>
+<text x="885" y="432" font-size="13" fill="#a1a1a1" text-anchor="middle" font-weight="400" >The API also wants a proof signed by the</text>
+<text x="885" y="454" font-size="13" fill="#a1a1a1" text-anchor="middle" font-weight="400" >browser's key, which the attacker never had.</text>
+</svg>

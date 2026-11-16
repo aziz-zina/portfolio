@@ -1,6 +1,5 @@
 import {
   injectContent,
-  injectContentFiles,
   MarkdownComponent,
 } from '@analogjs/content';
 import { RouteMeta } from '@analogjs/router';
@@ -29,6 +28,7 @@ import { HlmSkeletonImports } from '@spartan-ng/helm/skeleton';
 import { ReadTimePipe } from '../../components/pipes/read-time.pipe';
 import { ReadingProgress } from '../../components/reading-progress/reading-progress';
 import { ShareButton } from '../../components/share-button/share-button';
+import { injectBlogPosts } from '../../lib/blog/blog-posts';
 import { ContentMetadata } from '../../lib/content-metadata/content-metadata';
 import {
   postMetaResolver,
@@ -43,7 +43,7 @@ export const routeMeta: RouteMeta = {
     (route) => {
       const router = inject(Router);
       const slug = route.params['slug'];
-      const fileExists = injectContentFiles<ContentMetadata>().some(
+      const fileExists = injectBlogPosts().some(
         (contentFile) =>
           contentFile.slug === slug ||
           contentFile.filename.endsWith(`/${slug}.md`)

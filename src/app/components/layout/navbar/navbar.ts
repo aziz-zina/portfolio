@@ -251,6 +251,7 @@ export class Navbar implements OnInit, AfterViewInit, OnDestroy {
     { label: "About", link: "#about" },
     { label: "Experience", link: "#experience" },
     { label: "Projects", link: "#projects" },
+    { label: "Blogs", link: "#blogs" },
     { label: "Contact Me", link: "#contact" },
   ];
 

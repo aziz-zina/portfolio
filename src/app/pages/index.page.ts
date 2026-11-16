@@ -22,7 +22,7 @@ import Projects from "../components/home/project/project.page";
     <app-about-me />
     <app-experience />
     <app-projects />
-    <!-- <app-featured-blogs /> -->
+    <app-featured-blogs />
     <app-contact />
   `,
 })

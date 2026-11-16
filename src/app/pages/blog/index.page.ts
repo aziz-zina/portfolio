@@ -1,7 +1,6 @@
-import { injectContentFiles } from '@analogjs/content';
 import { Component } from '@angular/core';
 import { BlogPreview } from '../../components/blog/blog-preview/blog-preview';
-import { ContentMetadata } from '../../lib/content-metadata/content-metadata';
+import { injectBlogPosts } from '../../lib/blog/blog-posts';
 
 @Component({
   selector: 'app-blog',
@@ -31,5 +30,5 @@ import { ContentMetadata } from '../../lib/content-metadata/content-metadata';
   `,
 })
 export default class Blog {
-  readonly articles = injectContentFiles<ContentMetadata>();
+  readonly articles = injectBlogPosts();
 }

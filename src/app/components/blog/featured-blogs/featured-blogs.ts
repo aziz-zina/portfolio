@@ -1,37 +1,40 @@
-import { injectContentFiles } from '@analogjs/content';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ContentMetadata } from '../../../lib/content-metadata/content-metadata';
+import { RouterLink } from '@angular/router';
+import { HlmButtonImports } from '@spartan-ng/helm/button';
+import { injectBlogPosts } from '../../../lib/blog/blog-posts';
+import { SectionTitle } from '../../../shared/components/section-title/section-title';
 import { FeaturedBlogPreview } from '../featured-blog-preview/featured-blog-preview';
 
 @Component({
   selector: 'app-featured-blogs',
-  imports: [FeaturedBlogPreview],
-  host: {
-    class: 'block max-w-7xl mx-auto px-4 py-16 sm:px-6 lg:px-8 ',
-  },
+  imports: [FeaturedBlogPreview, SectionTitle, RouterLink, HlmButtonImports],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: ` <!-- Section Header -->
-    <div class="text-center space-y-4">
-      <div
-        class="inline-flex items-center gap-2 text-lg font-mono text-zinc-600 dark:text-zinc-400"
-      >
-        <span class="w-8 h-px bg-zinc-300 dark:bg-zinc-700"></span>
-        <span> Featured Posts </span>
-        <span class="w-8 h-px bg-zinc-300 dark:bg-zinc-700"></span>
+  template: `
+    <section class="relative w-full bg-background z-10 py-24" id="blogs">
+      <div class="max-w-7xl mx-auto px-6 pb-16 relative z-10">
+        <app-section-title title="Blogs" />
       </div>
-    </div>
 
-    <div
-      class="mt-6 w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"
-    >
-      @for(article of articles; track article.slug){
-      <app-featured-blog-preview [article]="article" />
+      <div class="max-w-7xl mx-auto px-6 relative z-10">
+        @if (articles.length > 0) {
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @for (article of articles; track article.slug) {
+              <app-featured-blog-preview [article]="article" />
+            }
+          </div>
 
-      }
-    </div>`,
+          <div class="flex justify-center mt-16">
+            <a hlmBtn variant="outline" routerLink="/blog"> View All Posts </a>
+          </div>
+        } @else {
+          <p class="text-center font-mono text-sm text-muted-foreground">
+            First post coming soon.
+          </p>
+        }
+      </div>
+    </section>
+  `,
 })
 export class FeaturedBlogs {
-  public articles = injectContentFiles<ContentMetadata>()
-    .reverse()
-    .filter((_, i) => i < 3);
+  readonly articles = injectBlogPosts().slice(0, 3);
 }

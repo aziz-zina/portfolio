@@ -30,7 +30,7 @@ import { ContentMetadata } from '../../../lib/content-metadata/content-metadata'
   template: `
     @if(article(); as article){
 
-    <article>
+    <article class="flex w-full">
       <a
         hlmCard
         class="
