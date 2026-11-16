@@ -1,6 +1,5 @@
-import { injectContentFiles } from '@analogjs/content';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { ContentMetadata } from '../../../lib/content-metadata/content-metadata';
+import { injectBlogPosts } from '../../../lib/blog/blog-posts';
 import { FeaturedBlogPreview } from '../featured-blog-preview/featured-blog-preview';
 
 @Component({
@@ -31,7 +30,5 @@ import { FeaturedBlogPreview } from '../featured-blog-preview/featured-blog-prev
     </div>`,
 })
 export class FeaturedBlogs {
-  public articles = injectContentFiles<ContentMetadata>()
-    .reverse()
-    .filter((_, i) => i < 3);
+  public articles = injectBlogPosts().slice(0, 3);
 }

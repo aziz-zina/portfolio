@@ -43,7 +43,9 @@ export const routeMeta: RouteMeta = {
     (route) => {
       const router = inject(Router);
       const slug = route.params['slug'];
-      const fileExists = injectContentFiles<ContentMetadata>().some(
+      const fileExists = injectContentFiles<ContentMetadata>(
+        (file) => !file.filename.includes('/projects/')
+      ).some(
         (contentFile) =>
           contentFile.slug === slug ||
           contentFile.filename.endsWith(`/${slug}.md`)
