@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1060" width="1200" height="1060" role="img" aria-labelledby="t d">
+<title id="t">MCP authorization flow between an MCP client, a Spring AI MCP server and Keycloak</title>
+<desc id="d">The MCP client calls the server without a token and gets a 401 pointing to the protected resource metadata. It reads that metadata to find Keycloak, discovers and registers with Keycloak, logs the user in with the authorization code flow and PKCE, and receives an access token whose audience is the MCP server and which carries the user's roles. It then calls the tool with the token, and the server checks issuer, audience and role before running it.</desc>
+<style>
+svg{--frame:#fafafa;--frame-line:#e5e5e5;--card:#ffffff;--line:#e5e5e5;--code:#f5f5f5;--fg:#171717;--muted:#737373;--subtle:#a3a3a3;--life:#d4d4d4;--acc:#2563eb;--acc-bg:#eff6ff;--acc-line:#bfdbfe;--red:#dc2626;--red-bg:#fef2f2;--green:#15803d;--green-bg:#f0fdf4}
+@media (prefers-color-scheme: dark){svg{--frame:#111111;--frame-line:#262626;--card:#1a1a1a;--line:#2e2e2e;--code:#141414;--fg:#f5f5f5;--muted:#a3a3a3;--subtle:#737373;--life:#3a3a3a;--acc:#60a5fa;--acc-bg:#16233d;--acc-line:#1e3a8a;--red:#f87171;--red-bg:#2b1515;--green:#4ade80;--green-bg:#122318}}
+text{font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;fill:var(--fg)}
+.mono{font-family:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,'Liberation Mono',monospace}
+.muted{fill:var(--muted)}.subtle{fill:var(--subtle)}.acc{fill:var(--acc)}.red{fill:var(--red)}.green{fill:var(--green)}
+.frame{fill:var(--frame);stroke:var(--frame-line)}
+.card{fill:var(--card);stroke:var(--line)}
+.node{fill:var(--frame);stroke:var(--line)}
+.code{fill:var(--code);stroke:var(--line)}
+.hl{fill:var(--acc-bg);stroke:var(--acc-line)}
+.divider{stroke:var(--line)}
+.life{stroke:var(--life);stroke-dasharray:4 4}
+.req{stroke:var(--fg);fill:none}
+.res{stroke:var(--muted);fill:none;stroke-dasharray:6 5}
+.link{stroke:var(--acc);fill:none}
+.mk-fg{stroke:var(--fg)}.mk-muted{stroke:var(--muted)}.mk-acc{stroke:var(--acc)}
+.badge{fill:var(--fg)}.badge-text{fill:var(--card)}
+.chip-red{fill:var(--red-bg)}.chip-green{fill:var(--green-bg)}
+.label-bg{fill:var(--frame)}
+</style>
+<defs><marker id="h-fg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.5 1.5L9 5L1.5 8.5" fill="none" class="mk-fg" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="h-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.5 1.5L9 5L1.5 8.5" fill="none" class="mk-muted" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="h-acc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="11" markerHeight="11" markerUnits="userSpaceOnUse" orient="auto"><path d="M1.5 1.5L9 5L1.5 8.5" fill="none" class="mk-acc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<rect x="0.5" y="0.5" width="1199" height="1059" rx="12" class="frame"/>
+<line x1="200" y1="100" x2="200" y2="1030" class="life" stroke-width="1"/>
+<line x1="600" y1="100" x2="600" y2="1030" class="life" stroke-width="1"/>
+<line x1="1000" y1="100" x2="1000" y2="1030" class="life" stroke-width="1"/>
+<rect x="90" y="40" width="220" height="60" rx="8" class="card"/>
+<text x="200" y="66" font-size="15" font-weight="600" text-anchor="middle" xml:space="preserve">MCP client</text>
+<text x="200" y="86" font-size="12" class="muted" text-anchor="middle" xml:space="preserve">Claude, MCP Inspector</text>
+<rect x="490" y="40" width="220" height="60" rx="8" class="card"/>
+<text x="600" y="66" font-size="15" font-weight="600" text-anchor="middle" xml:space="preserve">Spring AI MCP server</text>
+<text x="600" y="86" font-size="12" class="muted" text-anchor="middle" xml:space="preserve">resource server</text>
+<rect x="890" y="40" width="220" height="60" rx="8" class="card"/>
+<text x="1000" y="66" font-size="15" font-weight="600" text-anchor="middle" xml:space="preserve">Keycloak</text>
+<text x="1000" y="86" font-size="12" class="muted" text-anchor="middle" xml:space="preserve">authorization server</text>
+<circle cx="236" cy="150" r="11" class="badge"/><text x="236" y="154.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">1</text>
+<text x="256" y="155" font-size="14" font-weight="600" xml:space="preserve">Call a tool, no token</text>
+<text x="224" y="177" font-size="13" class="mono" xml:space="preserve"><tspan>POST /mcp</tspan></text>
+<line x1="200" y1="197" x2="597" y2="197" class="req" stroke-width="1.5" marker-end="url(#h-fg)"/>
+<circle cx="236" cy="245" r="11" class="badge"/><text x="236" y="249.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">2</text>
+<text x="256" y="250" font-size="14" font-weight="600" class="red" xml:space="preserve">401 Unauthorized</text>
+<text x="224" y="272" font-size="13" class="mono" xml:space="preserve"><tspan>WWW-Authenticate: Bearer</tspan></text>
+<text x="224" y="294" font-size="13" class="mono" xml:space="preserve"><tspan class="acc">resource_metadata</tspan><tspan>="…/oauth-protected-resource"</tspan></text>
+<line x1="600" y1="314" x2="203" y2="314" class="res" stroke-width="1.5" marker-end="url(#h-muted)"/>
+<circle cx="236" cy="362" r="11" class="badge"/><text x="236" y="366.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">3</text>
+<text x="256" y="367" font-size="14" font-weight="600" xml:space="preserve">Read the protected resource metadata</text>
+<text x="224" y="389" font-size="13" class="mono" xml:space="preserve"><tspan>GET /.well-known/oauth-protected-resource</tspan></text>
+<line x1="200" y1="407" x2="597" y2="407" class="req" stroke-width="1.5" marker-end="url(#h-fg)"/>
+<text x="224" y="433" font-size="13" class="mono" xml:space="preserve"><tspan class="acc">authorization_servers</tspan><tspan>: [ …/realms/fleet ]</tspan></text>
+<line x1="600" y1="451" x2="203" y2="451" class="res" stroke-width="1.5" marker-end="url(#h-muted)"/>
+<circle cx="236" cy="500" r="11" class="badge"/><text x="236" y="504.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">4</text>
+<text x="256" y="505" font-size="14" font-weight="600" xml:space="preserve">Discover Keycloak and register the client</text>
+<text x="224" y="527" font-size="13" class="mono" xml:space="preserve"><tspan>GET /.well-known/openid-configuration · POST /register</tspan></text>
+<line x1="200" y1="547" x2="997" y2="547" class="req" stroke-width="1.5" marker-end="url(#h-fg)"/>
+<circle cx="236" cy="595" r="11" class="badge"/><text x="236" y="599.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">5</text>
+<text x="256" y="600" font-size="14" font-weight="600" xml:space="preserve">User logs in to Keycloak</text>
+<text x="224" y="622" font-size="13" class="mono" xml:space="preserve"><tspan>code + PKCE + </tspan><tspan class="acc">resource</tspan><tspan>=http://localhost:8090/mcp</tspan></text>
+<line x1="200" y1="642" x2="997" y2="642" class="req" stroke-width="1.5" marker-end="url(#h-fg)"/>
+<circle cx="236" cy="690" r="11" class="badge"/><text x="236" y="694.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">6</text>
+<text x="256" y="695" font-size="14" font-weight="600" xml:space="preserve">Access token for this server and this user</text>
+<text x="224" y="717" font-size="13" class="mono" xml:space="preserve"><tspan class="acc">aud</tspan><tspan> = http://localhost:8090/mcp    </tspan><tspan class="acc">roles</tspan><tspan> = [fleet-viewer]</tspan></text>
+<line x1="1000" y1="737" x2="203" y2="737" class="res" stroke-width="1.5" marker-end="url(#h-muted)"/>
+<circle cx="236" cy="785" r="11" class="badge"/><text x="236" y="789.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">7</text>
+<text x="256" y="790" font-size="14" font-weight="600" xml:space="preserve">Call the tool</text>
+<text x="224" y="812" font-size="13" class="mono" xml:space="preserve"><tspan>Authorization: Bearer &lt;access token&gt;</tspan></text>
+<line x1="200" y1="832" x2="597" y2="832" class="req" stroke-width="1.5" marker-end="url(#h-fg)"/>
+<rect x="430" y="862" width="340" height="98" rx="8" class="card"/>
+<circle cx="454" cy="886" r="11" class="badge"/><text x="454" y="890.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">8</text>
+<text x="474" y="891" font-size="14" font-weight="600" xml:space="preserve">Verify, then run the tool</text>
+<text x="454" y="918" font-size="13" class="mono muted" xml:space="preserve"><tspan>issuer, signature, expiry</tspan></text>
+<text x="454" y="940" font-size="13" class="mono" xml:space="preserve"><tspan class="acc">aud</tspan><tspan class="muted"> == this server · </tspan><tspan class="acc">hasRole(…)</tspan></text>
+<circle cx="236" cy="992" r="11" class="badge"/><text x="236" y="996.5" font-size="12" class="badge-text" font-weight="600" text-anchor="middle" xml:space="preserve">9</text>
+<text x="256" y="997" font-size="14" font-weight="600" class="green" xml:space="preserve">Tool result</text>
+<line x1="600" y1="1014" x2="203" y2="1014" class="res" stroke-width="1.5" marker-end="url(#h-muted)"/>
+</svg>
